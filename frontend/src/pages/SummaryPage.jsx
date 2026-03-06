@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {
     FileText, Loader2, Sparkles, Check, ChevronDown, Search, X,
     Users, Clock, Calendar, CheckCircle2, AlertTriangle, BarChart2,
     TrendingUp, MessageSquare, Target, Zap, ShieldCheck, Copy,
-    Save, Trash2, Pencil, ArrowLeft, FolderOpen, Send, User
+    Save, Trash2, Pencil, ArrowLeft, FolderOpen, Send, User,
+    Plus, Filter, LayoutGrid
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -17,11 +18,12 @@ const SummaryPage = () => {
     const [loading, setLoading] = useState(true);
     const [selectedMeetings, setSelectedMeetings] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [dropdownOpen, setDropdownOpen] = useState(false);
     const [generating, setGenerating] = useState(false);
     const [summary, setSummary] = useState(null);
     const [error, setError] = useState(null);
     const [copied, setCopied] = useState(null);
+    const [activeTab, setActiveTab] = useState('create'); // 'create' | 'saved'
+    const [quickFilter, setQuickFilter] = useState('all'); // 'all' | 'week' | 'month'
 
     // Saved summaries state
     const [savedSummaries, setSavedSummaries] = useState([]);
@@ -83,22 +85,35 @@ const SummaryPage = () => {
         setSelectedMeetings(prev => prev.filter(id => id !== meetingId));
     };
 
+    const filteredMeetings = useMemo(() => {
+        const now = new Date();
+        return meetings.filter(m => {
+            const query = searchQuery.toLowerCase();
+            const matchesSearch = (m.meetingName || '').toLowerCase().includes(query) ||
+                (m.topic || '').toLowerCase().includes(query) ||
+                (m.meetingLink || '').toLowerCase().includes(query);
+
+            if (!matchesSearch) return false;
+
+            if (quickFilter === 'week') {
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return new Date(m.createdAt) >= weekAgo;
+            }
+            if (quickFilter === 'month') {
+                const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                return new Date(m.createdAt) >= monthAgo;
+            }
+            return true;
+        });
+    }, [meetings, searchQuery, quickFilter]);
+
     const selectAll = () => {
-        if (selectedMeetings.length === filteredMeetings.length) {
+        if (selectedMeetings.length === filteredMeetings.length && filteredMeetings.length > 0) {
             setSelectedMeetings([]);
         } else {
             setSelectedMeetings(filteredMeetings.map(m => m._id));
         }
     };
-
-    const filteredMeetings = meetings.filter(m => {
-        const query = searchQuery.toLowerCase();
-        return (
-            (m.meetingName || '').toLowerCase().includes(query) ||
-            (m.topic || '').toLowerCase().includes(query) ||
-            (m.meetingLink || '').toLowerCase().includes(query)
-        );
-    });
 
     const generateAutoName = () => {
         const selected = meetings.filter(m => selectedMeetings.includes(m._id));
@@ -208,6 +223,8 @@ const SummaryPage = () => {
         setViewingSaved(false);
         setSelectedMeetings([]);
         setSummaryName('');
+        setChatHistory([]);
+        setChatOpen(false);
     };
 
     const handleCopy = (text, key) => {
@@ -255,6 +272,18 @@ const SummaryPage = () => {
         });
     };
 
+    const getRelativeTime = (dateStr) => {
+        if (!dateStr) return '';
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 60) return `${mins}m ago`;
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days}d ago`;
+        return formatDate(dateStr);
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -263,268 +292,384 @@ const SummaryPage = () => {
         );
     }
 
+    // ─── HOME VIEW (no summary being viewed) ───
+    const showHome = !summary && !generating;
+
     return (
         <div className="min-h-screen bg-[#0B0E14]">
-            <div className="max-w-7xl mx-auto px-6 py-10">
-                {/* Header */}
-                <div className="mb-10 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        {(summary || viewingSaved) && (
-                            <button
-                                onClick={handleBackToList}
-                                className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-colors"
-                            >
-                                <ArrowLeft size={20} />
-                            </button>
-                        )}
-                        <div>
-                            <h1 className="text-4xl font-bold text-white mb-2">Combined Summary</h1>
-                            <p className="text-slate-400">Select multiple meetings and generate a comprehensive combined analysis</p>
+            <div className="max-w-7xl mx-auto px-6 py-8">
+                {/* ═══════════ Header ═══════════ */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            {(summary || viewingSaved) && (
+                                <button
+                                    onClick={handleBackToList}
+                                    className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all border border-white/5 hover:border-white/10"
+                                >
+                                    <ArrowLeft size={18} />
+                                </button>
+                            )}
+                            <div>
+                                <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                                    <div className="p-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                                        <Sparkles size={22} className="text-emerald-400" />
+                                    </div>
+                                    AI Summary
+                                </h1>
+                                <p className="text-slate-500 text-sm mt-1.5 ml-[52px]">
+                                    {summary ? summaryName : 'Generate combined insights from your meetings'}
+                                </p>
+                            </div>
                         </div>
+
+                        {/* Quick Stats (only on home) */}
+                        {showHome && (
+                            <div className="hidden md:flex items-center gap-3">
+                                <div className="flex items-center gap-2 px-3 py-2 bg-[#1C1F2E] rounded-xl border border-white/5 text-xs">
+                                    <FileText size={14} className="text-cyan-400" />
+                                    <span className="text-slate-400">{meetings.length} meetings</span>
+                                </div>
+                                <div className="flex items-center gap-2 px-3 py-2 bg-[#1C1F2E] rounded-xl border border-white/5 text-xs">
+                                    <FolderOpen size={14} className="text-purple-400" />
+                                    <span className="text-slate-400">{savedSummaries.length} saved</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Saved Summaries Grid */}
-                {!summary && !generating && (
+                {/* ═══════════ HOME VIEW ═══════════ */}
+                {showHome && (
                     <>
-                        {savedSummaries.length > 0 && (
-                            <div className="mb-8">
-                                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                                    <FolderOpen size={20} className="text-slate-400" />
-                                    Saved Summaries
-                                </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {savedSummaries.map((saved) => (
-                                        <motion.div
-                                            key={saved._id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-5 hover:border-emerald-500/30 transition-all group cursor-pointer"
-                                            onClick={() => handleOpenSaved(saved)}
+                        {/* Tab Navigation */}
+                        <div className="flex items-center gap-1 bg-[#1C1F2E] rounded-xl p-1 mb-6 w-fit border border-white/5">
+                            <button
+                                onClick={() => setActiveTab('create')}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                    activeTab === 'create'
+                                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                <Plus size={16} />
+                                Create New
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('saved')}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                    activeTab === 'saved'
+                                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                <FolderOpen size={16} />
+                                Saved
+                                {savedSummaries.length > 0 && (
+                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                                        activeTab === 'saved' ? 'bg-white/20 text-white' : 'bg-white/10 text-slate-400'
+                                    }`}>
+                                        {savedSummaries.length}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+
+                        {/* ── CREATE NEW TAB ── */}
+                        {activeTab === 'create' && !viewingSaved && (
+                            <div className="space-y-5">
+                                {/* Search & Filters Bar */}
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                                    <div className="relative flex-1">
+                                        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                                        <input
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder="Search meetings by name or topic..."
+                                            className="w-full bg-[#1C1F2E] border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/30 placeholder:text-slate-600 transition-colors"
+                                        />
+                                        {searchQuery && (
+                                            <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                                                <X size={14} />
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {[
+                                            { key: 'all', label: 'All' },
+                                            { key: 'week', label: 'This Week' },
+                                            { key: 'month', label: 'This Month' },
+                                        ].map(f => (
+                                            <button
+                                                key={f.key}
+                                                onClick={() => setQuickFilter(f.key)}
+                                                className={`px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all border ${
+                                                    quickFilter === f.key
+                                                        ? 'bg-emerald-600/15 border-emerald-500/30 text-emerald-400'
+                                                        : 'bg-[#1C1F2E] border-white/5 text-slate-400 hover:text-white hover:border-white/10'
+                                                }`}
+                                            >
+                                                {f.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Selection Actions Bar */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={selectAll}
+                                            className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white bg-[#1C1F2E] hover:bg-white/10 rounded-lg border border-white/5 transition-all"
                                         >
-                                            <div className="flex items-start justify-between mb-3">
-                                                <div className="flex-1 min-w-0">
-                                                    {editingNameId === saved._id ? (
-                                                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                                            <input
-                                                                type="text"
-                                                                value={editNameValue}
-                                                                onChange={(e) => setEditNameValue(e.target.value)}
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter') handleRenameSaved(saved._id);
-                                                                    if (e.key === 'Escape') setEditingNameId(null);
-                                                                }}
-                                                                autoFocus
-                                                                className="w-full bg-[#0B0E14] border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500/50"
-                                                            />
-                                                            <button
-                                                                onClick={() => handleRenameSaved(saved._id)}
-                                                                className="p-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 transition-colors"
-                                                            >
-                                                                <Check size={14} />
-                                                            </button>
+                                            {selectedMeetings.length === filteredMeetings.length && filteredMeetings.length > 0 ? (
+                                                <><X size={12} /> Deselect All</>
+                                            ) : (
+                                                <><CheckCircle2 size={12} /> Select All</>
+                                            )}
+                                        </button>
+                                        <span className="text-xs text-slate-600">
+                                            {filteredMeetings.length} meeting{filteredMeetings.length !== 1 ? 's' : ''} available
+                                        </span>
+                                    </div>
+
+                                    {selectedMeetings.length > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.95 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            className="flex items-center gap-3"
+                                        >
+                                            <span className="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                                                {selectedMeetings.length} selected
+                                            </span>
+                                            <button
+                                                onClick={() => setSelectedMeetings([])}
+                                                className="text-xs text-slate-500 hover:text-white transition-colors"
+                                            >
+                                                Clear
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </div>
+
+                                {/* Meeting Cards Grid */}
+                                {filteredMeetings.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        {filteredMeetings.map((meeting) => {
+                                            const isSelected = selectedMeetings.includes(meeting._id);
+                                            return (
+                                                <motion.button
+                                                    key={meeting._id}
+                                                    onClick={() => toggleMeeting(meeting._id)}
+                                                    layout
+                                                    className={`relative text-left p-4 rounded-xl border transition-all group ${
+                                                        isSelected
+                                                            ? 'bg-emerald-500/5 border-emerald-500/30 ring-1 ring-emerald-500/20'
+                                                            : 'bg-[#1C1F2E] border-white/5 hover:border-white/15 hover:bg-[#1e2235]'
+                                                    }`}
+                                                >
+                                                    {/* Checkbox */}
+                                                    <div className="flex items-start gap-3">
+                                                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                                                            isSelected ? 'bg-emerald-500 border-emerald-500 scale-110' : 'border-white/20 group-hover:border-white/40'
+                                                        }`}>
+                                                            {isSelected && <Check size={12} className="text-white" />}
                                                         </div>
-                                                    ) : (
-                                                        <h3 className="text-base font-semibold text-white truncate">{saved.name}</h3>
-                                                    )}
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-semibold text-white truncate mb-1">
+                                                                {meeting.meetingName || meeting.topic || 'Untitled Meeting'}
+                                                            </p>
+                                                            <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                                                                <span className="flex items-center gap-1">
+                                                                    <Calendar size={10} />
+                                                                    {getRelativeTime(meeting.createdAt)}
+                                                                </span>
+                                                                {meeting.platform && (
+                                                                    <span className="px-1.5 py-0.5 bg-white/5 rounded text-[10px] capitalize">
+                                                                        {meeting.platform}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </motion.button>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-12 text-center">
+                                        <Search size={40} className="text-slate-600 mx-auto mb-3" />
+                                        <p className="text-sm text-slate-400 font-semibold mb-1">No meetings found</p>
+                                        <p className="text-xs text-slate-600">
+                                            {searchQuery ? 'Try a different search term' : 'Complete a meeting with transcription to get started'}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* ── Sticky Generate Bar ── */}
+                                <AnimatePresence>
+                                    {selectedMeetings.length > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 20 }}
+                                            className="sticky bottom-6 z-40"
+                                        >
+                                            <div className="bg-[#1C1F2E]/95 backdrop-blur-xl rounded-2xl border border-emerald-500/20 p-4 shadow-2xl shadow-black/40 flex items-center justify-between gap-4">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-500/20">
+                                                        <Sparkles size={18} className="text-emerald-400" />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="text-sm font-semibold text-white">
+                                                            {selectedMeetings.length} meeting{selectedMeetings.length > 1 ? 's' : ''} selected
+                                                        </p>
+                                                        <p className="text-[11px] text-slate-500 truncate">
+                                                            {getSelectedMeetingDetails().map(m => m.meetingName || m.topic || 'Untitled').join(', ')}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-                                                    <button
-                                                        onClick={() => { setEditingNameId(saved._id); setEditNameValue(saved.name); }}
-                                                        className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors"
-                                                        title="Rename"
-                                                    >
-                                                        <Pencil size={14} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteSaved(saved._id)}
-                                                        disabled={deletingId === saved._id}
-                                                        className="p-1.5 hover:bg-red-500/10 rounded-lg text-slate-400 hover:text-red-400 transition-colors disabled:opacity-50"
-                                                        title="Delete"
-                                                    >
-                                                        {deletingId === saved._id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-3 text-xs text-slate-500 mb-3">
-                                                <span className="flex items-center gap-1">
-                                                    <Calendar size={12} />
-                                                    {new Date(saved.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <FileText size={12} />
-                                                    {saved.summaryData?.meetingCount || saved.meetingIds?.length || 0} meetings
-                                                </span>
-                                            </div>
-                                            <p className="text-sm text-slate-400 line-clamp-2">
-                                                {saved.summaryData?.executiveSummary?.substring(0, 120) || 'No preview available'}...
-                                            </p>
-                                            <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
-                                                {saved.summaryData?.totalParticipants > 0 && (
-                                                    <span className="flex items-center gap-1"><Users size={12} /> {saved.summaryData.totalParticipants}</span>
-                                                )}
-                                                {saved.summaryData?.totalActionItems > 0 && (
-                                                    <span className="flex items-center gap-1"><CheckCircle2 size={12} /> {saved.summaryData.totalActionItems} tasks</span>
-                                                )}
+                                                <button
+                                                    onClick={handleGenerateSummary}
+                                                    disabled={generating}
+                                                    className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed text-sm whitespace-nowrap"
+                                                >
+                                                    <Sparkles size={16} />
+                                                    Generate Summary
+                                                </button>
                                             </div>
                                         </motion.div>
-                                    ))}
-                                </div>
+                                    )}
+                                </AnimatePresence>
+
+                                {/* Empty welcome when no meetings selected and none saved */}
+                                {selectedMeetings.length === 0 && meetings.length > 0 && savedSummaries.length === 0 && (
+                                    <div className="bg-gradient-to-br from-emerald-500/5 via-[#1C1F2E] to-[#1C1F2E] rounded-2xl border border-emerald-500/10 p-10 text-center">
+                                        <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
+                                            <Sparkles size={28} className="text-emerald-400" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-white mb-2">Select meetings above to begin</h3>
+                                        <p className="text-sm text-slate-500 max-w-md mx-auto">
+                                            Click on one or more meetings, then hit "Generate Summary" to create a comprehensive AI-powered analysis combining insights from all selected meetings.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* ── SAVED TAB ── */}
+                        {activeTab === 'saved' && (
+                            <div>
+                                {savedSummaries.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {savedSummaries.map((saved) => (
+                                            <motion.div
+                                                key={saved._id}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-5 hover:border-emerald-500/30 transition-all group cursor-pointer"
+                                                onClick={() => handleOpenSaved(saved)}
+                                            >
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div className="flex-1 min-w-0">
+                                                        {editingNameId === saved._id ? (
+                                                            <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={editNameValue}
+                                                                    onChange={(e) => setEditNameValue(e.target.value)}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter') handleRenameSaved(saved._id);
+                                                                        if (e.key === 'Escape') setEditingNameId(null);
+                                                                    }}
+                                                                    autoFocus
+                                                                    className="w-full bg-[#0B0E14] border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500/50"
+                                                                />
+                                                                <button
+                                                                    onClick={() => handleRenameSaved(saved._id)}
+                                                                    className="p-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 transition-colors"
+                                                                >
+                                                                    <Check size={14} />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <h3 className="text-base font-semibold text-white truncate">{saved.name}</h3>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                        <button
+                                                            onClick={() => { setEditingNameId(saved._id); setEditNameValue(saved.name); }}
+                                                            className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors"
+                                                            title="Rename"
+                                                        >
+                                                            <Pencil size={14} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteSaved(saved._id)}
+                                                            disabled={deletingId === saved._id}
+                                                            className="p-1.5 hover:bg-red-500/10 rounded-lg text-slate-400 hover:text-red-400 transition-colors disabled:opacity-50"
+                                                            title="Delete"
+                                                        >
+                                                            {deletingId === saved._id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3 text-xs text-slate-500 mb-3">
+                                                    <span className="flex items-center gap-1">
+                                                        <Calendar size={12} />
+                                                        {getRelativeTime(saved.createdAt)}
+                                                    </span>
+                                                    <span className="flex items-center gap-1">
+                                                        <FileText size={12} />
+                                                        {saved.summaryData?.meetingCount || saved.meetingIds?.length || 0} meetings
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-slate-400 line-clamp-2">
+                                                    {saved.summaryData?.executiveSummary?.substring(0, 120) || 'No preview available'}...
+                                                </p>
+                                                <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
+                                                    {saved.summaryData?.totalParticipants > 0 && (
+                                                        <span className="flex items-center gap-1"><Users size={12} /> {saved.summaryData.totalParticipants}</span>
+                                                    )}
+                                                    {saved.summaryData?.totalActionItems > 0 && (
+                                                        <span className="flex items-center gap-1"><CheckCircle2 size={12} /> {saved.summaryData.totalActionItems} tasks</span>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-16 text-center">
+                                        <FolderOpen size={48} className="text-slate-600 mx-auto mb-4" />
+                                        <h3 className="text-lg font-bold text-slate-400 mb-2">No saved summaries yet</h3>
+                                        <p className="text-sm text-slate-500 mb-6 max-w-sm mx-auto">
+                                            Generate a summary and save it for quick access later.
+                                        </p>
+                                        <button
+                                            onClick={() => setActiveTab('create')}
+                                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-colors text-sm"
+                                        >
+                                            <Plus size={16} />
+                                            Create Your First Summary
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </>
                 )}
 
-                {/* Meeting Selector - only show when not viewing a saved summary */}
-                {!viewingSaved && (
-                <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-6 mb-8">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                            <FileText size={20} className="text-slate-400" />
-                            Select Meetings
-                        </h2>
-                        <span className="text-sm text-slate-400">
-                            {selectedMeetings.length} selected
-                        </span>
-                    </div>
-
-                    {/* Selected Meeting Tags */}
-                    {selectedMeetings.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            {getSelectedMeetingDetails().map(m => (
-                                <div
-                                    key={m._id}
-                                    className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-sm text-emerald-400"
-                                >
-                                    <span className="max-w-[200px] truncate">{m.meetingName || m.topic || 'Untitled'}</span>
-                                    <button
-                                        onClick={() => removeMeeting(m._id)}
-                                        className="hover:text-emerald-300 transition-colors"
-                                    >
-                                        <X size={14} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Dropdown Trigger */}
-                    <div className="relative">
-                        <button
-                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="w-full flex items-center justify-between px-4 py-3 bg-[#0B0E14] border border-white/10 rounded-xl text-sm text-slate-300 hover:border-white/20 transition-colors"
-                        >
-                            <span>{dropdownOpen ? 'Close meeting list' : 'Click to select meetings...'}</span>
-                            <ChevronDown size={18} className={`text-slate-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
-
-                        <AnimatePresence>
-                            {dropdownOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className="absolute z-50 w-full mt-2 bg-[#0B0E14] border border-white/10 rounded-xl shadow-2xl overflow-hidden"
-                                >
-                                    {/* Search */}
-                                    <div className="p-3 border-b border-white/5">
-                                        <div className="relative">
-                                            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                                            <input
-                                                type="text"
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                placeholder="Search meetings..."
-                                                className="w-full bg-[#1C1F2E] border border-white/5 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-white/20 placeholder:text-slate-500"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Select All */}
-                                    <div className="px-3 py-2 border-b border-white/5">
-                                        <button
-                                            onClick={selectAll}
-                                            className="text-xs text-slate-400 hover:text-white transition-colors"
-                                        >
-                                            {selectedMeetings.length === filteredMeetings.length ? 'Deselect All' : 'Select All'}
-                                        </button>
-                                    </div>
-
-                                    {/* Meeting List */}
-                                    <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
-                                        {filteredMeetings.length > 0 ? (
-                                            filteredMeetings.map(meeting => {
-                                                const isSelected = selectedMeetings.includes(meeting._id);
-                                                return (
-                                                    <button
-                                                        key={meeting._id}
-                                                        onClick={() => toggleMeeting(meeting._id)}
-                                                        className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors ${isSelected ? 'bg-emerald-500/5' : ''}`}
-                                                    >
-                                                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${isSelected ? 'bg-emerald-500 border-emerald-500' : 'border-white/20'
-                                                            }`}>
-                                                            {isSelected && <Check size={12} className="text-white" />}
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-medium text-white truncate">
-                                                                {meeting.meetingName || meeting.topic || 'Untitled Meeting'}
-                                                            </p>
-                                                            <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
-                                                                <span>{formatDate(meeting.createdAt)}</span>
-                                                                <span className="capitalize">{meeting.platform || 'unknown'}</span>
-                                                            </div>
-                                                        </div>
-                                                    </button>
-                                                );
-                                            })
-                                        ) : (
-                                            <div className="px-4 py-8 text-center text-sm text-slate-500">
-                                                No meetings found
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Generate Button */}
-                    <div className="mt-6 flex items-center gap-4">
-                        <button
-                            onClick={handleGenerateSummary}
-                            disabled={selectedMeetings.length === 0 || generating}
-                            className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                            {generating ? (
-                                <>
-                                    <Loader2 size={18} className="animate-spin" />
-                                    Generating Summary...
-                                </>
-                            ) : (
-                                <>
-                                    <Sparkles size={18} />
-                                    Generate Combined Summary
-                                </>
-                            )}
-                        </button>
-                        {selectedMeetings.length > 0 && !generating && (
-                            <span className="text-sm text-slate-400">
-                                {selectedMeetings.length} meeting{selectedMeetings.length > 1 ? 's' : ''} selected
-                            </span>
-                        )}
-                    </div>
-                </div>
-                )}
-
-                {/* Error */}
+                {/* ═══════════ ERROR ═══════════ */}
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-8 flex items-center gap-3">
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6 flex items-center gap-3">
                         <AlertTriangle size={20} className="text-red-400 flex-shrink-0" />
                         <p className="text-sm text-red-400">{error}</p>
+                        <button onClick={() => setError(null)} className="ml-auto text-red-400/60 hover:text-red-400"><X size={16} /></button>
                     </div>
                 )}
 
-                {/* Generating Animation */}
+                {/* ═══════════ GENERATING ═══════════ */}
                 {generating && (
                     <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-16 mb-8 flex flex-col items-center justify-center">
                         <div className="relative mb-6">
@@ -535,6 +680,11 @@ const SummaryPage = () => {
                         <p className="text-sm text-slate-400 text-center max-w-md">
                             AI is processing all transcripts, extracting insights, and creating a comprehensive combined summary.
                         </p>
+                        <div className="mt-6 flex items-center gap-2">
+                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
+                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+                        </div>
                     </div>
                 )}
 
@@ -907,13 +1057,13 @@ const SummaryPage = () => {
                     </div>
                 )}
 
-                {/* Empty State */}
-                {!summary && !generating && !error && savedSummaries.length === 0 && (
+                {/* Empty State - no meetings at all */}
+                {showHome && meetings.length === 0 && (
                     <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-16 flex flex-col items-center justify-center text-center">
-                        <FileText size={64} className="text-slate-500 mb-4 opacity-20" />
-                        <h3 className="text-xl font-bold text-slate-400 mb-2">Select Meetings to Begin</h3>
+                        <FileText size={56} className="text-slate-600 mb-4" />
+                        <h3 className="text-lg font-bold text-slate-400 mb-2">No meetings available</h3>
                         <p className="text-sm text-slate-500 max-w-md">
-                            Choose one or more past meetings from the dropdown above and click "Generate Combined Summary" to create a comprehensive analysis across all selected meetings.
+                            Complete a meeting with transcription first, then come back to generate AI-powered summaries.
                         </p>
                     </div>
                 )}
