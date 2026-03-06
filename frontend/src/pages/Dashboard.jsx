@@ -14,7 +14,7 @@ import zoomLogo from '../assets/zoom.png';
 const API_URL = 'http://localhost:3000';
 
 const getPlatformDetails = (link) => {
-    if (!link) return { name: 'Meeting', logo: null, color: 'text-gray-400', border: 'from-gray-700 to-gray-800', shadow: 'shadow-gray-500/20' };
+    if (!link) return { name: 'Meeting', logo: null, color: 'text-slate-400', border: 'from-gray-700 to-gray-800', shadow: 'shadow-slate-500/20' };
 
     if (link.includes('zoom.us')) return {
         name: 'Zoom Meeting',
@@ -749,7 +749,7 @@ const Dashboard = () => {
                 <div className="flex items-center gap-4 flex-shrink-0">
                     <h1 className="text-3xl font-bold tracking-tight text-white">Meetings Archive</h1>
                     <div className="h-6 w-px bg-white/10"></div>
-                    <p className="text-gray-400 font-medium flex items-center gap-2 text-sm whitespace-nowrap">
+                    <p className="text-slate-400 font-medium flex items-center gap-2 text-sm whitespace-nowrap">
                         <Mic size={16} className="text-white" />
                         {meetings.filter(m => m.audioPath).length} Recordings
                     </p>
@@ -762,7 +762,7 @@ const Dashboard = () => {
                         <div className={`relative flex items-center bg-[#0B0E14] border rounded-full px-4 py-2.5 transition-all ${
                             aiSearchMode ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.15)]' : 'border-white/10 focus-within:border-white/50'
                         }`}>
-                            <Search size={16} className={aiSearchMode ? 'text-purple-400' : 'text-gray-500'} />
+                            <Search size={16} className={aiSearchMode ? 'text-purple-400' : 'text-slate-500'} />
                             <input
                                 type="text"
                                 placeholder={aiSearchMode ? "Ask AI: Find meetings about tasks, topics, or discussions..." : "Search Meetings by name, platform, participant..."}
@@ -773,7 +773,7 @@ const Dashboard = () => {
                                         handleAiSearch();
                                     }
                                 }}
-                                className="bg-transparent border-none outline-none text-sm text-white w-full placeholder-gray-600 mx-2"
+                                className="bg-transparent border-none outline-none text-sm text-white w-full placeholder-slate-500 mx-2"
                             />
                             {searchQuery && (
                                 <button
@@ -781,7 +781,7 @@ const Dashboard = () => {
                                         setSearchQuery('');
                                         setAiSearchResults([]);
                                     }}
-                                    className="text-gray-500 hover:text-gray-300 ml-2"
+                                    className="text-slate-500 hover:text-slate-300 ml-2"
                                 >
                                     <X size={16} />
                                 </button>
@@ -796,7 +796,7 @@ const Dashboard = () => {
                         className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                             aiSearchMode 
                                 ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
-                                : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                                : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
                         } ${aiSearching ? 'opacity-50 cursor-not-allowed' : ''}`}
                         title={aiSearchMode ? "Switch to Normal Search" : "AI Search (Search through transcripts)"}
                     >
@@ -813,14 +813,14 @@ const Dashboard = () => {
 
             {/* Filter Chips */}
             <div className="mb-6 flex flex-wrap items-center gap-2">
-                <span className="text-sm text-gray-500 font-medium mr-2">Quick Filters:</span>
+                <span className="text-sm text-slate-500 font-medium mr-2">Quick Filters:</span>
 
                 {/* Platform Filters */}
                 <button
                     onClick={() => toggleFilter('zoom')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('zoom')
                             ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <img src={zoomLogo} alt="Zoom" className="w-3 h-3" />
@@ -831,7 +831,7 @@ const Dashboard = () => {
                     onClick={() => toggleFilter('meet')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('meet')
                             ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <img src={googleMeetLogo} alt="Meet" className="w-3 h-3" />
@@ -842,7 +842,7 @@ const Dashboard = () => {
                     onClick={() => toggleFilter('teams')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('teams')
                             ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <img src={teamsLogo} alt="Teams" className="w-3 h-3" />
@@ -856,7 +856,7 @@ const Dashboard = () => {
                     onClick={() => toggleFilter('transcript')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('transcript')
                             ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <FileText size={12} />
@@ -867,7 +867,7 @@ const Dashboard = () => {
                     onClick={() => toggleFilter('completed')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('completed')
                             ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <CheckCircle2 size={12} />
@@ -878,7 +878,7 @@ const Dashboard = () => {
                     onClick={() => toggleFilter('failed')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('failed')
                             ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <X size={12} />
@@ -905,20 +905,20 @@ const Dashboard = () => {
                             <div className="absolute inset-0 bg-white blur-xl opacity-20 animate-pulse"></div>
                             <Loader2 className="animate-spin text-white relative z-10" size={40} />
                         </div>
-                        <p className="mt-4 text-gray-500 font-medium">Loading archives...</p>
+                        <p className="mt-4 text-slate-500 font-medium">Loading archives...</p>
                     </div>
                 </div>
             ) : filteredMeetings.length === 0 ? (
-                <div className="text-center py-20 text-gray-500 border border-dashed border-white/10 rounded-3xl bg-white/5">
+                <div className="text-center py-20 text-slate-500 border border-dashed border-white/10 rounded-3xl bg-white/5">
                     <FileAudio size={60} className="mx-auto mb-4 opacity-30" />
                     {searchQuery ? (
                         <>
-                            <p className="text-xl mb-2 font-semibold text-gray-400">No meetings found</p>
+                            <p className="text-xl mb-2 font-semibold text-slate-400">No meetings found</p>
                             <p className="text-sm">Try adjusting your search query</p>
                         </>
                     ) : (
                         <>
-                            <p className="text-xl mb-2 font-semibold text-gray-400">No recordings found</p>
+                            <p className="text-xl mb-2 font-semibold text-slate-400">No recordings found</p>
                             <p className="text-sm">Summon your first bot from the home page!</p>
                         </>
                     )}
@@ -963,12 +963,12 @@ const Dashboard = () => {
                                                             className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-white/10 rounded-md"
                                                             title="Edit meeting name"
                                                         >
-                                                            <svg className="w-4 h-4 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 text-slate-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                             </svg>
                                                         </button>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                                                    <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
                                                         <span>{new Date(meeting.createdAt).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
                                                         {meeting.liveTranscriptUpdatedAt && (
                                                             <span className="flex items-center gap-1 text-[10px] text-white bg-white/10 px-2 py-0.5 rounded-full" title={`Saved: ${new Date(meeting.liveTranscriptUpdatedAt).toLocaleString()}`}>
@@ -993,7 +993,7 @@ const Dashboard = () => {
                                     <div className="flex-1 px-5 py-2">
                                         {meeting.transcription ? (
                                             <div className="bg-[#1C1F2E] rounded-xl p-4 min-h-[100px] border border-white/5 relative group/content">
-                                                <p className="text-gray-400 text-sm line-clamp-3 leading-relaxed">
+                                                <p className="text-slate-400 text-sm line-clamp-3 leading-relaxed">
                                                     {meeting.transcription}
                                                 </p>
                                                 <div className="absolute top-2 right-2 opacity-0 group-hover/content:opacity-100 transition-opacity">
@@ -1001,7 +1001,7 @@ const Dashboard = () => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="flex items-center justify-center h-[100px] text-gray-500 text-sm">
+                                            <div className="flex items-center justify-center h-[100px] text-slate-500 text-sm">
                                                 Transcript not available
                                             </div>
                                         )}
@@ -1062,7 +1062,7 @@ const Dashboard = () => {
                                                     <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 bg-white/10 border border-white/20 rounded-full group/speakers hover:border-white/40 transition-colors">
                                                         <div className="flex -space-x-2">
                                                             {[...Array(Math.min(3, meeting.totalSpeakers))].map((_, idx) => (
-                                                                <div key={idx} className="w-5 h-5 rounded-full bg-gray-800 border-2 border-[#1C1F2E] flex items-center justify-center overflow-hidden relative z-[3] first:ml-0">
+                                                                <div key={idx} className="w-5 h-5 rounded-full bg-white/5 border-2 border-[#1C1F2E] flex items-center justify-center overflow-hidden relative z-[3] first:ml-0">
                                                                     <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${meeting._id}-${idx}`} alt="avatar" className="w-full h-full" />
                                                                 </div>
                                                             ))}
@@ -1072,7 +1072,7 @@ const Dashboard = () => {
                                                         </span>
                                                     </div>
                                                 ) : (
-                                                    <div className="flex items-center gap-2 text-xs text-gray-500 px-2 py-1 bg-white/5 rounded-lg border border-white/5">
+                                                    <div className="flex items-center gap-2 text-xs text-slate-500 px-2 py-1 bg-white/5 rounded-lg border border-white/5">
                                                         <Users size={12} />
                                                         <span>No speakers yet</span>
                                                     </div>
@@ -1092,13 +1092,13 @@ const Dashboard = () => {
                                                 {meeting.audioPath && (
                                                     <button
                                                         onClick={() => togglePlay(meeting._id, meeting.audioPath)}
-                                                        className={`p-2 rounded-full transition-colors ${playing === meeting._id ? 'bg-white/20 text-white' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'}`}
+                                                        className={`p-2 rounded-full transition-colors ${playing === meeting._id ? 'bg-white/20 text-white' : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
                                                     >
                                                         {playing === meeting._id ? <Pause size={14} /> : <Play size={14} />}
                                                     </button>
                                                 )}
 
-                                                <button onClick={() => deleteMeeting(meeting._id)} className="p-2 rounded-full bg-white/5 text-gray-400 hover:text-red-400 hover:bg-white/10 transition-colors">
+                                                <button onClick={() => deleteMeeting(meeting._id)} className="p-2 rounded-full bg-white/5 text-slate-400 hover:text-red-400 hover:bg-white/10 transition-colors">
                                                     <Trash2 size={14} />
                                                 </button>
                                             </div>
@@ -1140,7 +1140,7 @@ const Dashboard = () => {
                         >
                             <button
                                 onClick={() => setLiveOverlay(null)}
-                                className="absolute top-6 right-6 text-gray-500 hover:text-white z-10 transition-colors"
+                                className="absolute top-6 right-6 text-slate-500 hover:text-white z-10 transition-colors"
                             >
                                 <X size={24} />
                             </button>
@@ -1155,11 +1155,11 @@ const Dashboard = () => {
                                 <div>
                                     <h2 className="text-2xl font-bold flex items-center gap-2">
                                         Live Meeting
-                                        <span className="text-base font-normal text-gray-500">
+                                        <span className="text-base font-normal text-slate-500">
                                             {getStatusInfo(liveOverlay).text}
                                         </span>
                                     </h2>
-                                    <p className="text-sm text-gray-400 mt-1">
+                                    <p className="text-sm text-slate-400 mt-1">
                                         Recording started at {new Date(liveOverlay.createdAt).toLocaleTimeString()}
                                     </p>
                                 </div>
@@ -1168,7 +1168,7 @@ const Dashboard = () => {
                             {/* Meeting Information */}
                             <div className="bg-white/5 rounded-xl p-6 mb-6 space-y-4 border border-white/10">
                                 <div>
-                                    <label className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">Meeting URL</label>
+                                    <label className="text-xs text-slate-500 uppercase tracking-wide mb-1 block">Meeting URL</label>
                                     <div className="flex items-center gap-2">
                                         <ExternalLink size={16} className="text-white" />
                                         <a
@@ -1184,14 +1184,14 @@ const Dashboard = () => {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">Status</label>
+                                        <label className="text-xs text-slate-500 uppercase tracking-wide mb-1 block">Status</label>
                                         <div className="flex items-center gap-2">
                                             <span className={`w-2 h-2 rounded-full ${getStatusInfo(liveOverlay).color} animate-pulse`} />
                                             <span className="text-white font-medium">{getStatusInfo(liveOverlay).text}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">Recording Size</label>
+                                        <label className="text-xs text-slate-500 uppercase tracking-wide mb-1 block">Recording Size</label>
                                         <span className="text-white font-medium">
                                             {liveStatus[liveOverlay._id]?.size || '0'} MB
                                         </span>
@@ -1217,7 +1217,7 @@ const Dashboard = () => {
                                         </span>
                                     )}
                                     {liveTranscripts[liveOverlay._id] && (
-                                        <span className="text-xs text-gray-500">
+                                        <span className="text-xs text-slate-500">
                                             ({liveTranscripts[liveOverlay._id].length} segments)
                                         </span>
                                     )}
@@ -1236,7 +1236,7 @@ const Dashboard = () => {
                                                         : 'bg-white/5 border border-white/20 hover:bg-white/10 opacity-70'
                                                         }`}
                                                 >
-                                                    <div className="flex items-center gap-2 mb-1 text-xs text-gray-500">
+                                                    <div className="flex items-center gap-2 mb-1 text-xs text-slate-500">
                                                         {item.isFinal ? (
                                                             <span className="px-2 py-0.5 bg-white/20 text-white rounded text-xs font-semibold">✅ Final</span>
                                                         ) : (
@@ -1245,26 +1245,26 @@ const Dashboard = () => {
                                                         <Clock size={12} />
                                                         {new Date(item.timestamp).toLocaleTimeString()}
                                                         {item.confidence && (
-                                                            <span className="ml-auto text-gray-600 text-xs">
+                                                            <span className="ml-auto text-slate-500 text-xs">
                                                                 Confidence: {Math.round(item.confidence * 100)}%
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <p className="text-gray-200 leading-relaxed font-medium">{item.text}</p>
+                                                    <p className="text-slate-200 leading-relaxed font-medium">{item.text}</p>
                                                 </motion.div>
                                             ))}
                                         </div>
                                     ) : liveStatus[liveOverlay._id]?.liveStatus === 'connected' ? (
-                                        <div className="h-full flex flex-col items-center justify-center text-gray-600">
+                                        <div className="h-full flex flex-col items-center justify-center text-slate-500">
                                             <Loader2 size={40} className="animate-spin mb-4 text-white" />
                                             <p>Connected to Deepgram Live Stream</p>
-                                            <p className="text-xs text-gray-700 mt-2">Waiting for speech to transcribe...</p>
+                                            <p className="text-xs text-slate-500 mt-2">Waiting for speech to transcribe...</p>
                                         </div>
                                     ) : (
-                                        <div className="h-full flex flex-col items-center justify-center text-gray-600">
+                                        <div className="h-full flex flex-col items-center justify-center text-slate-500">
                                             <Loader2 size={40} className="animate-spin mb-4 text-white" />
                                             <p>Waiting for transcript data...</p>
-                                            <p className="text-xs text-gray-700 mt-2">Live transcription will appear here</p>
+                                            <p className="text-xs text-slate-500 mt-2">Live transcription will appear here</p>
                                         </div>
                                     )}
                                 </div>
@@ -1272,7 +1272,7 @@ const Dashboard = () => {
 
                             {/* Actions */}
                             <div className="flex justify-between items-center gap-4 pt-6 border-t border-white/10 mt-6">
-                                <div className="text-sm text-gray-500">
+                                <div className="text-sm text-slate-500">
                                     Bot is actively recording and transcribing
                                 </div>
                                 <div className="flex gap-3">
@@ -1311,17 +1311,17 @@ const Dashboard = () => {
                 {selectedMeeting && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                         <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-[#0f0b1e] border border-white/10 rounded-2xl p-8 max-w-3xl w-full shadow-2xl relative max-h-[90vh] overflow-hidden flex flex-col">
-                            <button onClick={() => { stopTranscription(); setSelectedMeeting(null) }} className="absolute top-6 right-6 text-gray-500 hover:text-white z-10"><X /></button>
+                            <button onClick={() => { stopTranscription(); setSelectedMeeting(null) }} className="absolute top-6 right-6 text-slate-500 hover:text-white z-10"><X /></button>
 
                             <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                                <div className={`p-2 rounded-full ${transcribing ? 'bg-white/20 text-white animate-pulse' : transcript ? 'bg-white/20 text-white' : 'bg-gray-800 text-gray-400'}`}>
+                                <div className={`p-2 rounded-full ${transcribing ? 'bg-white/20 text-white animate-pulse' : transcript ? 'bg-white/20 text-white' : 'bg-white/5 text-slate-400'}`}>
                                     {transcribing ? <Loader2 size={20} className="animate-spin" /> : <FileText size={20} />}
                                 </div>
                                 <span>
                                     {transcribing ? 'AI Transcribing...' : 'Transcript'}
                                 </span>
                                 {transcribing && (
-                                    <span className="text-xs text-gray-500 font-normal ml-2">Powered by Deepgram</span>
+                                    <span className="text-xs text-slate-500 font-normal ml-2">Powered by Deepgram</span>
                                 )}
                             </h2>
 
@@ -1337,8 +1337,8 @@ const Dashboard = () => {
                                         <div className="relative">
                                             <Sparkles size={40} className="text-white animate-pulse" />
                                         </div>
-                                        <p className="text-gray-400">AI is transcribing your audio...</p>
-                                        <p className="text-xs text-gray-600">This may take 30-60 seconds</p>
+                                        <p className="text-slate-400">AI is transcribing your audio...</p>
+                                        <p className="text-xs text-slate-500">This may take 30-60 seconds</p>
                                     </div>
                                 ) : transcript ? (
                                     <>
@@ -1350,21 +1350,21 @@ const Dashboard = () => {
                                                         <div className="font-semibold text-white min-w-[100px] flex-shrink-0">
                                                             {segment.speaker}:
                                                         </div>
-                                                        <div className="text-gray-300 leading-relaxed flex-1">
+                                                        <div className="text-slate-300 leading-relaxed flex-1">
                                                             {segment.text}
                                                         </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="text-lg leading-relaxed text-gray-300 whitespace-pre-wrap">
+                                            <div className="text-lg leading-relaxed text-slate-300 whitespace-pre-wrap">
                                                 {transcript}
                                             </div>
                                         )}
 
                                         {selectedMeeting?.totalSpeakers && selectedMeeting.totalSpeakers > 0 && (
                                             <div className="mt-6 pt-6 border-t border-white/5">
-                                                <h3 className="text-sm font-semibold text-gray-400 mb-4 flex items-center gap-2">
+                                                <h3 className="text-sm font-semibold text-slate-400 mb-4 flex items-center gap-2">
                                                     <Users size={16} />
                                                     Speaker Analysis ({selectedMeeting.totalSpeakers} speakers detected)
                                                 </h3>
@@ -1375,9 +1375,9 @@ const Dashboard = () => {
                                                             <div key={speaker} className="p-4 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10">
                                                                 <div className="flex items-center justify-between mb-2">
                                                                     <span className="font-semibold text-white">{speaker}</span>
-                                                                    <span className="text-xs text-gray-500">{stats.segment_count} segments</span>
+                                                                    <span className="text-xs text-slate-500">{stats.segment_count} segments</span>
                                                                 </div>
-                                                                <div className="text-sm text-gray-400">
+                                                                <div className="text-sm text-slate-400">
                                                                     Total time: {Math.floor(stats.total_time / 60)}:{String(Math.floor(stats.total_time % 60)).padStart(2, '0')}
                                                                 </div>
                                                             </div>
@@ -1387,7 +1387,7 @@ const Dashboard = () => {
 
                                                 {selectedMeeting.speakerSegments && selectedMeeting.speakerSegments.length > 0 && (
                                                     <details className="cursor-pointer group">
-                                                        <summary className="text-sm font-medium text-gray-400 hover:text-gray-300 transition-colors">
+                                                        <summary className="text-sm font-medium text-slate-400 hover:text-slate-300 transition-colors">
                                                             View timeline with timestamps ({selectedMeeting.speakerSegments.length} segments)
                                                         </summary>
                                                         <div className="mt-3 max-h-64 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
@@ -1395,14 +1395,14 @@ const Dashboard = () => {
                                                                 <div key={idx} className="text-sm p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
                                                                     <div className="flex items-center gap-3 mb-2">
                                                                         <span className="font-medium text-white">{segment.speaker}</span>
-                                                                        <span className="text-gray-500 font-mono text-xs">
+                                                                        <span className="text-slate-500 font-mono text-xs">
                                                                             {Math.floor(segment.start / 60)}:{String(Math.floor(segment.start % 60)).padStart(2, '0')} -
                                                                             {Math.floor(segment.end / 60)}:{String(Math.floor(segment.end % 60)).padStart(2, '0')}
                                                                         </span>
-                                                                        <span className="text-gray-600 text-xs">({segment.duration.toFixed(1)}s)</span>
+                                                                        <span className="text-slate-500 text-xs">({segment.duration.toFixed(1)}s)</span>
                                                                     </div>
                                                                     {segment.text && (
-                                                                        <div className="text-gray-400 text-xs mt-1 pl-2 border-l-2 border-white/30">
+                                                                        <div className="text-slate-400 text-xs mt-1 pl-2 border-l-2 border-white/30">
                                                                             {segment.text}
                                                                         </div>
                                                                     )}
@@ -1415,7 +1415,7 @@ const Dashboard = () => {
                                         )}
                                     </>
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-600">
+                                    <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-500">
                                         <FileText size={40} className="opacity-30" />
                                         <p>No transcript available</p>
                                         <button
@@ -1429,7 +1429,7 @@ const Dashboard = () => {
                             </div>
 
                             <div className="flex justify-between items-center gap-3 pt-4 border-t border-white/5">
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-slate-500">
                                     {transcript ? `${transcript.split(' ').length} words` : ''}
                                 </p>
                                 <div className="flex gap-3">
@@ -1471,11 +1471,11 @@ const Dashboard = () => {
                                         <Mic className="text-white" size={24} />
                                         Action Items & Tasks
                                     </h2>
-                                    <p className="text-sm text-gray-400 mt-1">
+                                    <p className="text-sm text-slate-400 mt-1">
                                         {getPlatformDetails(selectedTasksMeeting.meetingLink).name} • {new Date(selectedTasksMeeting.createdAt).toLocaleDateString()}
                                     </p>
                                 </div>
-                                <button onClick={() => setSelectedTasksMeeting(null)} className="text-gray-400 hover:text-white transition-colors">
+                                <button onClick={() => setSelectedTasksMeeting(null)} className="text-slate-400 hover:text-white transition-colors">
                                     <X size={24} />
                                 </button>
                             </div>
@@ -1486,7 +1486,7 @@ const Dashboard = () => {
                                         <Loader2 className="animate-spin text-white" size={48} />
                                         <div className="text-center">
                                             <p className="text-white font-medium text-lg">Extracting tasks with AI...</p>
-                                            <p className="text-sm text-gray-400 mt-2">Analyzing transcript and identifying action items</p>
+                                            <p className="text-sm text-slate-400 mt-2">Analyzing transcript and identifying action items</p>
                                         </div>
                                     </div>
                                 ) : selectedTasksMeeting.extractedTasks && selectedTasksMeeting.extractedTasks.length > 0 ? (
@@ -1506,13 +1506,13 @@ const Dashboard = () => {
                                                     <div className="flex-1">
                                                         <p className="text-white font-medium">{task.task || task}</p>
                                                         {task.assignee && (
-                                                            <p className="text-sm text-gray-400 mt-1">
-                                                                <span className="text-gray-500">Assigned to:</span> {task.assignee}
+                                                            <p className="text-sm text-slate-400 mt-1">
+                                                                <span className="text-slate-500">Assigned to:</span> {task.assignee}
                                                             </p>
                                                         )}
                                                         {task.deadline && (
-                                                            <p className="text-sm text-gray-400 mt-1">
-                                                                <span className="text-gray-500">Deadline:</span> {task.deadline}
+                                                            <p className="text-sm text-slate-400 mt-1">
+                                                                <span className="text-slate-500">Deadline:</span> {task.deadline}
                                                             </p>
                                                         )}
                                                         <div className="flex flex-wrap gap-2 mt-3">
@@ -1572,11 +1572,11 @@ const Dashboard = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-600">
+                                    <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-500">
                                         <Sparkles size={48} className="opacity-30 text-white" />
                                         <div className="text-center">
                                             <p className="text-white text-lg font-medium mb-2">No tasks extracted yet</p>
-                                            <p className="text-sm text-gray-500 mb-6">
+                                            <p className="text-sm text-slate-500 mb-6">
                                                 {selectedTasksMeeting.transcription ?
                                                     'Extract action items, assignments, and decisions from the meeting transcript using AI' :
                                                     'Please transcribe the meeting first before extracting tasks'}
@@ -1609,7 +1609,7 @@ const Dashboard = () => {
                             </div>
 
                             <div className="flex justify-between items-center gap-3 px-8 py-6 border-t border-white/5">
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-slate-500">
                                     {selectedTasksMeeting.extractedTasks?.length || 0} task(s)
                                 </p>
                                 <button onClick={() => setSelectedTasksMeeting(null)} className="px-6 py-3 rounded-xl text-sm font-semibold hover:bg-white/5 transition-colors">
@@ -1642,7 +1642,7 @@ const Dashboard = () => {
                                 value={newMeetingName}
                                 onChange={(e) => setNewMeetingName(e.target.value)}
                                 placeholder="Enter new meeting name..."
-                                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-white focus:outline-none transition-colors mb-6"
+                                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-white focus:outline-none transition-colors mb-6"
                                 onKeyDown={(e) => e.key === 'Enter' && saveMeetingName()}
                                 autoFocus
                             />

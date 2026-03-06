@@ -35,7 +35,7 @@ const Upload = () => {
 
         socket.on('meetingUpdate', (data) => {
             console.log('[Upload] Meeting update:', data);
-            
+
             if (currentMeetingId && data.meetingId === currentMeetingId) {
                 if (data.status === 'processing') {
                     setProcessingStatus(data.message || 'Processing...');
@@ -173,7 +173,7 @@ const Upload = () => {
                     <UploadIcon className="text-white" />
                     Upload Recording
                 </h1>
-                <p className="text-gray-400 font-light">
+                <p className="text-slate-400 font-light">
                     Upload your meeting audio or video for AI transcription and speaker identification
                 </p>
             </header>
@@ -193,8 +193,8 @@ const Upload = () => {
                     >
                         <UploadIcon size={60} className="mx-auto mb-4 text-white opacity-50" />
                         <h3 className="text-xl font-semibold mb-2">Drop your file here</h3>
-                        <p className="text-gray-400 mb-4">or click to browse</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-slate-400 mb-4">or click to browse</p>
+                        <p className="text-sm text-slate-500">
                             Supports: MP3, WAV, M4A, MP4, WebM, MOV (Max 500MB)
                         </p>
                         <input
@@ -209,13 +209,13 @@ const Upload = () => {
                     <div className="space-y-4">
                         {/* Meeting Title Input */}
                         <div>
-                            <label className="block text-sm text-gray-400 mb-2">Meeting Title (Optional)</label>
+                            <label className="block text-sm text-slate-400 mb-2">Meeting Title (Optional)</label>
                             <input
                                 type="text"
                                 value={meetingTitle}
                                 onChange={(e) => setMeetingTitle(e.target.value)}
                                 placeholder="e.g., Q1 Planning Meeting"
-                                className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg focus:outline-none focus:border-white text-white"
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-blue-500/50 text-white"
                             />
                         </div>
 
@@ -226,7 +226,7 @@ const Upload = () => {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-white font-medium truncate">{selectedFile.name}</p>
-                                <p className="text-sm text-gray-400">{formatFileSize(selectedFile.size)}</p>
+                                <p className="text-sm text-slate-400">{formatFileSize(selectedFile.size)}</p>
                             </div>
                             {!uploading && !processing && (
                                 <button
@@ -241,7 +241,7 @@ const Upload = () => {
                         {/* Upload Progress */}
                         {uploading && (
                             <div>
-                                <div className="flex justify-between text-sm text-gray-400 mb-2">
+                                <div className="flex justify-between text-sm text-slate-400 mb-2">
                                     <span>Uploading...</span>
                                     <span>{uploadProgress}%</span>
                                 </div>
@@ -249,7 +249,7 @@ const Upload = () => {
                                     <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${uploadProgress}%` }}
-                                        className="h-full bg-gradient-to-r from-white to-gray-200"
+                                        className="h-full bg-blue-500"
                                     />
                                 </div>
                             </div>
@@ -262,7 +262,7 @@ const Upload = () => {
                                     <Loader2 className="animate-spin text-white" size={24} />
                                     <div>
                                         <p className="text-white font-medium">Processing your recording...</p>
-                                        <p className="text-sm text-gray-400">
+                                        <p className="text-sm text-slate-400">
                                             {processingStatus || 'AI transcription and speaker identification in progress'}
                                         </p>
                                     </div>
@@ -274,7 +274,7 @@ const Upload = () => {
                         {!uploading && !processing && !result && (
                             <button
                                 onClick={handleUpload}
-                                className="w-full py-4 bg-gradient-to-r from-white to-gray-200 hover:from-gray-100 hover:to-gray-300 text-black rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                                className="w-full py-4 bg-white hover:bg-slate-200 text-black rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
                             >
                                 <Sparkles size={20} />
                                 Start AI Transcription
@@ -313,16 +313,16 @@ const Upload = () => {
                         <div className="text-center">
                             <CheckCircle2 size={60} className="text-green-400 mx-auto mb-4" />
                             <h2 className="text-2xl font-bold mb-2">Transcription Complete! 🎉</h2>
-                            <p className="text-gray-400 mb-6">Your recording has been processed successfully</p>
-                            
+                            <p className="text-slate-400 mb-6">Your recording has been processed successfully</p>
+
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="p-4 bg-white/5 rounded-xl">
-                                    <p className="text-sm text-gray-400 mb-1">Speakers Detected</p>
+                                    <p className="text-sm text-slate-400 mb-1">Speakers Detected</p>
                                     <p className="text-2xl font-bold text-white">{result.speakers || 'N/A'}</p>
                                 </div>
                                 <div className="p-4 bg-white/5 rounded-xl">
-                                    <p className="text-sm text-gray-400 mb-1">Meeting ID</p>
-                                    <p className="text-sm font-mono text-gray-300">{result.meetingId?.slice(-8)}</p>
+                                    <p className="text-sm text-slate-400 mb-1">Meeting ID</p>
+                                    <p className="text-sm font-mono text-slate-300">{result.meetingId?.slice(-8)}</p>
                                 </div>
                             </div>
 
@@ -335,7 +335,7 @@ const Upload = () => {
                                 </button>
                                 <a
                                     href="/dashboard"
-                                    className="px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-gray-100 hover:to-gray-300 text-black rounded-xl font-semibold transition-all"
+                                    className="px-6 py-3 bg-white hover:bg-slate-200 text-black rounded-xl font-semibold transition-all"
                                 >
                                     View in Dashboard
                                 </a>
@@ -348,7 +348,7 @@ const Upload = () => {
             {/* Info Section */}
             <div className="glass rounded-xl p-6 mt-6">
                 <h3 className="text-lg font-semibold mb-4">What happens after upload?</h3>
-                <div className="space-y-3 text-sm text-gray-400">
+                <div className="space-y-3 text-sm text-slate-400">
                     <div className="flex items-start gap-3">
                         <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <span className="text-white font-semibold">1</span>

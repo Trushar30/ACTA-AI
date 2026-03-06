@@ -274,7 +274,7 @@ const Settings = () => {
         >
             <div className="p-4">
                 <div className="flex justify-between items-start mb-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${connected ? 'bg-blue-500/20 text-blue-400' : 'bg-white/10 text-gray-400'
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${connected ? 'bg-blue-500/20 text-blue-400' : 'bg-white/10 text-slate-400'
                         }`}>
                         <Icon size={20} />
                     </div>
@@ -290,10 +290,10 @@ const Settings = () => {
                 </div>
 
                 <h3 className="text-base font-bold mb-1 group-hover:text-blue-400 transition-colors">{title}</h3>
-                <p className="text-xs text-gray-400 mb-4 line-clamp-2">{description}</p>
+                <p className="text-xs text-slate-400 mb-4 line-clamp-2">{description}</p>
 
                 <div className="flex items-center justify-between mt-auto">
-                    <span className={`text-xs font-medium flex items-center gap-1.5 ${connected ? 'text-blue-400' : 'text-gray-500 group-hover:text-gray-300'
+                    <span className={`text-xs font-medium flex items-center gap-1.5 ${connected ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300'
                         }`}>
                         {connected ? 'Manage Connection' : 'Connect App'}
                         <ChevronRight size={14} />
@@ -316,11 +316,11 @@ const Settings = () => {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative w-full max-w-lg bg-[#141922] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+                className="relative w-full max-w-lg bg-[#0F1219] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
             >
                 <div className="px-6 py-4 border-b border-white/5 flex justify-between items-start">
                     <h2 className="text-xl font-bold">{title}</h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+                    <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
                         <X size={20} />
                     </button>
                 </div>
@@ -343,7 +343,7 @@ const Settings = () => {
         <div className="min-h-screen p-8 max-w-7xl mx-auto">
             <div className="mb-10">
                 <h1 className="text-4xl font-bold mb-3">Settings & Integrations</h1>
-                <p className="text-gray-400 text-lg">Manage your external connections and bot status</p>
+                <p className="text-slate-400 text-lg">Manage your external connections and bot status</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -413,9 +413,9 @@ const Settings = () => {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="block text-sm font-medium text-gray-300">Base URL</label>
+                                <label className="block text-sm font-medium text-slate-300">Base URL</label>
                                 <div className="relative">
-                                    <Globe className="absolute left-3 top-3 text-gray-500" size={16} />
+                                    <Globe className="absolute left-3 top-3 text-slate-500" size={16} />
                                     <input
                                         type="text"
                                         value={jiraConfig.domain}
@@ -425,7 +425,7 @@ const Settings = () => {
                                     />
                                 </div>
 
-                                <label className="block text-sm font-medium text-gray-300">Email</label>
+                                <label className="block text-sm font-medium text-slate-300">Email</label>
                                 <input
                                     type="email"
                                     value={jiraConfig.email}
@@ -434,9 +434,9 @@ const Settings = () => {
                                     placeholder="email@example.com"
                                 />
 
-                                <label className="block text-sm font-medium text-gray-300">API Token</label>
+                                <label className="block text-sm font-medium text-slate-300">API Token</label>
                                 <div className="relative">
-                                    <Key className="absolute left-3 top-3 text-gray-500" size={16} />
+                                    <Key className="absolute left-3 top-3 text-slate-500" size={16} />
                                     <input
                                         type="password"
                                         value={jiraConfig.apiToken}
@@ -446,7 +446,7 @@ const Settings = () => {
                                     />
                                 </div>
 
-                                <label className="block text-sm font-medium text-gray-300">Project Key (Optional)</label>
+                                <label className="block text-sm font-medium text-slate-300">Project Key (Optional)</label>
                                 <input
                                     type="text"
                                     value={jiraConfig.projectKey}
@@ -460,7 +460,7 @@ const Settings = () => {
                                 <button
                                     onClick={saveJira}
                                     disabled={savingJira}
-                                    className="w-full py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all font-semibold flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
+                                    className="w-full py-3 rounded-lg bg-white text-black hover:bg-slate-200 transition-all font-semibold flex items-center justify-center gap-2 shadow-lg"
                                 >
                                     {savingJira ? <Loader2 className="animate-spin" size={18} /> : (
                                         <>
@@ -493,59 +493,59 @@ const Settings = () => {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="block text-sm font-medium text-gray-300">API Key</label>
+                                <label className="block text-sm font-medium text-slate-300">API Key</label>
                                 <div className="relative">
-                                    <Key className="absolute left-3 top-3 text-gray-500" size={16} />
+                                    <Key className="absolute left-3 top-3 text-slate-500" size={16} />
                                     <input
                                         type="text"
                                         value={trelloConfig.apiKey}
                                         onChange={(e) => setTrelloConfig({ ...trelloConfig, apiKey: e.target.value })}
-                                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-indigo-500 outline-none transition-colors"
+                                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-blue-500/50 outline-none transition-colors"
                                         placeholder="TRELLO_API_KEY"
                                     />
                                 </div>
-                                <a href="https://trello.com/app-key" target="_blank" rel="noreferrer" className="text-xs text-indigo-400 hover:underline flex items-center gap-1">
+                                <a href="https://trello.com/app-key" target="_blank" rel="noreferrer" className="text-xs text-blue-400 hover:underline flex items-center gap-1">
                                     Get API Key <ExternalLink size={10} />
                                 </a>
 
-                                <label className="block text-sm font-medium text-gray-300">API Token</label>
+                                <label className="block text-sm font-medium text-slate-300">API Token</label>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-3 text-gray-500" size={16} />
+                                    <Lock className="absolute left-3 top-3 text-slate-500" size={16} />
                                     <input
                                         type="password"
                                         value={trelloConfig.apiToken}
                                         onChange={(e) => setTrelloConfig({ ...trelloConfig, apiToken: e.target.value })}
-                                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-indigo-500 outline-none transition-colors"
+                                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-blue-500/50 outline-none transition-colors"
                                         placeholder="TRELLO_TOKEN"
                                     />
                                 </div>
 
-                                <label className="block text-sm font-medium text-gray-300">Board ID</label>
+                                <label className="block text-sm font-medium text-slate-300">Board ID</label>
                                 <input
                                     type="text"
                                     value={trelloConfig.boardId}
                                     onChange={(e) => setTrelloConfig({ ...trelloConfig, boardId: e.target.value })}
-                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-indigo-500 outline-none transition-colors"
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-blue-500/50 outline-none transition-colors"
                                     placeholder="TRELLO_BOARD_ID"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">Find this in your Trello board URL</p>
+                                <p className="text-xs text-slate-500 mt-1">Find this in your Trello board URL</p>
 
-                                <label className="block text-sm font-medium text-gray-300">List ID</label>
+                                <label className="block text-sm font-medium text-slate-300">List ID</label>
                                 <input
                                     type="text"
                                     value={trelloConfig.listId}
                                     onChange={(e) => setTrelloConfig({ ...trelloConfig, listId: e.target.value })}
-                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-indigo-500 outline-none transition-colors"
+                                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-blue-500/50 outline-none transition-colors"
                                     placeholder="TRELLO_LIST_ID"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">Find this in your Trello list settings or API response</p>
+                                <p className="text-xs text-slate-500 mt-1">Find this in your Trello list settings or API response</p>
                             </div>
 
                             <div className="mt-6">
                                 <button
                                     onClick={saveTrello}
                                     disabled={savingTrello}
-                                    className="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 transition-all font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20"
+                                    className="w-full py-3 rounded-lg bg-white text-black hover:bg-slate-200 transition-all font-semibold flex items-center justify-center gap-2 shadow-lg"
                                 >
                                     {savingTrello ? <Loader2 className="animate-spin" size={18} /> : (
                                         <>
@@ -580,7 +580,7 @@ const Settings = () => {
                                         <CheckCircle size={32} />
                                     </div>
                                     <h3 className="text-xl font-bold mb-2">Bot Ready</h3>
-                                    <p className="text-gray-400 mb-6">Your bot is configured and ready to join meetings.</p>
+                                    <p className="text-slate-400 mb-6">Your bot is configured and ready to join meetings.</p>
 
                                     <div className="flex flex-col gap-3">
                                         <button
@@ -603,11 +603,11 @@ const Settings = () => {
                                 </div>
                             ) : (
                                 <div className="text-center py-6">
-                                    <div className="w-16 h-16 bg-white/5 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <div className="w-16 h-16 bg-white/5 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <UserIconPlaceholder />
                                     </div>
                                     <h3 className="text-xl font-bold mb-2">Not Configured</h3>
-                                    <p className="text-gray-400 mb-6">Connect a Google account to enable the bot.</p>
+                                    <p className="text-slate-400 mb-6">Connect a Google account to enable the bot.</p>
 
                                     <button
                                         onClick={handleBotSetup}
@@ -641,7 +641,7 @@ const Settings = () => {
                                     <CheckCircle size={32} />
                                 </div>
                                 <h3 className="text-xl font-bold mb-2">Ready to Use!</h3>
-                                <p className="text-gray-400 mb-4">
+                                <p className="text-slate-400 mb-4">
                                     Microsoft Teams supports <strong className="text-white">guest joining</strong> - no Microsoft account required!
                                 </p>
                             </div>

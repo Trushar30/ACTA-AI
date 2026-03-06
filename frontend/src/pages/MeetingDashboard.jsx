@@ -89,11 +89,11 @@ const MeetingDashboard = () => {
             const userRes = await axios.get(`${API_URL}/api/auth/user`);
             if (userRes.data.user && userRes.data.user.email) {
                 setCurrentUserEmail(userRes.data.user.email);
-                
+
                 // Get meeting data
                 const meetingRes = await axios.get(`${API_URL}/api/meetings/${id}`);
                 const meetingEmail = meetingRes.data.userEmail || '';
-                
+
                 // Check if current user is the owner
                 setIsOwner(userRes.data.user.email === meetingEmail);
             }
@@ -274,7 +274,7 @@ const MeetingDashboard = () => {
             <div className="flex h-screen flex-col items-center justify-center bg-[#0B0E14] text-white gap-4">
                 <AlertTriangle className="text-red-500" size={48} />
                 <h2 className="text-2xl font-bold">Error</h2>
-                <p className="text-gray-400">{error}</p>
+                <p className="text-slate-400">{error}</p>
                 <button
                     onClick={() => navigate('/dashboard')}
                     className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
@@ -294,7 +294,7 @@ const MeetingDashboard = () => {
                 </div>
                 <div>
                     <h2 className="text-3xl font-bold mb-2">Ready to Analyze</h2>
-                    <p className="text-gray-400 max-w-md mx-auto">
+                    <p className="text-slate-400 max-w-md mx-auto">
                         This meeting has a transcript but hasn't been analyzed yet.
                         Generate a professional dashboard powered by Gemini AI.
                     </p>
@@ -318,7 +318,7 @@ const MeetingDashboard = () => {
                 </button>
                 <button
                     onClick={() => navigate('/dashboard')}
-                    className="text-gray-500 hover:text-white transition-colors text-sm"
+                    className="text-slate-500 hover:text-white transition-colors text-sm"
                 >
                     Cancel and return
                 </button>
@@ -333,7 +333,7 @@ const MeetingDashboard = () => {
         { id: 'transcript', label: 'Transcript Timeline', icon: FileText },
         { id: 'calendar', label: 'Calendar', icon: Calendar },
         { id: 'analytics', label: 'Analytics', icon: BarChart2 },
-        { id: 'ask-ai', label: 'Ask AI', icon: Sparkles },
+        // { id: 'ask-ai', label: 'Ask AI', icon: Sparkles },
         ...(isOwner ? [{ id: 'collaboration', label: 'Collaboration', icon: Users }] : []),
     ];
 
@@ -354,12 +354,12 @@ const MeetingDashboard = () => {
                             onClick={() => navigate('/dashboard')}
                             className="p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors group"
                         >
-                            <ArrowLeft size={20} className="text-gray-400 group-hover:text-white transition-colors" />
+                            <ArrowLeft size={20} className="text-slate-400 group-hover:text-white transition-colors" />
                         </button>
                         <div>
                             <h1 className="text-lg font-bold text-white flex items-center gap-2">
                                 {data.title}
-                                <span className="px-2 py-0.5 bg-white/5 rounded text-[10px] text-gray-400 font-normal border border-white/5">
+                                <span className="px-2 py-0.5 bg-white/5 rounded text-[10px] text-slate-400 font-normal border border-white/5">
                                     {data.date}
                                 </span>
                             </h1>
@@ -370,11 +370,10 @@ const MeetingDashboard = () => {
                         <button
                             onClick={generateAnalysis}
                             disabled={generating}
-                            className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                                generating 
-                                    ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
-                                    : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
-                            }`}
+                            className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${generating
+                                    ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]'
+                                    : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
+                                }`}
                             title="Regenerate AI Analysis"
                         >
                             {generating ? (
@@ -404,7 +403,7 @@ const MeetingDashboard = () => {
                         <button
                             onClick={() => fetchDashboardData(true)}
                             disabled={reloading}
-                            className="p-2 hover:bg-white/5 rounded-lg text-gray-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Refresh Data"
                         >
                             <RefreshCw size={18} className={reloading ? 'animate-spin' : ''} />
@@ -418,7 +417,7 @@ const MeetingDashboard = () => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`relative pb-4 pt-2 text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${activeTab === tab.id ? 'text-white' : 'text-gray-500 hover:text-gray-300'
+                            className={`relative pb-4 pt-2 text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${activeTab === tab.id ? 'text-white' : 'text-slate-500 hover:text-slate-300'
                                 }`}
                         >
                             <tab.icon size={16} className={activeTab === tab.id ? 'text-emerald-400' : ''} />
@@ -541,7 +540,7 @@ const OverviewTab = ({ data, meetingId }) => {
             if (res.data.success) {
                 setEmailExported(true);
                 alert(`✅ Dashboard successfully exported to ${recipientEmail}!\n\nCheck your Outlook inbox for the complete meeting summary.`);
-                
+
                 // Reset the exported state after 3 seconds
                 setTimeout(() => setEmailExported(false), 3000);
             }
@@ -655,7 +654,7 @@ const OverviewTab = ({ data, meetingId }) => {
                 // Reload full data from database to ensure consistency
                 await fetchDashboardData();
                 setEditingSpeaker(null);
-                
+
                 // Show success message
                 console.log('Speaker name updated successfully in database');
             }
@@ -688,7 +687,7 @@ const OverviewTab = ({ data, meetingId }) => {
             {/* Speakers Section */}
             <div className="bg-[#1C1F2E] rounded-3xl p-6 border border-white/5 shadow-sm">
                 <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-                    <User size={18} className="text-gray-400" />
+                    <User size={18} className="text-slate-400" />
                     Speakers
                 </h3>
                 <div className="space-y-3">
@@ -755,19 +754,19 @@ const OverviewTab = ({ data, meetingId }) => {
                                                     className="p-1 opacity-0 group-hover:opacity-100 hover:bg-white/10 rounded transition-all"
                                                     title="Edit speaker name"
                                                 >
-                                                    <Edit2 size={12} className="text-gray-400 hover:text-white" />
+                                                    <Edit2 size={12} className="text-slate-400 hover:text-white" />
                                                 </button>
                                             </>
                                         )}
                                         {speaker.role && !isEditing && (
-                                            <span className="text-xs px-2 py-0.5 bg-white/5 rounded-full text-gray-400">
+                                            <span className="text-xs px-2 py-0.5 bg-white/5 rounded-full text-slate-400">
                                                 {speaker.role}
                                             </span>
                                         )}
                                     </div>
-                                    <div className="flex items-center gap-3 text-xs text-gray-400">
+                                    <div className="flex items-center gap-3 text-xs text-slate-400">
                                         <span>{utterances} utterances</span>
-                                        <span className="text-gray-600">•</span>
+                                        <span className="text-slate-500">•</span>
                                         <span className="text-cyan-400 font-semibold">{speaker.contribution?.toFixed(1) || '0.0'}%</span>
                                     </div>
                                 </div>
@@ -783,7 +782,7 @@ const OverviewTab = ({ data, meetingId }) => {
                         );
                     })}
                     {!data.participants?.length && (
-                        <p className="text-gray-500 text-sm text-center py-4">No speaker data available.</p>
+                        <p className="text-slate-500 text-sm text-center py-4">No speaker data available.</p>
                     )}
                 </div>
             </div>
@@ -793,7 +792,7 @@ const OverviewTab = ({ data, meetingId }) => {
                 <div className="lg:col-span-2 bg-[#1C1F2E] rounded-3xl p-6 border border-white/5 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            <FileText size={18} className="text-gray-400" />
+                            <FileText size={18} className="text-slate-400" />
                             Executive Summary
                         </h3>
 
@@ -820,13 +819,12 @@ const OverviewTab = ({ data, meetingId }) => {
                             </button>
                             <button
                                 onClick={handleTextToSpeech}
-                                className={`p-1.5 rounded-lg transition-colors ${
-                                    isSpeaking
+                                className={`p-1.5 rounded-lg transition-colors ${isSpeaking
                                         ? isPaused
                                             ? 'bg-amber-600/20 hover:bg-amber-600/40 text-amber-400'
                                             : 'bg-purple-600/20 hover:bg-purple-600/40 text-purple-400'
                                         : 'bg-blue-600/20 hover:bg-blue-600/40 text-blue-400'
-                                }`}
+                                    }`}
                                 title={isSpeaking ? (isPaused ? 'Resume' : 'Pause') : 'Listen to Summary'}
                             >
                                 {isSpeaking ? (isPaused ? <Volume2 size={12} /> : <Pause size={12} />) : <Volume2 size={12} />}
@@ -847,13 +845,13 @@ const OverviewTab = ({ data, meetingId }) => {
                     </p>
 
                     <div className="mt-6">
-                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Key Topics</h4>
+                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Key Topics</h4>
                         <div className="flex flex-wrap gap-2">
                             {data.keyTopics?.map((topic, i) => (
                                 <div key={i} className="px-3 py-1.5 bg-white/5 rounded-lg border border-white/5 text-xs text-slate-300 flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
                                     {topic.name}
-                                    <span className="text-gray-500 ml-1 opacity-60">
+                                    <span className="text-slate-500 ml-1 opacity-60">
                                         {Math.round(topic.percentage)}%
                                     </span>
                                 </div>
@@ -871,7 +869,7 @@ const OverviewTab = ({ data, meetingId }) => {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveHubTab(tab)}
-                                    className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${activeHubTab === tab ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'
+                                    className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${activeHubTab === tab ? 'bg-white/10 text-white' : 'text-slate-500 hover:text-slate-300'
                                         }`}
                                 >
                                     {tab}
@@ -884,16 +882,15 @@ const OverviewTab = ({ data, meetingId }) => {
                         {activeHubTab === 'email' && (
                             <div className="h-full flex flex-col animate-in fade-in duration-300">
                                 <div className="flex justify-between items-center mb-3">
-                                    <span className="text-xs text-gray-500">Draft</span>
+                                    <span className="text-xs text-slate-500">Draft</span>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={handleExportToEmail}
                                             disabled={exportingEmail}
-                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                                                emailExported 
-                                                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${emailExported
+                                                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                                                     : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30'
-                                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                } disabled:opacity-50 disabled:cursor-not-allowed`}
                                             title="Auto-export dashboard to your Outlook email"
                                         >
                                             {exportingEmail ? (
@@ -924,7 +921,7 @@ const OverviewTab = ({ data, meetingId }) => {
                         {activeHubTab === 'slack' && (
                             <div className="h-full flex flex-col animate-in fade-in duration-300">
                                 <div className="flex justify-between items-center mb-3">
-                                    <span className="text-xs text-gray-500">Update</span>
+                                    <span className="text-xs text-slate-500">Update</span>
                                     <CopyButton text={data.followUpDrafts?.slack} />
                                 </div>
                                 <div className="p-3 bg-[#0B0E14] rounded-xl border border-white/5 text-xs text-slate-300">
@@ -941,10 +938,10 @@ const OverviewTab = ({ data, meetingId }) => {
                                             <span className={`text-[9px] px-1.5 py-0.5 rounded uppercase font-bold ${risk.severity === 'High' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'
                                                 }`}>{risk.severity}</span>
                                         </div>
-                                        <p className="text-[10px] text-gray-400">{risk.impact}</p>
+                                        <p className="text-[10px] text-slate-400">{risk.impact}</p>
                                     </div>
                                 ))}
-                                {!data.risks?.length && <p className="text-center text-gray-500 text-xs mt-10">No risks identified.</p>}
+                                {!data.risks?.length && <p className="text-center text-slate-500 text-xs mt-10">No risks identified.</p>}
                             </div>
                         )}
                     </div>
@@ -962,7 +959,7 @@ const OverviewTab = ({ data, meetingId }) => {
                 <div className="bg-[#1C1F2E] rounded-3xl p-6 border border-white/5 shadow-sm">
                     <h3 className="text-base font-bold text-white mb-4 flex items-center gap-2">
                         Top Priorities
-                        <span className="text-xs text-gray-500 font-normal">by Speaker</span>
+                        <span className="text-xs text-slate-500 font-normal">by Speaker</span>
                     </h3>
                     <ul className="space-y-4">
                         {data.topPriorities?.map((item, i) => {
@@ -986,7 +983,7 @@ const OverviewTab = ({ data, meetingId }) => {
                                                             alt={speaker}
                                                             className="w-4 h-4 rounded-full"
                                                         />
-                                                        <span className="text-xs text-gray-400 font-medium">{speaker}</span>
+                                                        <span className="text-xs text-slate-400 font-medium">{speaker}</span>
                                                     </div>
                                                     {percentage !== null && (
                                                         <div className="flex items-center gap-1.5">
@@ -1008,7 +1005,7 @@ const OverviewTab = ({ data, meetingId }) => {
                                 </li>
                             );
                         })}
-                        {!data.topPriorities?.length && <p className="text-gray-500 text-sm">No specific priorities listed.</p>}
+                        {!data.topPriorities?.length && <p className="text-slate-500 text-sm">No specific priorities listed.</p>}
                     </ul>
                 </div>
 
@@ -1020,10 +1017,10 @@ const OverviewTab = ({ data, meetingId }) => {
                                 <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#1C1F2E] border-2 border-emerald-500"></div>
                                 <span className="text-xs text-emerald-400 font-mono mb-1 block">{item.time}</span>
                                 <p className="text-sm font-semibold text-slate-200">{item.event}</p>
-                                <p className="text-xs text-gray-400 mt-1">{item.description}</p>
+                                <p className="text-xs text-slate-400 mt-1">{item.description}</p>
                             </div>
                         ))}
-                        {!data.timeline?.length && <p className="text-gray-500 text-sm">Timeline data unavailable.</p>}
+                        {!data.timeline?.length && <p className="text-slate-500 text-sm">Timeline data unavailable.</p>}
                     </div>
                 </div>
             </div>
@@ -1039,7 +1036,7 @@ const TasksTab = ({ data }) => {
             <div className="p-8 border-b border-white/5">
                 <div>
                     <h2 className="text-2xl font-bold text-white mb-1">Tasks & Actions</h2>
-                    <p className="text-gray-400 text-sm">Track progress and accountability</p>
+                    <p className="text-slate-400 text-sm">Track progress and accountability</p>
                 </div>
             </div>
 
@@ -1049,12 +1046,12 @@ const TasksTab = ({ data }) => {
                         {tasks.map((task, i) => (
                             <div key={i} className="group flex items-start sm:items-center justify-between p-5 bg-[#0B0E14] border border-white/5 rounded-2xl hover:border-emerald-500/30 transition-all hover:bg-[#0B0E14]/80">
                                 <div className="flex items-start gap-4">
-                                    <button className="mt-1 text-gray-500 hover:text-emerald-500 transition-colors">
+                                    <button className="mt-1 text-slate-500 hover:text-emerald-500 transition-colors">
                                         <CheckCircle2 size={20} />
                                     </button>
                                     <div>
                                         <p className="text-base font-medium text-slate-100 mb-1">{task.task}</p>
-                                        <div className="flex items-center gap-3 text-xs text-gray-400">
+                                        <div className="flex items-center gap-3 text-xs text-slate-400">
                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${task.priority === 'High' ? 'bg-red-500/10 text-red-400' :
                                                 task.priority === 'Medium' ? 'bg-amber-500/10 text-amber-400' :
                                                     'bg-blue-500/10 text-blue-400'
@@ -1075,17 +1072,17 @@ const TasksTab = ({ data }) => {
                                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-[10px] font-bold text-white">
                                             {task.owner ? task.owner.charAt(0) : '?'}
                                         </div>
-                                        <span className="text-sm text-gray-400">{task.owner || 'Unassigned'}</span>
+                                        <span className="text-sm text-slate-400">{task.owner || 'Unassigned'}</span>
                                     </div>
                                     <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                                        <button className="p-2 hover:bg-white/10 rounded-lg text-gray-400"><MoreHorizontal size={16} /></button>
+                                        <button className="p-2 hover:bg-white/10 rounded-lg text-slate-400"><MoreHorizontal size={16} /></button>
                                     </div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <div className="flex flex-col items-center justify-center h-full text-slate-500">
                         <CheckCircle2 size={48} className="opacity-20 mb-4" />
                         <p>No action items extracted from this meeting.</p>
                     </div>
@@ -1129,14 +1126,14 @@ const CalendarTab = ({ data }) => {
                             </div>
                             <h3 className="text-lg font-bold text-white mb-1">{date.date}</h3>
                             <p className="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">{date.event}</p>
-                            <p className="text-sm text-gray-400 leading-relaxed">
+                            <p className="text-sm text-slate-400 leading-relaxed">
                                 {date.description}
                             </p>
                         </div>
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                <div className="flex flex-col items-center justify-center h-64 text-slate-500">
                     <Calendar size={48} className="opacity-20 mb-4" />
                     <p>No important dates detected.</p>
                 </div>
@@ -1215,14 +1212,14 @@ const AnalyticsTab = ({ data }) => {
                             <p className="text-sm text-slate-300 mb-4">{item.details}</p>
                             <div className="flex flex-wrap gap-2">
                                 {item.subtopics?.map((sub, j) => (
-                                    <span key={j} className="text-[10px] px-2 py-1 bg-white/5 rounded-md text-gray-400">
+                                    <span key={j} className="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400">
                                         {sub}
                                     </span>
                                 ))}
                             </div>
                         </div>
                     ))}
-                    {!data.topicBreakdown?.length && <p className="text-gray-500">No detailed breakdown available.</p>}
+                    {!data.topicBreakdown?.length && <p className="text-slate-500">No detailed breakdown available.</p>}
                 </div>
             </div>
         </div>
@@ -1240,11 +1237,11 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                     <div className="h-full flex flex-col items-center justify-center text-center">
                         <Sparkles size={48} className="text-white mb-3 opacity-40" />
                         <h3 className="text-xl font-bold text-white mb-1.5">Ask AI about the meeting</h3>
-                        <p className="text-xs text-gray-400 mb-4">Powered by Google Gemini AI</p>
+                        <p className="text-xs text-slate-400 mb-4">Powered by Google Gemini AI</p>
 
                         {/* Suggested Questions */}
                         <div className="mt-3 w-full max-w-2xl">
-                            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-semibold">Suggested Questions</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2 font-semibold">Suggested Questions</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {suggestedQuestions?.map((question, idx) => (
                                     <button
@@ -1323,7 +1320,7 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                         onChange={(e) => setChatQuery(e.target.value)}
                         placeholder="Ask anything about the meeting..."
                         disabled={askingAi}
-                        className="w-full bg-[#1C1F2E] border border-white/10 rounded-lg pl-3 pr-10 py-2.5 text-xs text-white focus:outline-none focus:border-white/50 focus:ring-1 focus:ring-white/50 transition-all placeholder:text-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-[#1C1F2E] border border-white/10 rounded-lg pl-3 pr-10 py-2.5 text-xs text-white focus:outline-none focus:border-white/50 focus:ring-1 focus:ring-white/50 transition-all placeholder:text-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <button
                         type="submit"
@@ -1350,7 +1347,7 @@ const TranscriptTimelineTab = ({ data, exportToSRT }) => {
                             <FileText size={24} className="text-white" />
                             Transcript Timeline
                         </h2>
-                        <p className="text-gray-400 text-sm">Timestamped conversation with speakers (SRT Format)</p>
+                        <p className="text-slate-400 text-sm">Timestamped conversation with speakers (SRT Format)</p>
                     </div>
                     <button
                         onClick={exportToSRT}
@@ -1388,13 +1385,13 @@ const TranscriptTimelineTab = ({ data, exportToSRT }) => {
                                             <span className="text-xs font-mono text-white bg-white/10 px-2 py-1 rounded border border-white/20">
                                                 {segment.startTime}
                                             </span>
-                                            <span className="text-xs text-gray-500">→</span>
-                                            <span className="text-xs font-mono text-gray-400">
+                                            <span className="text-xs text-slate-500">→</span>
+                                            <span className="text-xs font-mono text-slate-400">
                                                 {segment.endTime}
                                             </span>
                                             {segment.speaker && (
                                                 <>
-                                                    <span className="text-xs text-gray-600">•</span>
+                                                    <span className="text-xs text-slate-500">•</span>
                                                     <span className="text-xs font-semibold text-white">
                                                         {segment.speaker}
                                                     </span>
@@ -1407,7 +1404,7 @@ const TranscriptTimelineTab = ({ data, exportToSRT }) => {
                                     </div>
 
                                     {/* Segment number */}
-                                    <div className="flex-shrink-0 text-xs text-gray-600 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex-shrink-0 text-xs text-slate-500 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
                                         #{index + 1}
                                     </div>
                                 </div>
@@ -1416,12 +1413,12 @@ const TranscriptTimelineTab = ({ data, exportToSRT }) => {
                     </div>
                 ) : (
                     <div className="h-full flex flex-col items-center justify-center text-center">
-                        <FileText size={64} className="text-gray-600 mb-4 opacity-30" />
-                        <h3 className="text-xl font-bold text-gray-500 mb-2">No Timeline Available</h3>
-                        <p className="text-sm text-gray-600 mb-6">
+                        <FileText size={64} className="text-slate-500 mb-4 opacity-30" />
+                        <h3 className="text-xl font-bold text-slate-500 mb-2">No Timeline Available</h3>
+                        <p className="text-sm text-slate-500 mb-6">
                             The transcript timeline will be generated when you create or regenerate the analysis.
                         </p>
-                        <div className="text-xs text-gray-600 bg-white/5 px-4 py-3 rounded-lg border border-white/5 max-w-md">
+                        <div className="text-xs text-slate-500 bg-white/5 px-4 py-3 rounded-lg border border-white/5 max-w-md">
                             <p className="mb-2"><strong>What is this?</strong></p>
                             <p>Transcript Timeline shows the conversation broken into timestamped segments with speaker identification - perfect for creating subtitles or reviewing specific moments.</p>
                         </div>
@@ -1435,7 +1432,7 @@ const TranscriptTimelineTab = ({ data, exportToSRT }) => {
 const SpeakerTimelineVisualization = ({ data }) => {
     if (!data.transcriptTimeline || data.transcriptTimeline.length === 0) {
         return (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-slate-500">
                 <p className="text-sm">No timeline data available</p>
             </div>
         );
@@ -1497,7 +1494,7 @@ const SpeakerTimelineVisualization = ({ data }) => {
             {/* Timeline Bar */}
             <div className="relative bg-[#0B0E14] rounded-xl p-4 border border-white/5">
                 {/* Time markers */}
-                <div className="flex justify-between text-xs text-gray-600 mb-2 px-1">
+                <div className="flex justify-between text-xs text-slate-500 mb-2 px-1">
                     <span>0:00</span>
                     <span>{formatDisplayTime(totalDuration)}</span>
                 </div>
@@ -1548,7 +1545,7 @@ const SpeakerTimelineVisualization = ({ data }) => {
                                 className="w-3 h-3 rounded"
                                 style={{ backgroundColor: speakerColors[speaker] }}
                             />
-                            <span className="text-xs text-gray-400">{speaker}</span>
+                            <span className="text-xs text-slate-400">{speaker}</span>
                         </div>
                     ))}
                 </div>
@@ -1563,7 +1560,7 @@ const StatCard = ({ label, value, icon }) => (
             {icon}
         </div>
         <div>
-            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider">{label}</p>
+            <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider">{label}</p>
             <p className="text-2xl font-bold text-white mt-1">{value}</p>
         </div>
     </div>
@@ -1577,7 +1574,7 @@ const SentimentAnalysisTab = ({ data }) => {
     const sentimentTimeline = data.sentimentTimeline || [];
 
     // Calculate overall metrics
-    const totalStatements = speakerSentiments.reduce((acc, s) => 
+    const totalStatements = speakerSentiments.reduce((acc, s) =>
         acc + (s.positiveCount || 0) + (s.neutralCount || 0) + (s.negativeCount || 0), 0);
     const totalPositive = speakerSentiments.reduce((acc, s) => acc + (s.positiveCount || 0), 0);
     const totalNeutral = speakerSentiments.reduce((acc, s) => acc + (s.neutralCount || 0), 0);
@@ -1612,34 +1609,34 @@ const SentimentAnalysisTab = ({ data }) => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-[#1C1F2E] p-6 rounded-2xl border border-white/5">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Total Statements</h3>
-                        <MessageSquare className="text-gray-500" size={20} />
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Total Statements</h3>
+                        <MessageSquare className="text-slate-500" size={20} />
                     </div>
                     <p className="text-3xl font-bold text-white">{totalStatements}</p>
                 </div>
                 <div className="bg-[#1C1F2E] p-6 rounded-2xl border border-white/5">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Positive</h3>
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Positive</h3>
                         <Smile className="text-white" size={20} />
                     </div>
                     <p className="text-3xl font-bold text-white">{totalPositive}</p>
-                    <p className="text-xs text-gray-500 mt-1">{totalStatements > 0 ? ((totalPositive / totalStatements) * 100).toFixed(1) : 0}%</p>
+                    <p className="text-xs text-slate-500 mt-1">{totalStatements > 0 ? ((totalPositive / totalStatements) * 100).toFixed(1) : 0}%</p>
                 </div>
                 <div className="bg-[#1C1F2E] p-6 rounded-2xl border border-white/5">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Neutral</h3>
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Neutral</h3>
                         <Meh className="text-white/80" size={20} />
                     </div>
                     <p className="text-3xl font-bold text-white/80">{totalNeutral}</p>
-                    <p className="text-xs text-gray-500 mt-1">{totalStatements > 0 ? ((totalNeutral / totalStatements) * 100).toFixed(1) : 0}%</p>
+                    <p className="text-xs text-slate-500 mt-1">{totalStatements > 0 ? ((totalNeutral / totalStatements) * 100).toFixed(1) : 0}%</p>
                 </div>
                 <div className="bg-[#1C1F2E] p-6 rounded-2xl border border-white/5">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Negative</h3>
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Negative</h3>
                         <Frown className="text-white/60" size={20} />
                     </div>
                     <p className="text-3xl font-bold text-white/60">{totalNegative}</p>
-                    <p className="text-xs text-gray-500 mt-1">{totalStatements > 0 ? ((totalNegative / totalStatements) * 100).toFixed(1) : 0}%</p>
+                    <p className="text-xs text-slate-500 mt-1">{totalStatements > 0 ? ((totalNegative / totalStatements) * 100).toFixed(1) : 0}%</p>
                 </div>
             </div>
 
@@ -1666,36 +1663,36 @@ const SentimentAnalysisTab = ({ data }) => {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-semibold text-white">{speaker.speaker || 'Unknown'}</p>
-                                                <p className="text-xs text-gray-500">{total} statements</p>
+                                                <p className="text-xs text-slate-500">{total} statements</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
                                             <p className={`text-lg font-bold ${getSentimentColor(speaker.averageSentiment || 50)}`}>
                                                 {(speaker.averageSentiment || 50).toFixed(0)}
                                             </p>
-                                            <p className="text-xs text-gray-500">{getSentimentLabel(speaker.averageSentiment || 50)}</p>
+                                            <p className="text-xs text-slate-500">{getSentimentLabel(speaker.averageSentiment || 50)}</p>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Sentiment distribution bar */}
                                     <div className="w-full h-2 bg-[#1C1F2E] rounded-full overflow-hidden flex">
-                                        <div 
+                                        <div
                                             className="h-full bg-white transition-all"
                                             style={{ width: `${posPercent}%` }}
                                             title={`Positive: ${posPercent.toFixed(1)}%`}
                                         />
-                                        <div 
+                                        <div
                                             className="h-full bg-white/60 transition-all"
                                             style={{ width: `${neuPercent}%` }}
                                             title={`Neutral: ${neuPercent.toFixed(1)}%`}
                                         />
-                                        <div 
+                                        <div
                                             className="h-full bg-white/30 transition-all"
                                             style={{ width: `${negPercent}%` }}
                                             title={`Negative: ${negPercent.toFixed(1)}%`}
                                         />
                                     </div>
-                                    
+
                                     <div className="flex gap-4 mt-2 text-xs">
                                         <span className="text-white">{speaker.positiveCount || 0} Pos</span>
                                         <span className="text-white/80">{speaker.neutralCount || 0} Neu</span>
@@ -1705,7 +1702,7 @@ const SentimentAnalysisTab = ({ data }) => {
                             );
                         })}
                         {speakerSentiments.length === 0 && (
-                            <div className="text-center py-8 text-gray-500">
+                            <div className="text-center py-8 text-slate-500">
                                 <Meh size={48} className="mx-auto mb-3 opacity-30" />
                                 <p className="text-sm">No speaker sentiment data available</p>
                             </div>
@@ -1731,17 +1728,16 @@ const SentimentAnalysisTab = ({ data }) => {
                                                     {getSentimentIcon(trend.sentiment)}
                                                 </div>
                                                 <div className="flex-1">
-                                                    <p className="text-gray-300 leading-relaxed">"{trend.text}"</p>
+                                                    <p className="text-slate-300 leading-relaxed">"{trend.text}"</p>
                                                     <div className="flex items-center gap-2 mt-1">
-                                                        <span className={`font-semibold ${
-                                                            trend.sentiment?.toLowerCase() === 'positive' ? 'text-white' :
-                                                            trend.sentiment?.toLowerCase() === 'negative' ? 'text-white/60' :
-                                                            'text-white/80'
-                                                        }`}>
+                                                        <span className={`font-semibold ${trend.sentiment?.toLowerCase() === 'positive' ? 'text-white' :
+                                                                trend.sentiment?.toLowerCase() === 'negative' ? 'text-white/60' :
+                                                                    'text-white/80'
+                                                            }`}>
                                                             {trend.sentiment}
                                                         </span>
                                                         {trend.score && (
-                                                            <span className="text-gray-600">• Score: {trend.score}</span>
+                                                            <span className="text-slate-500">• Score: {trend.score}</span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -1752,7 +1748,7 @@ const SentimentAnalysisTab = ({ data }) => {
                             )
                         ))}
                         {speakerSentiments.every(s => !s.sentimentTrend || s.sentimentTrend.length === 0) && (
-                            <div className="text-center py-8 text-gray-500">
+                            <div className="text-center py-8 text-slate-500">
                                 <TrendingUp size={48} className="mx-auto mb-3 opacity-30" />
                                 <p className="text-sm">No sentiment trend data available</p>
                             </div>
@@ -1780,14 +1776,14 @@ const SentimentAnalysisTab = ({ data }) => {
                                 </span>
                             </div>
                             {buzz.context && (
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[#0B0E14] border border-white/10 rounded-lg text-xs text-gray-300 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[#0B0E14] border border-white/10 rounded-lg text-xs text-slate-300 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
                                     {buzz.context}
                                 </div>
                             )}
                         </div>
                     ))}
                     {buzzwords.length === 0 && (
-                        <div className="w-full text-center py-8 text-gray-500">
+                        <div className="w-full text-center py-8 text-slate-500">
                             <Target size={48} className="mx-auto mb-3 opacity-30" />
                             <p className="text-sm">No buzzwords data available</p>
                         </div>
@@ -1809,7 +1805,7 @@ const SentimentAnalysisTab = ({ data }) => {
                                     <div className={`px-3 py-1.5 rounded-lg border text-xs font-semibold uppercase tracking-wide ${getEmotionColor(moment.emotion)}`}>
                                         {moment.emotion}
                                     </div>
-                                    <p className="text-xs text-gray-600 text-center mt-2">{moment.timestamp}</p>
+                                    <p className="text-xs text-slate-500 text-center mt-2">{moment.timestamp}</p>
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-2">
@@ -1817,16 +1813,16 @@ const SentimentAnalysisTab = ({ data }) => {
                                         {moment.intensity && (
                                             <div className="flex items-center gap-1">
                                                 <div className="w-12 h-1.5 bg-[#1C1F2E] rounded-full overflow-hidden">
-                                                    <div 
+                                                    <div
                                                         className="h-full bg-white rounded-full"
                                                         style={{ width: `${moment.intensity}%` }}
                                                     />
                                                 </div>
-                                                <span className="text-xs text-gray-500">{moment.intensity}%</span>
+                                                <span className="text-xs text-slate-500">{moment.intensity}%</span>
                                             </div>
                                         )}
                                     </div>
-                                    <p className="text-sm text-gray-300 leading-relaxed italic">
+                                    <p className="text-sm text-slate-300 leading-relaxed italic">
                                         "{moment.text}"
                                     </p>
                                 </div>
@@ -1834,7 +1830,7 @@ const SentimentAnalysisTab = ({ data }) => {
                         </div>
                     ))}
                     {emotionalMoments.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-slate-500">
                             <Heart size={48} className="mx-auto mb-3 opacity-30" />
                             <p className="text-sm">No emotional moments data available</p>
                         </div>
@@ -1863,13 +1859,13 @@ const CopyButton = ({ text }) => {
     );
 }
 
-const CollaborationTab = ({ 
-    collaborators, 
-    newCollaboratorEmail, 
-    setNewCollaboratorEmail, 
-    handleAddCollaborator, 
-    handleRemoveCollaborator, 
-    addingCollaborator 
+const CollaborationTab = ({
+    collaborators,
+    newCollaboratorEmail,
+    setNewCollaboratorEmail,
+    handleAddCollaborator,
+    handleRemoveCollaborator,
+    addingCollaborator
 }) => {
     return (
         <div className="space-y-6">
@@ -1880,7 +1876,7 @@ const CollaborationTab = ({
                             <Users size={18} className="text-white" />
                             Share Dashboard
                         </h3>
-                        <p className="text-sm text-gray-400 mt-1">
+                        <p className="text-sm text-slate-400 mt-1">
                             Invite others to view this meeting dashboard
                         </p>
                     </div>
@@ -1890,13 +1886,13 @@ const CollaborationTab = ({
                 <form onSubmit={handleAddCollaborator} className="mb-6">
                     <div className="flex gap-3">
                         <div className="flex-1 relative">
-                            <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                            <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                             <input
                                 type="email"
                                 value={newCollaboratorEmail}
                                 onChange={(e) => setNewCollaboratorEmail(e.target.value)}
                                 placeholder="Enter email address"
-                                className="w-full pl-10 pr-4 py-3 bg-[#0B0E14] border border-white/10 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                                className="w-full pl-10 pr-4 py-3 bg-[#0B0E14] border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 transition-colors"
                                 disabled={addingCollaborator}
                             />
                         </div>
@@ -1922,11 +1918,11 @@ const CollaborationTab = ({
 
                 {/* Collaborators List */}
                 <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                    <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">
                         Collaborators ({collaborators.length})
                     </h4>
                     {collaborators.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-slate-500">
                             <Users size={48} className="mx-auto mb-3 opacity-30" />
                             <p className="text-sm">No collaborators yet</p>
                             <p className="text-xs mt-1">Add someone's email to share this dashboard</p>
@@ -1944,7 +1940,7 @@ const CollaborationTab = ({
                                         </div>
                                         <div>
                                             <p className="text-white font-medium">{email}</p>
-                                            <p className="text-xs text-gray-500">Can view this dashboard</p>
+                                            <p className="text-xs text-slate-500">Can view this dashboard</p>
                                         </div>
                                     </div>
                                     <button
@@ -1967,8 +1963,8 @@ const CollaborationTab = ({
                     <AlertTriangle size={20} className="text-white flex-shrink-0 mt-0.5" />
                     <div>
                         <h4 className="text-white font-semibold text-sm mb-1">Sharing Information</h4>
-                        <p className="text-gray-400 text-sm">
-                            Collaborators will be able to view all meeting details, transcripts, analytics, and AI insights. 
+                        <p className="text-slate-400 text-sm">
+                            Collaborators will be able to view all meeting details, transcripts, analytics, and AI insights.
                             They can access this dashboard using the shared link.
                         </p>
                     </div>

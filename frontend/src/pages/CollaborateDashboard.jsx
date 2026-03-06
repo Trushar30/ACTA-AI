@@ -109,24 +109,24 @@ const CollaborateDashboard = () => {
                                 <Users size={28} className="text-white" />
                             </div>
                             <h1 className="text-2xl font-bold text-white mb-2">Collaborate</h1>
-                            <p className="text-gray-400 text-sm">
+                            <p className="text-slate-400 text-sm">
                                 Enter your email to view meetings shared with you
                             </p>
                         </div>
 
                         <form onSubmit={handleEmailSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-2">
+                                <label className="block text-sm font-medium text-slate-400 mb-2">
                                     Your Email Address
                                 </label>
                                 <div className="relative">
-                                    <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                    <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                                     <input
                                         type="email"
                                         value={userEmail}
                                         onChange={(e) => setUserEmail(e.target.value)}
                                         placeholder="you@example.com"
-                                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-white/30 transition-colors"
+                                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30 transition-colors"
                                         required
                                     />
                                 </div>
@@ -142,7 +142,7 @@ const CollaborateDashboard = () => {
 
                         <button
                             onClick={() => navigate('/dashboard')}
-                            className="w-full mt-4 text-gray-400 hover:text-white text-sm transition-colors"
+                            className="w-full mt-4 text-slate-400 hover:text-white text-sm transition-colors"
                         >
                             Back to Dashboard
                         </button>
@@ -163,7 +163,7 @@ const CollaborateDashboard = () => {
                 <div className="flex items-center gap-4">
                     <h1 className="text-3xl font-bold tracking-tight text-white">Collaborate</h1>
                     <div className="h-6 w-px bg-white/10"></div>
-                    <p className="text-gray-400 font-medium flex items-center gap-2 text-sm">
+                    <p className="text-slate-400 font-medium flex items-center gap-2 text-sm">
                         <Users size={16} className="text-white" />
                         Shared Meetings
                     </p>
@@ -182,12 +182,12 @@ const CollaborateDashboard = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="bg-white/5 rounded-2xl p-12 border border-white/10 text-center backdrop-blur-sm"
                     >
-                        <Users size={64} className="mx-auto mb-4 text-gray-600" />
+                        <Users size={64} className="mx-auto mb-4 text-slate-500" />
                         <h3 className="text-xl font-bold text-white mb-2">No Shared Meetings</h3>
-                        <p className="text-gray-400">
+                        <p className="text-slate-400">
                             No meetings have been shared with <span className="text-white font-medium">{userEmail}</span> yet.
                         </p>
-                        <p className="text-gray-500 text-sm mt-2">
+                        <p className="text-slate-500 text-sm mt-2">
                             When someone shares a meeting dashboard with you, it will appear here.
                         </p>
                     </motion.div>
@@ -214,7 +214,7 @@ const CollaborateDashboard = () => {
                                                     <h3 className="font-semibold text-white text-base leading-tight line-clamp-2">
                                                         {meeting.meetingName || 'Meeting'}
                                                     </h3>
-                                                    <p className="text-xs text-gray-500 mt-1">
+                                                    <p className="text-xs text-slate-500 mt-1">
                                                         Shared by: {meeting.userEmail?.split('@')[0] || 'Unknown'}
                                                     </p>
                                                 </div>
@@ -233,11 +233,11 @@ const CollaborateDashboard = () => {
 
                                         {/* Meeting Details */}
                                         <div className="space-y-2 mb-4">
-                                            <div className="flex items-center gap-2 text-xs text-gray-400">
+                                            <div className="flex items-center gap-2 text-xs text-slate-400">
                                                 <Calendar size={12} />
                                                 <span>{formatDate(meeting.createdAt)}</span>
                                             </div>
-                                            <div className="flex items-center gap-2 text-xs text-gray-400">
+                                            <div className="flex items-center gap-2 text-xs text-slate-400">
                                                 <Clock size={12} />
                                                 <span>{formatTime(meeting.createdAt)}</span>
                                             </div>
@@ -245,10 +245,10 @@ const CollaborateDashboard = () => {
 
                                         {/* Footer */}
                                         <div className="pt-3 border-t border-white/5 flex items-center justify-between">
-                                            <span className="text-xs text-gray-500">
+                                            <span className="text-xs text-slate-500">
                                                 View dashboard
                                             </span>
-                                            <ExternalLink size={12} className="text-gray-500 group-hover:text-white transition-colors" />
+                                            <ExternalLink size={12} className="text-slate-500 group-hover:text-white transition-colors" />
                                         </div>
                                     </div>
                                 </div>

@@ -53,7 +53,7 @@ const Profile = () => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="glass rounded-2xl p-6 border border-white/5"
+                className="glass rounded-2xl p-6 border border-white/10"
             >
                 <div className="flex flex-col items-center mb-6">
                     <div className="relative mb-3">
@@ -77,7 +77,7 @@ const Profile = () => {
                 </div>
 
                 <div className="space-y-2.5 mb-6">
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/[0.07] transition-colors">
+                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3 hover:bg-white/[0.07] transition-colors">
                         <div className="p-2 rounded-lg bg-white/5 text-white/70">
                             <User size={16} />
                         </div>
@@ -87,7 +87,7 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/[0.07] transition-colors">
+                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3 hover:bg-white/[0.07] transition-colors">
                         <div className="p-2 rounded-lg bg-white/5 text-white/70">
                             <Mail size={16} />
                         </div>
@@ -113,7 +113,7 @@ const Profile = () => {
 
                 <button
                     onClick={handleLogout}
-                    className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/5 hover:border-white/10 transition-all font-medium flex items-center justify-center gap-2 text-sm"
+                    className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 hover:border-white/20 transition-all font-medium flex items-center justify-center gap-2 text-sm"
                 >
                     <LogOut size={16} />
                     Sign Out

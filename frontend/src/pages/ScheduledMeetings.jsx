@@ -287,24 +287,23 @@ const ScheduledMeetings = () => {
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setShowGeminiModal(true)}
-                            className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                                showGeminiModal 
-                                    ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
-                                    : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                    <button
+                        onClick={() => setShowGeminiModal(true)}
+                        className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${showGeminiModal
+                                ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]'
+                                : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
                             }`}
-                            title="Generate with Gemini AI"
-                        >
-                            <Sparkles size={16} className={showGeminiModal ? 'animate-pulse' : ''} />
-                        </button>
-                        <button
-                            onClick={() => setShowCreateForm(true)}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-white text-black hover:bg-slate-200 rounded-md transition-all font-semibold text-sm shadow-lg"
-                        >
-                            <Plus size={18} />
-                            Create Schedule
-                        </button>
+                        title="Generate with Gemini AI"
+                    >
+                        <Sparkles size={16} className={showGeminiModal ? 'animate-pulse' : ''} />
+                    </button>
+                    <button
+                        onClick={() => setShowCreateForm(true)}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white text-black hover:bg-slate-200 rounded-md transition-all font-semibold text-sm shadow-lg"
+                    >
+                        <Plus size={18} />
+                        Create Schedule
+                    </button>
                 </div>
             </header>
 
@@ -314,10 +313,10 @@ const ScheduledMeetings = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-center py-20 text-gray-500 border border-dashed border-white/10 rounded-3xl bg-white/5"
+                        className="text-center py-20 text-slate-500 border border-dashed border-white/10 rounded-3xl bg-white/5"
                     >
                         <Calendar size={60} className="mx-auto mb-4 opacity-30" />
-                        <h3 className="text-xl mb-2 font-semibold text-gray-400">No Scheduled Meetings</h3>
+                        <h3 className="text-xl mb-2 font-semibold text-slate-400">No Scheduled Meetings</h3>
                         <p className="text-sm mb-4">
                             Create your first scheduled meeting to get started.
                         </p>
@@ -386,11 +385,11 @@ const ScheduledMeetings = () => {
                                             </div>
 
                                             <div className="space-y-1.5 mb-4">
-                                                <div className="flex items-center gap-2 text-xs text-gray-400">
+                                                <div className="flex items-center gap-2 text-xs text-slate-400">
                                                     <Calendar size={12} />
                                                     {date}
                                                 </div>
-                                                <div className="flex items-center gap-2 text-xs text-gray-400">
+                                                <div className="flex items-center gap-2 text-xs text-slate-400">
                                                     <Clock size={12} />
                                                     {time}
                                                 </div>
@@ -447,7 +446,7 @@ const ScheduledMeetings = () => {
 
 
                             {/* Modal Content */}
-                            <div className="relative bg-[#12151C] rounded-xl p-6 border border-white/5 shadow-2xl">
+                            <div className="relative bg-[#0F1219] rounded-xl p-6 border border-white/5 shadow-2xl">
                                 {/* Header */}
                                 <div className="flex items-center justify-between mb-6">
                                     <h2 className="text-xl font-bold text-white">Create Scheduled Meeting</h2>
@@ -455,7 +454,7 @@ const ScheduledMeetings = () => {
                                         onClick={() => setShowCreateForm(false)}
                                         className="p-2 hover:bg-white/10 rounded-lg transition-all hover:rotate-90 duration-300"
                                     >
-                                        <X size={20} className="text-gray-400 hover:text-white transition-colors" />
+                                        <X size={20} className="text-slate-400 hover:text-white transition-colors" />
                                     </button>
                                 </div>
 
@@ -585,10 +584,10 @@ const ScheduledMeetings = () => {
                             className="max-w-md w-full relative group"
                         >
                             {/* Gradient Glow Effect */}
-                            <div className="absolute -inset-1 bg-gradient-to-r from-white/20 via-white/10 to-white/20 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
+                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/10 to-blue-500/20 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
 
                             {/* Modal Content */}
-                            <div className="relative bg-[#12151C] rounded-2xl p-6 border border-white/10 shadow-2xl">
+                            <div className="relative bg-[#0F1219] rounded-2xl p-6 border border-white/10 shadow-2xl">
                                 {/* Header */}
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="flex items-center gap-3">
@@ -601,7 +600,7 @@ const ScheduledMeetings = () => {
                                         onClick={() => setShowGeminiModal(false)}
                                         className="p-2 hover:bg-white/10 rounded-lg transition-all hover:rotate-90 duration-300"
                                     >
-                                        <X size={20} className="text-gray-400 hover:text-white transition-colors" />
+                                        <X size={20} className="text-slate-400 hover:text-white transition-colors" />
                                     </button>
                                 </div>
 

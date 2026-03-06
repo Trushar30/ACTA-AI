@@ -46,7 +46,7 @@ const Presentation = () => {
       title: 'Technology Stack',
       type: 'tech',
       stacks: [
-        { 
+        {
           category: 'Frontend',
           color: 'from-blue-500 to-cyan-500',
           items: ['React', 'Vite', 'TailwindCSS', 'Socket.IO', 'Framer Motion']
@@ -165,10 +165,10 @@ const Presentation = () => {
               <h1 className="text-8xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 {slide.title}
               </h1>
-              <p className="text-3xl text-gray-300 font-light">{slide.subtitle}</p>
+              <p className="text-3xl text-slate-300 font-light">{slide.subtitle}</p>
               <div className="flex items-center justify-center gap-4 mt-12">
                 <Play className="w-6 h-6 text-blue-400 animate-pulse" />
-                <span className="text-gray-400">Press → to start</span>
+                <span className="text-slate-400">Press → to start</span>
               </div>
             </div>
           </div>
@@ -186,7 +186,7 @@ const Presentation = () => {
                   style={{ animationDelay: `${i * 0.1}s` }}
                 >
                   <div className="text-5xl mb-4">{item.icon}</div>
-                  <p className="text-2xl text-gray-200">{item.text}</p>
+                  <p className="text-2xl text-slate-200">{item.text}</p>
                 </div>
               ))}
             </div>
@@ -203,12 +203,12 @@ const Presentation = () => {
                 return (
                   <div
                     key={i}
-                    className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700 hover:border-blue-500 transition-all transform hover:-translate-y-2"
+                    className="bg-white/5 p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all transform hover:-translate-y-2"
                     style={{ animationDelay: `${i * 0.1}s` }}
                   >
                     <Icon className="w-12 h-12 text-blue-400 mb-4" />
                     <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
-                    <p className="text-gray-400">{feature.desc}</p>
+                    <p className="text-slate-400">{feature.desc}</p>
                   </div>
                 );
               })}
@@ -225,29 +225,29 @@ const Presentation = () => {
                 <div className="bg-blue-500/20 border border-blue-500 p-6 rounded-xl">
                   <Globe className="w-10 h-10 text-blue-400 mb-2" />
                   <div className="font-bold text-white">Frontend</div>
-                  <div className="text-sm text-gray-400">React + Vite</div>
+                  <div className="text-sm text-slate-400">React + Vite</div>
                 </div>
                 <div className="bg-green-500/20 border border-green-500 p-6 rounded-xl">
                   <Database className="w-10 h-10 text-green-400 mb-2" />
                   <div className="font-bold text-white">Backend</div>
-                  <div className="text-sm text-gray-400">Node.js + Express</div>
+                  <div className="text-sm text-slate-400">Node.js + Express</div>
                 </div>
               </div>
-              
+
               <div className="flex flex-col items-center gap-4">
-                <ArrowRight className="w-12 h-12 text-gray-600" />
-                <ArrowRight className="w-12 h-12 text-gray-600" />
+                <ArrowRight className="w-12 h-12 text-slate-500" />
+                <ArrowRight className="w-12 h-12 text-slate-500" />
               </div>
 
               <div className="bg-purple-500/20 border border-purple-500 p-8 rounded-xl">
                 <Bot className="w-12 h-12 text-purple-400 mb-3 mx-auto" />
                 <div className="font-bold text-white text-center">Meeting Bot</div>
-                <div className="text-sm text-gray-400 text-center">Puppeteer</div>
+                <div className="text-sm text-slate-400 text-center">Puppeteer</div>
               </div>
 
               <div className="flex flex-col items-center gap-4">
-                <ArrowRight className="w-12 h-12 text-gray-600" />
-                <ArrowRight className="w-12 h-12 text-gray-600" />
+                <ArrowRight className="w-12 h-12 text-slate-500" />
+                <ArrowRight className="w-12 h-12 text-slate-500" />
               </div>
 
               <div className="flex flex-col gap-4">
@@ -282,9 +282,9 @@ const Presentation = () => {
                     {stack.items.map((item, j) => (
                       <div
                         key={j}
-                        className="bg-gray-800 p-4 rounded-lg border border-gray-700 hover:border-blue-500 transition-colors"
+                        className="bg-white/5 p-4 rounded-lg border border-white/10 hover:border-white/20 transition-colors"
                       >
-                        <span className="text-gray-200">{item}</span>
+                        <span className="text-slate-200">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -306,10 +306,10 @@ const Presentation = () => {
                       {step.num}
                     </div>
                     <div className="font-bold text-white mb-2">{step.title}</div>
-                    <div className="text-sm text-gray-400">{step.desc}</div>
+                    <div className="text-sm text-slate-400">{step.desc}</div>
                   </div>
                   {i < slide.steps.length - 1 && (
-                    <ArrowRight className="w-8 h-8 text-gray-600 flex-shrink-0" />
+                    <ArrowRight className="w-8 h-8 text-slate-500 flex-shrink-0" />
                   )}
                 </React.Fragment>
               ))}
@@ -321,7 +321,7 @@ const Presentation = () => {
         return (
           <div className="h-full flex flex-col justify-center px-16">
             <h2 className="text-6xl font-bold text-white mb-16">{slide.title}</h2>
-            <div className="bg-gradient-to-br from-gray-900 to-black rounded-3xl p-12 border border-gray-800">
+            <div className="bg-white/5 rounded-3xl p-12 border border-white/10">
               <div className="space-y-8">
                 <div className="flex items-start gap-6">
                   <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
@@ -329,11 +329,11 @@ const Presentation = () => {
                   </div>
                   <div className="flex-1">
                     <div className="text-2xl font-bold text-white mb-2">Live Transcription</div>
-                    <div className="bg-gray-800 p-6 rounded-xl">
-                      <p className="text-gray-300 italic">"Let's discuss the Q4 roadmap. John, can you update the mockups by Friday?"</p>
+                    <div className="bg-white/5 p-6 rounded-xl border border-white/10">
+                      <p className="text-slate-300 italic">"Let's discuss the Q4 roadmap. John, can you update the mockups by Friday?"</p>
                       <div className="mt-4 flex gap-2">
                         <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm">SPEAKER_A</span>
-                        <span className="text-gray-500">00:45</span>
+                        <span className="text-slate-500">00:45</span>
                       </div>
                     </div>
                   </div>
@@ -345,9 +345,9 @@ const Presentation = () => {
                   </div>
                   <div className="flex-1">
                     <div className="text-2xl font-bold text-white mb-2">Extracted Tasks</div>
-                    <div className="bg-gray-800 p-6 rounded-xl">
+                    <div className="bg-white/5 p-6 rounded-xl border border-white/10">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-300">Update design mockups</span>
+                        <span className="text-slate-300">Update design mockups</span>
                         <div className="flex gap-2">
                           <span className="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-sm">High Priority</span>
                           <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">John</span>
@@ -369,12 +369,12 @@ const Presentation = () => {
               {slide.metrics.map((metric, i) => (
                 <div
                   key={i}
-                  className="bg-gradient-to-br from-gray-800 to-gray-900 p-12 rounded-2xl border border-gray-700 text-center transform hover:scale-110 transition-transform"
+                  className="bg-white/5 p-12 rounded-2xl border border-white/10 text-center transform hover:scale-110 transition-transform"
                 >
                   <div className={`text-7xl font-black mb-4 ${metric.color}`}>
                     {metric.value}
                   </div>
-                  <div className="text-xl text-gray-400">{metric.label}</div>
+                  <div className="text-xl text-slate-400">{metric.label}</div>
                 </div>
               ))}
             </div>
@@ -390,12 +390,12 @@ const Presentation = () => {
               <h1 className="text-7xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 {slide.title}
               </h1>
-              <p className="text-3xl text-gray-300 font-light">{slide.subtitle}</p>
+              <p className="text-3xl text-slate-300 font-light">{slide.subtitle}</p>
               <div className="flex gap-6 justify-center mt-12">
-                <button className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl text-xl font-bold hover:scale-105 transition-transform">
+                <button className="px-8 py-4 bg-white text-black rounded-xl text-xl font-bold hover:bg-slate-200 hover:scale-105 transition-all">
                   Get Started
                 </button>
-                <button className="px-8 py-4 bg-gray-800 border border-gray-600 rounded-xl text-xl font-bold hover:border-blue-500 transition-colors">
+                <button className="px-8 py-4 bg-white/5 border border-white/10 rounded-xl text-xl font-bold hover:border-white/20 transition-colors">
                   Learn More
                 </button>
               </div>
@@ -409,7 +409,7 @@ const Presentation = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
+    <div className="h-screen w-screen bg-[#050505] text-white overflow-hidden">
       <style>
         {`
           @keyframes float {
@@ -418,7 +418,7 @@ const Presentation = () => {
           }
         `}
       </style>
-      
+
       <div className={`h-full transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
         {renderSlide()}
       </div>
@@ -428,7 +428,7 @@ const Presentation = () => {
         <button
           onClick={prevSlide}
           disabled={currentSlide === 0}
-          className="p-3 bg-gray-800/50 rounded-full hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-3 bg-white/5 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -438,11 +438,10 @@ const Presentation = () => {
             <button
               key={i}
               onClick={() => goToSlide(i)}
-              className={`transition-all ${
-                i === currentSlide
-                  ? 'w-8 h-3 bg-blue-500'
-                  : 'w-3 h-3 bg-gray-600 hover:bg-gray-500'
-              } rounded-full`}
+              className={`transition-all ${i === currentSlide
+                  ? 'w-8 h-3 bg-white'
+                  : 'w-3 h-3 bg-white/20 hover:bg-white/40'
+                } rounded-full`}
             />
           ))}
         </div>
@@ -450,14 +449,14 @@ const Presentation = () => {
         <button
           onClick={nextSlide}
           disabled={currentSlide === slides.length - 1}
-          className="p-3 bg-gray-800/50 rounded-full hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-3 bg-white/5 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
       </div>
 
       {/* Slide Counter */}
-      <div className="absolute top-8 right-8 text-gray-400">
+      <div className="absolute top-8 right-8 text-slate-400">
         {currentSlide + 1} / {slides.length}
       </div>
     </div>
