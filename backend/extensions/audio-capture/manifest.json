@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "Tab Audio Capture",
+    "version": "1.0",
+    "description": "Captures audio from browser tab",
+    "permissions": [
+        "tabCapture",
+        "activeTab"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_title": "Start Capture"
+    }
+}

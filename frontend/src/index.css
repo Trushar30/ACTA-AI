@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+:root {
+  /* Professional Dark Theme Palette */
+  --color-bg: #0B0E14;
+  /* Deep Slate/Black */
+  --color-surface: rgba(255, 255, 255, 0.03);
+  --color-surface-hover: rgba(255, 255, 255, 0.06);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-accent: #3B82F6;
+  /* Trustworthy Blue */
+  --font-sans: 'Outfit', sans-serif;
+}
+
+@theme {
+  --font-sans: 'Outfit', sans-serif;
+  --color-bg-dots: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  /* Central soft focus light */
+  --color-bg-spotlight: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 40%, transparent 80%);
+}
+
+body {
+  @apply bg-[#050505] text-slate-200 overflow-x-hidden min-h-screen font-sans antialiased;
+  background-image: var(--color-bg-spotlight), var(--color-bg-dots);
+  background-size: 100% 100%, 20px 20px;
+  background-attachment: fixed;
+}
+
+/* Glass Utilities - Refined */
+.glass {
+  @apply bg-[#151921]/70 backdrop-blur-md border border-white/5 shadow-2xl;
+}
+
+.glass-card {
+  @apply bg-[#1A1F29]/60 backdrop-blur-sm border border-white/5 shadow-lg transition-all duration-300;
+}
+
+.glass-card:hover {
+  @apply bg-[#1A1F29]/80 border-white/10 -translate-y-[2px] shadow-xl;
+}
+
+.glass-input {
+  @apply bg-[#12151C] border border-white/10 text-white placeholder-slate-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all duration-300;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-lg shadow-blue-900/20 transition-all duration-300;
+}
+
+/* Custom Scrollbar - Minimal */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-white/20;
+}
+
+/* Text Gradients */
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400;
+}
+
+/* Custom Scrollbar for specific elements */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
+}

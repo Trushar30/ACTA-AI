@@ -1,0 +1,54 @@
+# Python Dependencies for Live Transcription with Speaker Identification
+# Install with: pip install -r requirements.txt
+
+# =================================================================
+# LIVE TRANSCRIPTION (Faster-Whisper + SpeechBrain)
+# =================================================================
+
+# Faster-whisper for GPU-accelerated transcription
+faster-whisper==1.0.3
+
+# SpeechBrain for real-time speaker identification with ECAPA-TDNN
+speechbrain==0.5.16
+
+# Deep learning framework with CUDA support (required by faster-whisper and SpeechBrain)
+# For GPU support, install CUDA-enabled version: 
+# pip install torch==2.3.0+cu121 torchaudio==2.3.0+cu121 --index-url https://download.pytorch.org/whl/cu121
+torch==2.3.0
+torchaudio==2.3.0
+
+# =================================================================
+# AUDIO PROCESSING
+# =================================================================
+
+# Audio format conversion (requires FFmpeg installed on system)
+pydub>=0.25.1
+ffmpeg-python>=0.2.0
+
+# Audio processing and I/O
+soundfile>=0.12.1
+audioread>=3.0.0
+librosa>=0.10.0
+
+# =================================================================
+# UTILITIES
+# =================================================================
+
+# NumPy - version 1.x required for compatibility with PyTorch 2.3.0
+numpy<2
+
+# Hugging Face Hub for model downloads
+huggingface_hub>=0.19.0
+
+# Progress tracking
+tqdm>=4.65.0
+
+# Scientific computing
+scipy>=1.10.0
+
+# =================================================================
+# NOTES:
+# - Pyannote.audio REMOVED (only for Assembly AI post-meeting processing)
+# - Live transcription uses Faster-Whisper + SpeechBrain ECAPA-TDNN
+# - Post-meeting transcription uses Deepgram API + Assembly AI API
+# =================================================================

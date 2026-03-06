@@ -1,0 +1,222 @@
+const path = require('path');
+const fs = require('fs');
+const { spawn } = require('child_process');
+const { createClient } = require('@deepgram/sdk');
+const speakerDiarizationService = require('./speakerDiarizationService');
+
+/**
+ * Dual-Mode Transcription Service
+ * 
+ * LIVE MODE (During Meeting):
+ * - Faster-Whisper (GPU-accelerated) for real-time transcription
+ * - SpeechBrain ECAPA-TDNN for real-time speaker identification
+ * - Low latency, fully local processing
+ * 
+ * POST-MEETING MODE (After Meeting Ends):
+ * - Deepgram API for high-quality full transcription
+ * - Assembly AI for accurate speaker diarization
+ * - Cloud-based, highest accuracy
+ */
+
+/**
+ * Get Python executable path from environment
+ */
+function getPythonExecutable() {
+    // Try environment variable first
+    if (process.env.PYTHON_EXECUTABLE) {
+        return process.env.PYTHON_EXECUTABLE;
+    }
+    
+    // Try virtual environment
+    const venvPython = path.join(__dirname, '..', '..', 'myenv', 'Scripts', 'python.exe');
+    if (fs.existsSync(venvPython)) {
+        return venvPython;
+    }
+    
+    // Fall back to system python
+    return 'python';
+}
+
+/**
+ * LIVE MODE: Transcribe audio using Faster-Whisper + SpeechBrain
+ * Used for real-time transcription during meetings
+ * 
+ * @param {string} audioPath - Path to the audio file
+ * @param {function} onProgress - Callback for progress updates
+ * @param {boolean} enableSpeakerDiarization - Enable speaker identification (default: true)
+ * @param {string} modelSize - Whisper model: tiny, base, small, medium, large-v3 (default: base)
+ * @param {string} language - Language code or null for auto-detection
+ * @returns {Promise<Object>} - Transcript with speaker information
+ */
+async function transcribeLive(audioPath, onProgress = () => {}, enableSpeakerDiarization = true, modelSize = 'base', language = null) {
+    try {
+        onProgress('starting', 'Starting transcription with Faster-Whisper...');
+
+        // Check if file exists
+        if (!fs.existsSync(audioPath)) {
+            throw new Error(`Audio file not found: ${audioPath}`);
+        }
+
+        const fileSize = fs.statSync(audioPath).size;
+        console.log(`[Transcription] Processing file: ${path.basename(audioPath)} (${(fileSize / 1024 / 1024).toFixed(2)} MB)`);
+
+        onProgress('loading', 'Loading Faster-Whisper model...');
+
+        // Get Python executable and script path
+        const pythonExe = getPythonExecutable();
+        const scriptPath = path.join(__dirname, 'transcribe_audio.py');
+        
+        // Prepare arguments
+        const args = [scriptPath, audioPath, modelSize, 'auto'];
+        if (language) {
+            args.push(language);
+        }
+
+        console.log(`[Transcription] Using Python: ${pythonExe}`);
+        console.log(`[Transcription] Model: ${modelSize}, Language: ${language || 'auto-detect'}`);
+
+        onProgress('transcribing', 'AI is transcribing your audio...');
+
+        // Run Python script
+        const result = await new Promise((resolve, reject) => {
+            let stdout = '';
+            let stderr = '';
+
+            const pythonProcess = spawn(pythonExe, args, {
+                cwd: path.dirname(scriptPath)
+            });
+
+            pythonProcess.stdout.on('data', (data) => {
+                stdout += data.toString();
+            });
+
+            pythonProcess.stderr.on('data', (data) => {
+                const message = data.toString();
+                stderr += message;
+                
+                // Parse progress messages
+                if (message.includes('Loading audio') || message.includes('Converting')) {
+                    onProgress('loading', 'Loading audio file...');
+                } else if (message.includes('Starting transcription')) {
+                    onProgress('transcribing', 'Transcribing audio...');
+                } else if (message.includes('Processing')) {
+                    onProgress('transcribing', 'Processing segments...');
+                }
+                
+                console.log(`[Transcription] ${message.trim()}`);
+            });
+
+            pythonProcess.on('close', (code) => {
+                if (code !== 0) {
+                    reject(new Error(`Python process exited with code ${code}\n${stderr}`));
+                } else {
+                    try {
+                        const result = JSON.parse(stdout);
+                        resolve(result);
+                    } catch (parseError) {
+                        reject(new Error(`Failed to parse JSON output: ${parseError.message}\nOutput: ${stdout}`));
+                    }
+                }
+            });
+
+            pythonProcess.on('error', (error) => {
+                reject(new Error(`Failed to spawn Python process: ${error.message}`));
+            });
+        });
+
+        if (!result.success) {
+            throw new Error(result.error || 'Transcription failed');
+        }
+
+        const transcript = result.transcript;
+
+        if (!transcript) {
+            throw new Error('No transcript returned from Faster-Whisper');
+        }
+
+        console.log(`[Transcription] ✅ Transcript generated (${transcript.length} chars)`);
+        console.log(`[Transcription] Language: ${result.metadata.language} (${(result.metadata.language_probability * 100).toFixed(1)}%)`);
+        console.log(`[Transcription] Duration: ${result.metadata.duration}s`);
+        console.log(`[Transcription] Device: ${result.metadata.device}`);
+
+        // Prepare response object
+        const response = {
+            transcript: transcript.trim(),
+            segments: result.segments || [],
+            metadata: result.metadata || {},
+            speakerSegments: [],
+            speakerStats: {},
+            totalSpeakers: 0
+        };
+
+        // Perform advanced speaker diarization if enabled
+        if (enableSpeakerDiarization) {
+            try {
+                onProgress('diarizing', 'Identifying speakers with AI...');
+                console.log('[Transcription] Running speaker diarization...');
+
+                // Use pyannote.audio for speaker diarization
+                const diarizationResult = await speakerDiarizationService.diarizeAudio(
+                    audioPath,
+                    (status, message) => {
+                        console.log(`[Speaker Diarization] ${status}: ${message}`);
+                        onProgress('diarizing', message);
+                    }
+                );
+
+                if (diarizationResult.success) {
+                    response.speakerSegments = diarizationResult.segments;
+                    response.speakerStats = diarizationResult.speaker_stats;
+                    response.totalSpeakers = diarizationResult.total_speakers;
+
+                    console.log(`[Transcription] ✅ Speaker diarization complete: ${response.totalSpeakers} speakers identified`);
+                }
+            } catch (diarizationError) {
+                console.warn('[Transcription] Speaker diarization failed, continuing without it:', diarizationError.message);
+                // Don't fail the entire transcription if diarization fails
+            }
+        }
+
+        onProgress('completed', 'Transcription complete!');
+
+        return response;
+
+    } catch (error) {
+        console.error('[Transcription] Error:', error.message);
+        onProgress('error', error.message);
+        throw error;
+    }
+}
+
+/**
+ * Check if Faster-Whisper is configured (Python environment with dependencies)
+ */
+function checkFasterWhisperConfigured() {
+    // Check if Python executable exists
+    const pythonExe = getPythonExecutable();
+    const scriptPath = path.join(__dirname, 'transcribe_audio.py');
+    
+    return fs.existsSync(scriptPath);
+}
+
+/**
+ * Get info about the transcription service
+ */
+function getServiceInfo() {
+    return {
+        provider: 'Faster-Whisper',
+        model: 'base (configurable: tiny, base, small, medium, large-v3)',
+        configured: checkFasterWhisperConfigured(),
+        gpuSupport: 'Automatic (CUDA)',
+        speakerDiarization: {
+            enabled: true,
+            provider: 'pyannote.audio'
+        }
+    };
+}
+
+module.exports = {
+    transcribeAudio,
+    checkFasterWhisperConfigured,
+    getServiceInfo
+};
