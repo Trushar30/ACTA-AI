@@ -1,10 +1,93 @@
+# ═══════════════════════════════════════════════════════════
+# ACTA — AI Meeting Bot — .gitignore
+# ═══════════════════════════════════════════════════════════
+
+# ── Dependencies ──────────────────────────────────────────
 node_modules/
+.pnp
+.pnp.js
+
+# ── Environment Variables ─────────────────────────────────
 .env
-.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# ── Build Outputs ─────────────────────────────────────────
 dist/
 build/
 .next/
-coverage/
+out/
+*.tsbuildinfo
+
+# ── Browser Profiles (Puppeteer / Playwright) ─────────────
+browser-profiles/
+browser_profiles/
+user-data-dir/
+chrome-data/
+
+# ── Recordings & Media ────────────────────────────────────
+recordings/
+*.mp3
+*.mp4
+*.wav
+*.webm
+*.ogg
+*.m4a
+*.flac
+*.avi
+*.mkv
+
+# ── Python ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+env/
+*.egg-info/
+*.egg
+
+# ── Logs ──────────────────────────────────────────────────
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ── Testing ───────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ── OS Generated ─────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── IDE / Editor ──────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ── Misc ──────────────────────────────────────────────────
+*.pid
+*.seed
+*.pid.lock
+.cache/
+.temp/
+.tmp/

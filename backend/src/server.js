@@ -157,24 +157,40 @@ app.get('/api/auth/google',
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-app.get('/api/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: 'http://localhost:5173' }),
-    (req, res) => {
-        // Generate JWT token
-        const token = generateToken(req.user);
+app.get('/api/auth/google/callback', (req, res, next) => {
+    passport.authenticate('google', (err, user, info) => {
+        if (err) {
+            console.error('[Auth] Google OAuth error:', err.message);
+            console.error('[Auth] OAuth error details:', err.oauthError || err);
+            return res.redirect(`http://localhost:5173?error=${encodeURIComponent(err.message)}`);
+        }
+        if (!user) {
+            console.error('[Auth] Google OAuth - no user returned:', info);
+            return res.redirect('http://localhost:5173?error=auth_failed');
+        }
 
-        // Set token in httpOnly cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-            sameSite: 'lax'
+        req.logIn(user, (loginErr) => {
+            if (loginErr) {
+                console.error('[Auth] Login error:', loginErr);
+                return res.redirect(`http://localhost:5173?error=${encodeURIComponent(loginErr.message)}`);
+            }
+
+            // Generate JWT token
+            const token = generateToken(user);
+
+            // Set token in httpOnly cookie
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+                sameSite: 'lax'
+            });
+
+            // Redirect to frontend with token in URL (for localStorage)
+            res.redirect(`http://localhost:5173?token=${token}`);
         });
-
-        // Redirect to frontend with token in URL (for localStorage)
-        res.redirect(`http://localhost:5173?token=${token}`);
-    }
-);
+    })(req, res, next);
+});
 
 app.get('/api/auth/user', optionalAuth, (req, res) => {
     if (req.isAuthenticated() || req.user) {
@@ -1035,12 +1051,12 @@ app.put('/api/meetings/:id/name', optionalAuth, async (req, res) => {
 app.put('/api/meetings/:id/save-transcript', optionalAuth, async (req, res) => {
     try {
         const meetingId = req.params.id;
-        const { 
-            liveTranscriptFull, 
+        const {
+            liveTranscriptFull,
             liveTranscriptSentences,
-            speakerSegments, 
+            speakerSegments,
             totalSpeakers,
-            transcription 
+            transcription
         } = req.body;
 
         console.log('[Server] Saving transcript for meeting:', meetingId);
@@ -1067,18 +1083,18 @@ app.put('/api/meetings/:id/save-transcript', optionalAuth, async (req, res) => {
         }
 
         console.log('[Server] Transcript saved successfully:', meetingId);
-        
+
         // Emit update to connected clients
-        global.io.emit('meetingUpdate', { 
-            meetingId: meetingId.toString(), 
+        global.io.emit('meetingUpdate', {
+            meetingId: meetingId.toString(),
             status: 'transcript-saved',
-            message: 'Transcript saved to database' 
+            message: 'Transcript saved to database'
         });
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: 'Transcript saved successfully',
-            meeting 
+            meeting
         });
     } catch (err) {
         console.error('[Server] Save transcript error:', err);
@@ -1100,7 +1116,7 @@ app.put('/api/meetings/:id/save-tasks', optionalAuth, async (req, res) => {
 
         const meeting = await Meeting.findByIdAndUpdate(
             meetingId,
-            { 
+            {
                 extractedTasks: extractedTasks,
                 tasksUpdatedAt: new Date()
             },
@@ -1112,18 +1128,18 @@ app.put('/api/meetings/:id/save-tasks', optionalAuth, async (req, res) => {
         }
 
         console.log('[Server] Tasks saved successfully:', meetingId, '-', extractedTasks.length, 'tasks');
-        
+
         // Emit update to connected clients
-        global.io.emit('meetingUpdate', { 
-            meetingId: meetingId.toString(), 
+        global.io.emit('meetingUpdate', {
+            meetingId: meetingId.toString(),
             status: 'tasks-saved',
-            message: `${extractedTasks.length} tasks saved to database` 
+            message: `${extractedTasks.length} tasks saved to database`
         });
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: `${extractedTasks.length} tasks saved successfully`,
-            meeting 
+            meeting
         });
     } catch (err) {
         console.error('[Server] Save tasks error:', err);
@@ -1394,7 +1410,7 @@ app.post('/api/meetings/ai-search', optionalAuth, async (req, res) => {
         }
 
         // Prepare context for Gemini
-        const meetingsContext = meetingsWithTranscripts.map(m => 
+        const meetingsContext = meetingsWithTranscripts.map(m =>
             `Meeting ID: ${m.id}\nMeeting Name: ${m.name}\nDate: ${new Date(m.date).toLocaleDateString()}\nTranscript: ${m.transcript.substring(0, 3000)}`
         ).join('\n\n---\n\n');
 
@@ -1449,18 +1465,18 @@ Do not include any explanation, just the JSON array.`;
             }
         }
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             relevantMeetingIds,
             totalSearched: meetingsWithTranscripts.length
         });
 
     } catch (error) {
         console.error('AI search error:', error);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             error: 'Failed to perform AI search',
-            details: error.message 
+            details: error.message
         });
     }
 });
@@ -1581,10 +1597,10 @@ app.get('/api/scheduler/status', (req, res) => {
 app.post('/api/scheduler/cleanup', optionalAuth, async (req, res) => {
     try {
         const deletedCount = await meetingSchedulerService.cleanupExpiredMeetings();
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: `Cleaned up ${deletedCount} expired meeting(s)`,
-            deletedCount 
+            deletedCount
         });
     } catch (err) {
         console.error('Cleanup error:', err);
@@ -1652,17 +1668,17 @@ IMPORTANT:
             return res.status(400).json({ error: 'Failed to generate valid meeting data' });
         }
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             meeting: meetingData,
             message: 'Meeting schedule generated successfully'
         });
 
     } catch (err) {
         console.error('Gemini generation error:', err);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Failed to generate meeting schedule',
-            details: err.message 
+            details: err.message
         });
     }
 });
@@ -1671,19 +1687,19 @@ IMPORTANT:
 app.post('/api/scheduler/test-reminder', optionalAuth, async (req, res) => {
     try {
         const { meetingId } = req.body;
-        
+
         if (!meetingId) {
             return res.status(400).json({ error: 'Meeting ID is required' });
         }
-        
+
         const meeting = await ScheduledMeeting.findById(meetingId);
         if (!meeting) {
             return res.status(404).json({ error: 'Meeting not found' });
         }
-        
+
         const { sendMeetingReminder } = require('./services/emailService');
         const result = await sendMeetingReminder(meeting);
-        
+
         if (result.success) {
             res.json({ success: true, message: 'Test reminder email sent successfully', messageId: result.messageId });
         } else {
@@ -1902,7 +1918,7 @@ app.post('/api/meetings/:id/extract-tasks', optionalAuth, async (req, res) => {
         // Save tasks to meeting with timestamp (auto-save)
         const updatedMeeting = await Meeting.findByIdAndUpdate(
             req.params.id,
-            { 
+            {
                 extractedTasks: tasks,
                 tasksUpdatedAt: new Date() // Auto-save timestamp
             },
@@ -1910,12 +1926,12 @@ app.post('/api/meetings/:id/extract-tasks', optionalAuth, async (req, res) => {
         );
 
         console.log(`[Server] ✅ Successfully extracted and auto-saved ${tasks.length} tasks`);
-        
+
         // Emit update to connected clients
-        global.io.emit('meetingUpdate', { 
-            meetingId: req.params.id.toString(), 
+        global.io.emit('meetingUpdate', {
+            meetingId: req.params.id.toString(),
             status: 'tasks-saved',
-            message: `${tasks.length} tasks extracted and saved automatically` 
+            message: `${tasks.length} tasks extracted and saved automatically`
         });
 
         res.json({
@@ -2402,7 +2418,7 @@ app.post('/api/meetings/:id/translate', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    
+
     // Start the automatic meeting scheduler
     console.log('[Server] Starting automatic meeting scheduler...');
     meetingSchedulerService.startScheduler();
