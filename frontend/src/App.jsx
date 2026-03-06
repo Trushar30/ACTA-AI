@@ -8,7 +8,7 @@ import ScheduledMeetings from './pages/ScheduledMeetings';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Analysis from './pages/Analysis';
-import Upload from './pages/Upload';
+
 import Presentation from './pages/Presentation';
 import SummaryPage from './pages/SummaryPage';
 import Loader from './components/Loader';
@@ -98,7 +98,6 @@ const Navigation = () => {
     const navItems = [
         { path: '/', label: 'Home' },
         { path: '/analysis', label: 'Analysis' },
-        { path: '/upload', label: 'Upload' },
         { path: '/dashboard', label: 'Archive Meetings' },
         { path: '/scheduled', label: 'Scheduled' },
         { path: '/collaborate', label: 'Collaborate' },
@@ -110,9 +109,9 @@ const Navigation = () => {
             <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
                 {/* Logo Section */}
                 <Link to="/" className="flex items-center gap-2 group">
-                    <img 
-                        src="/logo.svg" 
-                        alt="ACTA Logo" 
+                    <img
+                        src="/logo.svg"
+                        alt="ACTA Logo"
                         className="h-8 w-auto transition-transform group-hover:scale-105"
                     />
                 </Link>
@@ -120,10 +119,10 @@ const Navigation = () => {
                 {/* Center Links */}
                 <div className="flex items-center gap-8">
                     {navItems.map(item => {
-                        const isActive = item.path === '/dashboard' 
+                        const isActive = item.path === '/dashboard'
                             ? location.pathname === item.path || location.pathname.startsWith('/dashboard/')
                             : location.pathname === item.path;
-                        
+
                         return (
                             <Link
                                 key={item.path}
@@ -202,7 +201,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/analysis" element={<Analysis />} />
-                    <Route path="/upload" element={<Upload />} />
+
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/dashboard/:id" element={<MeetingDashboard />} />
                     <Route path="/scheduled" element={<ScheduledMeetings />} />
