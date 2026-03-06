@@ -500,14 +500,72 @@ exports.getDashboard = async (req, res) => {
         let analysis = meeting.analysis || null;
 
         // Apply speaker name mappings if they exist
-        if (analysis && analysis.participants && meeting.speakerNameMapping) {
-            analysis.participants = analysis.participants.map(participant => {
-                const mappedName = meeting.speakerNameMapping[participant.name];
-                if (mappedName) {
-                    return { ...participant, name: mappedName };
-                }
-                return participant;
-            });
+        if (analysis && meeting.speakerNameMapping) {
+            const mapping = meeting.speakerNameMapping;
+            
+            // Helper function to map speaker names
+            const mapSpeakerName = (speakerName) => {
+                return mapping[speakerName] || speakerName;
+            };
+            
+            // Map participants
+            if (analysis.participants) {
+                analysis.participants = analysis.participants.map(participant => {
+                    const mappedName = mapSpeakerName(participant.name);
+                    if (mappedName !== participant.name) {
+                        return { ...participant, name: mappedName };
+                    }
+                    return participant;
+                });
+            }
+            
+            // Map transcript timeline
+            if (analysis.transcriptTimeline) {
+                analysis.transcriptTimeline = analysis.transcriptTimeline.map(segment => {
+                    const mappedSpeaker = mapSpeakerName(segment.speaker);
+                    if (mappedSpeaker !== segment.speaker) {
+                        return { ...segment, speaker: mappedSpeaker };
+                    }
+                    return segment;
+                });
+            }
+            
+            // Map speaker sentiments
+            if (analysis.speakerSentiments) {
+                analysis.speakerSentiments = analysis.speakerSentiments.map(sentiment => {
+                    const mappedSpeaker = mapSpeakerName(sentiment.speaker);
+                    if (mappedSpeaker !== sentiment.speaker) {
+                        return { ...sentiment, speaker: mappedSpeaker };
+                    }
+                    return sentiment;
+                });
+            }
+            
+            // Map top priorities
+            if (analysis.topPriorities) {
+                analysis.topPriorities = analysis.topPriorities.map(priority => {
+                    if (typeof priority === 'object' && priority.speaker) {
+                        const mappedSpeaker = mapSpeakerName(priority.speaker);
+                        if (mappedSpeaker !== priority.speaker) {
+                            return { ...priority, speaker: mappedSpeaker };
+                        }
+                    }
+                    return priority;
+                });
+            }
+            
+            // Map emotional moments
+            if (analysis.emotionalMoments) {
+                analysis.emotionalMoments = analysis.emotionalMoments.map(moment => {
+                    if (moment.speaker) {
+                        const mappedSpeaker = mapSpeakerName(moment.speaker);
+                        if (mappedSpeaker !== moment.speaker) {
+                            return { ...moment, speaker: mappedSpeaker };
+                        }
+                    }
+                    return moment;
+                });
+            }
             
             console.log('[Dashboard] Applied speaker name mappings:', meeting.speakerNameMapping);
         }

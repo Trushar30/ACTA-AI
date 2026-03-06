@@ -1461,6 +1461,23 @@ const SpeakerTimelineVisualization = ({ data }) => {
         );
     }
 
+    // Create a mapping from SPEAKER_A, SPEAKER_B, etc. to actual names
+    const speakerMapping = React.useMemo(() => {
+        const mapping = {};
+        if (data.participants && Array.isArray(data.participants)) {
+            data.participants.forEach((participant, index) => {
+                const speakerId = `SPEAKER_${String.fromCharCode(65 + index)}`; // SPEAKER_A, SPEAKER_B, etc.
+                mapping[speakerId] = participant.name || speakerId;
+            });
+        }
+        return mapping;
+    }, [data.participants]);
+
+    // Helper function to get display name for speaker
+    const getDisplayName = (speakerId) => {
+        return speakerMapping[speakerId] || speakerId;
+    };
+
     // Helper function to parse time strings to seconds
     const parseTimeToSeconds = (timeStr) => {
         if (!timeStr) return 0;
@@ -1545,13 +1562,13 @@ const SpeakerTimelineVisualization = ({ data }) => {
                                     width: `${widthPercent}%`,
                                     backgroundColor: speakerColors[segment.speaker] || '#6b7280'
                                 }}
-                                title={`${segment.speaker}: ${segment.text.substring(0, 50)}...`}
+                                title={`${getDisplayName(segment.speaker)}: ${segment.text.substring(0, 50)}...`}
                             >
                                 {/* Speaker label on hover */}
                                 {widthPercent > 3 && (
                                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                         <span className="text-[10px] font-bold text-white drop-shadow-lg">
-                                            {segment.speaker.replace('Speaker ', '')}
+                                            {getDisplayName(segment.speaker)}
                                         </span>
                                     </div>
                                 )}
@@ -1568,7 +1585,7 @@ const SpeakerTimelineVisualization = ({ data }) => {
                                 className="w-3 h-3 rounded"
                                 style={{ backgroundColor: speakerColors[speaker] }}
                             />
-                            <span className="text-xs text-slate-400">{speaker}</span>
+                            <span className="text-xs text-slate-400">{getDisplayName(speaker)}</span>
                         </div>
                     ))}
                 </div>
