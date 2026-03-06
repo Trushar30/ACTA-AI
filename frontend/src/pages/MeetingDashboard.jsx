@@ -1950,106 +1950,172 @@ const CollaborationTab = ({
     handleRemoveCollaborator,
     addingCollaborator
 }) => {
+    const [linkCopied, setLinkCopied] = useState(false);
+    const avatarColors = ['bg-purple-500', 'bg-emerald-500', 'bg-amber-500', 'bg-blue-500', 'bg-pink-500', 'bg-cyan-500', 'bg-rose-500', 'bg-indigo-500'];
+
+    const copyShareLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+    };
+
     return (
-        <div className="space-y-6">
-            <div className="bg-[#1C1F2E] rounded-3xl p-6 border border-white/5 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
+        <div className="max-w-3xl mx-auto space-y-6">
+            {/* Hero Invite Card */}
+            <div className="bg-gradient-to-br from-emerald-500/10 via-[#1C1F2E] to-[#1C1F2E] rounded-2xl border border-emerald-500/10 p-8">
+                <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 bg-emerald-500/15 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                        <Users size={22} className="text-emerald-400" />
+                    </div>
                     <div>
-                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            <Users size={18} className="text-white" />
-                            Share Dashboard
-                        </h3>
-                        <p className="text-sm text-slate-400 mt-1">
-                            Invite others to view this meeting dashboard
-                        </p>
+                        <h3 className="text-xl font-bold text-white">Share This Dashboard</h3>
+                        <p className="text-sm text-slate-400 mt-0.5">Invite team members to view this meeting's insights</p>
                     </div>
                 </div>
 
-                {/* Add Collaborator Form */}
-                <form onSubmit={handleAddCollaborator} className="mb-6">
-                    <div className="flex gap-3">
-                        <div className="flex-1 relative">
-                            <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                            <input
-                                type="email"
-                                value={newCollaboratorEmail}
-                                onChange={(e) => setNewCollaboratorEmail(e.target.value)}
-                                placeholder="Enter email address"
-                                className="w-full pl-10 pr-4 py-3 bg-[#0B0E14] border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 transition-colors"
-                                disabled={addingCollaborator}
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={addingCollaborator || !newCollaboratorEmail.trim()}
-                            className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                        >
-                            {addingCollaborator ? (
-                                <>
-                                    <Loader2 size={18} className="animate-spin" />
-                                    Adding...
-                                </>
-                            ) : (
-                                <>
-                                    <Plus size={18} />
-                                    Add
-                                </>
-                            )}
-                        </button>
+                {/* Invite Form */}
+                <form onSubmit={handleAddCollaborator} className="flex gap-3">
+                    <div className="flex-1 relative">
+                        <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                        <input
+                            type="email"
+                            value={newCollaboratorEmail}
+                            onChange={(e) => setNewCollaboratorEmail(e.target.value)}
+                            placeholder="colleague@company.com"
+                            className="w-full pl-11 pr-4 py-3.5 bg-[#0B0E14] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20 transition-all"
+                            disabled={addingCollaborator}
+                        />
                     </div>
+                    <button
+                        type="submit"
+                        disabled={addingCollaborator || !newCollaboratorEmail.trim()}
+                        className="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm shadow-lg shadow-emerald-600/20 hover:shadow-emerald-500/30"
+                    >
+                        {addingCollaborator ? (
+                            <><Loader2 size={16} className="animate-spin" /> Inviting...</>
+                        ) : (
+                            <><Send size={16} /> Invite</>
+                        )}
+                    </button>
                 </form>
 
-                {/* Collaborators List */}
-                <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">
-                        Collaborators ({collaborators.length})
-                    </h4>
-                    {collaborators.length === 0 ? (
-                        <div className="text-center py-8 text-slate-500">
-                            <Users size={48} className="mx-auto mb-3 opacity-30" />
-                            <p className="text-sm">No collaborators yet</p>
-                            <p className="text-xs mt-1">Add someone's email to share this dashboard</p>
-                        </div>
+                {/* Quick Copy Link */}
+                <div className="mt-4 flex items-center gap-3">
+                    <div className="flex-1 h-px bg-white/5" />
+                    <span className="text-[11px] text-slate-600 uppercase tracking-wider font-medium">or</span>
+                    <div className="flex-1 h-px bg-white/5" />
+                </div>
+                <button
+                    onClick={copyShareLink}
+                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#0B0E14] border border-white/10 hover:border-white/20 rounded-xl text-sm text-slate-300 hover:text-white transition-all group"
+                >
+                    {linkCopied ? (
+                        <><Check size={15} className="text-emerald-400" /> <span className="text-emerald-400 font-medium">Link Copied!</span></>
                     ) : (
-                        <div className="space-y-2">
-                            {collaborators.map((email, index) => (
-                                <div
-                                    key={index}
-                                    className="flex items-center justify-between p-4 bg-[#0B0E14] rounded-xl border border-white/5 hover:border-white/10 transition-colors"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                                            <Mail size={18} className="text-white" />
-                                        </div>
-                                        <div>
-                                            <p className="text-white font-medium">{email}</p>
-                                            <p className="text-xs text-slate-500">Can view this dashboard</p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => handleRemoveCollaborator(email)}
-                                        className="p-2 hover:bg-red-500/10 rounded-lg text-red-400 hover:text-red-300 transition-colors"
-                                        title="Remove collaborator"
-                                    >
-                                        <X size={18} />
-                                    </button>
+                        <><Copy size={15} className="text-slate-500 group-hover:text-white transition-colors" /> Copy Dashboard Link</>
+                    )}
+                </button>
+            </div>
+
+            {/* Team Members Section */}
+            <div className="bg-[#1C1F2E] rounded-2xl border border-white/5">
+                <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <h4 className="text-base font-bold text-white">Team Members</h4>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-400">
+                            {collaborators.length}
+                        </span>
+                    </div>
+                    {collaborators.length > 0 && (
+                        <div className="flex -space-x-2">
+                            {collaborators.slice(0, 5).map((email, i) => (
+                                <div key={i} className={`w-7 h-7 rounded-full ${avatarColors[i % avatarColors.length]} flex items-center justify-center text-[10px] font-bold text-white border-2 border-[#1C1F2E]`}>
+                                    {email.charAt(0).toUpperCase()}
                                 </div>
                             ))}
+                            {collaborators.length > 5 && (
+                                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-slate-400 border-2 border-[#1C1F2E]">
+                                    +{collaborators.length - 5}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
+
+                {collaborators.length === 0 ? (
+                    <div className="p-10 text-center">
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/5">
+                            <Users size={28} className="text-slate-600" />
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-400 mb-1">No team members yet</h4>
+                        <p className="text-xs text-slate-600 max-w-xs mx-auto">
+                            Invite colleagues above to give them access to this meeting dashboard
+                        </p>
+                    </div>
+                ) : (
+                    <div className="divide-y divide-white/5">
+                        {collaborators.map((email, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition-colors group"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl ${avatarColors[index % avatarColors.length]} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}>
+                                        {email.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-white">{email.split('@')[0]}</p>
+                                        <p className="text-[11px] text-slate-500">{email}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-medium px-2.5 py-1 bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20">
+                                        Viewer
+                                    </span>
+                                    <button
+                                        onClick={() => handleRemoveCollaborator(email)}
+                                        className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-500/10 rounded-lg text-slate-500 hover:text-red-400 transition-all"
+                                        title="Remove access"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
             </div>
 
-            {/* Info Box */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                <div className="flex gap-3">
-                    <AlertTriangle size={20} className="text-white flex-shrink-0 mt-0.5" />
+            {/* Permissions Info */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="bg-[#1C1F2E] rounded-xl border border-white/5 p-4 flex items-start gap-3">
+                    <div className="p-2 bg-emerald-500/10 rounded-lg flex-shrink-0">
+                        <CheckCircle2 size={14} className="text-emerald-400" />
+                    </div>
                     <div>
-                        <h4 className="text-white font-semibold text-sm mb-1">Sharing Information</h4>
-                        <p className="text-slate-400 text-sm">
-                            Collaborators will be able to view all meeting details, transcripts, analytics, and AI insights.
-                            They can access this dashboard using the shared link.
-                        </p>
+                        <p className="text-xs font-semibold text-white mb-0.5">View Transcripts</p>
+                        <p className="text-[11px] text-slate-500">Full meeting transcription access</p>
+                    </div>
+                </div>
+                <div className="bg-[#1C1F2E] rounded-xl border border-white/5 p-4 flex items-start gap-3">
+                    <div className="p-2 bg-blue-500/10 rounded-lg flex-shrink-0">
+                        <BarChart2 size={14} className="text-blue-400" />
+                    </div>
+                    <div>
+                        <p className="text-xs font-semibold text-white mb-0.5">View Analytics</p>
+                        <p className="text-[11px] text-slate-500">All charts, sentiment & insights</p>
+                    </div>
+                </div>
+                <div className="bg-[#1C1F2E] rounded-xl border border-white/5 p-4 flex items-start gap-3">
+                    <div className="p-2 bg-purple-500/10 rounded-lg flex-shrink-0">
+                        <Sparkles size={14} className="text-purple-400" />
+                    </div>
+                    <div>
+                        <p className="text-xs font-semibold text-white mb-0.5">Use Ask AI</p>
+                        <p className="text-[11px] text-slate-500">Query the meeting with AI</p>
                     </div>
                 </div>
             </div>

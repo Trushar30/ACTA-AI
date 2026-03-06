@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Users, Calendar, Clock, ExternalLink, Loader2, Mail, ArrowLeft, Sparkles } from 'lucide-react';
+import {
+    Users, Calendar, Clock, ExternalLink, Loader2, Mail, ArrowLeft,
+    Sparkles, Search, X, ChevronRight, FileText
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Loader from '../components/Loader';
 
@@ -14,9 +17,9 @@ const CollaborateDashboard = () => {
     const [userEmail, setUserEmail] = useState('');
     const [emailEntered, setEmailEntered] = useState(false);
     const [user, setUser] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        // First, try to get the logged-in user's email
         const fetchUser = async () => {
             try {
                 const res = await axios.get(`${API_URL}/api/auth/user`);
@@ -31,7 +34,6 @@ const CollaborateDashboard = () => {
                 console.log('No authenticated user, checking localStorage');
             }
 
-            // Fallback to localStorage if not authenticated
             const savedEmail = localStorage.getItem('collaborateEmail');
             if (savedEmail) {
                 setUserEmail(savedEmail);
@@ -87,63 +89,70 @@ const CollaborateDashboard = () => {
         });
     };
 
-    const formatTime = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+    const getRelativeTime = (dateStr) => {
+        if (!dateStr) return '';
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 60) return `${mins}m ago`;
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days}d ago`;
+        return formatDate(dateStr);
     };
+
+    const filteredMeetings = sharedMeetings.filter(m => {
+        const q = searchQuery.toLowerCase();
+        return (m.meetingName || '').toLowerCase().includes(q) ||
+            (m.userEmail || '').toLowerCase().includes(q) ||
+            (m.topic || '').toLowerCase().includes(q);
+    });
 
     if (!emailEntered) {
         return (
-            <div className="min-h-screen text-slate-100 flex items-center justify-center p-6">
+            <div className="min-h-screen bg-[#0B0E14] text-slate-100 flex items-center justify-center p-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="max-w-md w-full"
                 >
-                    <div className="bg-white/5 rounded-2xl p-8 border border-white/10 backdrop-blur-sm">
-                        <div className="text-center mb-6">
-                            <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                                <Users size={28} className="text-white" />
+                    <div className="bg-[#1C1F2E] rounded-2xl p-8 border border-white/5">
+                        <div className="text-center mb-8">
+                            <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                                <Users size={30} className="text-emerald-400" />
                             </div>
-                            <h1 className="text-2xl font-bold text-white mb-2">Collaborate</h1>
-                            <p className="text-slate-400 text-sm">
-                                Enter your email to view meetings shared with you
+                            <h1 className="text-2xl font-bold text-white mb-2">Shared With You</h1>
+                            <p className="text-slate-500 text-sm">
+                                Enter your email to see meetings others have shared with you
                             </p>
                         </div>
 
                         <form onSubmit={handleEmailSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-2">
-                                    Your Email Address
-                                </label>
-                                <div className="relative">
-                                    <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                                    <input
-                                        type="email"
-                                        value={userEmail}
-                                        onChange={(e) => setUserEmail(e.target.value)}
-                                        placeholder="you@example.com"
-                                        className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30 transition-colors"
-                                        required
-                                    />
-                                </div>
+                            <div className="relative">
+                                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                                <input
+                                    type="email"
+                                    value={userEmail}
+                                    onChange={(e) => setUserEmail(e.target.value)}
+                                    placeholder="your@email.com"
+                                    className="w-full pl-11 pr-4 py-3.5 bg-[#0B0E14] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20 transition-all"
+                                    required
+                                />
                             </div>
                             <button
                                 type="submit"
-                                className="w-full py-3 bg-white text-black hover:bg-gray-200 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-emerald-600/20"
                             >
-                                View Shared Meetings
-                                <ExternalLink size={18} />
+                                Continue
+                                <ChevronRight size={16} />
                             </button>
                         </form>
 
                         <button
                             onClick={() => navigate('/dashboard')}
-                            className="w-full mt-4 text-slate-400 hover:text-white text-sm transition-colors"
+                            className="w-full mt-4 flex items-center justify-center gap-2 text-slate-500 hover:text-white text-sm transition-colors py-2"
                         >
+                            <ArrowLeft size={14} />
                             Back to Dashboard
                         </button>
                     </div>
@@ -157,106 +166,147 @@ const CollaborateDashboard = () => {
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto w-full px-6 py-8">
-            {/* Header */}
-            <header className="flex items-center justify-between gap-8 mb-10">
-                <div className="flex items-center gap-4">
-                    <h1 className="text-3xl font-bold tracking-tight text-white">Collaborate</h1>
-                    <div className="h-6 w-px bg-white/10"></div>
-                    <p className="text-slate-400 font-medium flex items-center gap-2 text-sm">
-                        <Users size={16} className="text-white" />
-                        Shared Meetings
-                    </p>
-                </div>
-            </header>
-
-            {/* Main Content */}
-            <main>
-                {loading ? (
-                    <div className="flex items-center justify-center py-20">
-                        <Loader2 size={40} className="animate-spin text-emerald-400" />
+        <div className="min-h-screen bg-[#0B0E14]">
+            <div className="max-w-7xl mx-auto px-6 py-8">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                                <Users size={22} className="text-emerald-400" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-white">Shared With You</h1>
+                                <p className="text-slate-500 text-sm mt-0.5">
+                                    Meetings shared with <span className="text-slate-300 font-medium">{userEmail}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 px-3 py-2 bg-[#1C1F2E] rounded-xl border border-white/5 text-xs">
+                                <FileText size={14} className="text-cyan-400" />
+                                <span className="text-slate-400">{sharedMeetings.length} meeting{sharedMeetings.length !== 1 ? 's' : ''}</span>
+                            </div>
+                            <button
+                                onClick={handleChangeEmail}
+                                className="px-3 py-2 text-xs text-slate-500 hover:text-white bg-[#1C1F2E] hover:bg-white/10 rounded-xl border border-white/5 transition-all"
+                            >
+                                Change Email
+                            </button>
+                        </div>
                     </div>
-                ) : sharedMeetings.length === 0 ? (
+                </div>
+
+                {sharedMeetings.length === 0 ? (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white/5 rounded-2xl p-12 border border-white/10 text-center backdrop-blur-sm"
+                        className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-16 text-center"
                     >
-                        <Users size={64} className="mx-auto mb-4 text-slate-500" />
-                        <h3 className="text-xl font-bold text-white mb-2">No Shared Meetings</h3>
-                        <p className="text-slate-400">
-                            No meetings have been shared with <span className="text-white font-medium">{userEmail}</span> yet.
+                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/5">
+                            <Users size={28} className="text-slate-600" />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-400 mb-2">No shared meetings yet</h3>
+                        <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6">
+                            When someone shares a meeting dashboard with you, it will appear here automatically.
                         </p>
-                        <p className="text-slate-500 text-sm mt-2">
-                            When someone shares a meeting dashboard with you, it will appear here.
-                        </p>
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-colors text-sm"
+                        >
+                            <ArrowLeft size={16} />
+                            Go to My Meetings
+                        </button>
                     </motion.div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {sharedMeetings.map((meeting, index) => (
-                            <motion.div
-                                key={meeting._id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.05 }}
-                                onClick={() => navigate(`/dashboard/${meeting._id}`)}
-                                className="group relative cursor-pointer"
-                            >
-                                <div className="relative bg-white/5 rounded-xl overflow-hidden border border-white/10 group-hover:border-white/30 transition-all backdrop-blur-sm">
-                                    {/* Header */}
-                                    <div className="p-5">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className="flex items-center gap-3 flex-1">
-                                                <div className="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
-                                                    <Users size={20} className="text-white" />
+                    <>
+                        {/* Search */}
+                        {sharedMeetings.length > 3 && (
+                            <div className="relative mb-5">
+                                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search shared meetings..."
+                                    className="w-full sm:w-80 bg-[#1C1F2E] border border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/30 placeholder:text-slate-600 transition-colors"
+                                />
+                                {searchQuery && (
+                                    <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                                        <X size={14} />
+                                    </button>
+                                )}
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {filteredMeetings.map((meeting, index) => {
+                                const avatarColors = ['bg-purple-500', 'bg-emerald-500', 'bg-amber-500', 'bg-blue-500', 'bg-pink-500', 'bg-cyan-500'];
+                                return (
+                                    <motion.div
+                                        key={meeting._id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.04 }}
+                                        onClick={() => navigate(`/dashboard/${meeting._id}`)}
+                                        className="bg-[#1C1F2E] rounded-xl border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer group"
+                                    >
+                                        <div className="p-5">
+                                            <div className="flex items-start gap-3 mb-4">
+                                                <div className={`w-10 h-10 rounded-xl ${avatarColors[index % avatarColors.length]} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}>
+                                                    {(meeting.meetingName || 'M').charAt(0).toUpperCase()}
                                                 </div>
-                                                <div className="flex-1">
-                                                    <h3 className="font-semibold text-white text-base leading-tight line-clamp-2">
-                                                        {meeting.meetingName || 'Meeting'}
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="text-sm font-semibold text-white truncate">
+                                                        {meeting.meetingName || meeting.topic || 'Untitled Meeting'}
                                                     </h3>
-                                                    <p className="text-xs text-slate-500 mt-1">
-                                                        Shared by: {meeting.userEmail?.split('@')[0] || 'Unknown'}
+                                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                                        Shared by {meeting.userEmail?.split('@')[0] || 'Unknown'}
                                                     </p>
                                                 </div>
+                                                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${
+                                                    meeting.status === 'completed'
+                                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                                        : 'bg-white/5 text-slate-400 border-white/10'
+                                                }`}>
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${
+                                                        meeting.status === 'completed' ? 'bg-emerald-400' : 'bg-slate-400'
+                                                    }`} />
+                                                    {meeting.status}
+                                                </div>
                                             </div>
-                                            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${
-                                                meeting.status === 'completed'
-                                                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                                                    : 'bg-white/10 text-white border-white/20'
-                                            }`}>
-                                                <div className={`w-1.5 h-1.5 rounded-full ${
-                                                    meeting.status === 'completed' ? 'bg-emerald-400' : 'bg-white'
-                                                }`} />
-                                                {meeting.status}
-                                            </div>
-                                        </div>
 
-                                        {/* Meeting Details */}
-                                        <div className="space-y-2 mb-4">
-                                            <div className="flex items-center gap-2 text-xs text-slate-400">
-                                                <Calendar size={12} />
-                                                <span>{formatDate(meeting.createdAt)}</span>
+                                            <div className="flex items-center gap-3 text-[11px] text-slate-500 mb-4">
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar size={11} />
+                                                    {getRelativeTime(meeting.createdAt)}
+                                                </span>
+                                                {meeting.platform && (
+                                                    <span className="px-1.5 py-0.5 bg-white/5 rounded text-[10px] capitalize">
+                                                        {meeting.platform}
+                                                    </span>
+                                                )}
                                             </div>
-                                            <div className="flex items-center gap-2 text-xs text-slate-400">
-                                                <Clock size={12} />
-                                                <span>{formatTime(meeting.createdAt)}</span>
-                                            </div>
-                                        </div>
 
-                                        {/* Footer */}
-                                        <div className="pt-3 border-t border-white/5 flex items-center justify-between">
-                                            <span className="text-xs text-slate-500">
-                                                View dashboard
-                                            </span>
-                                            <ExternalLink size={12} className="text-slate-500 group-hover:text-white transition-colors" />
+                                            <div className="pt-3 border-t border-white/5 flex items-center justify-between">
+                                                <span className="text-xs text-slate-500 group-hover:text-emerald-400 transition-colors font-medium">View Dashboard</span>
+                                                <ChevronRight size={14} className="text-slate-600 group-hover:text-emerald-400 transition-colors" />
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+
+                        {searchQuery && filteredMeetings.length === 0 && (
+                            <div className="text-center py-12">
+                                <Search size={32} className="text-slate-600 mx-auto mb-3" />
+                                <p className="text-sm text-slate-400">No meetings match "{searchQuery}"</p>
+                            </div>
+                        )}
+                    </>
                 )}
-            </main>
+            </div>
         </div>
     );
 };
