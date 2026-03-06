@@ -1310,6 +1310,9 @@ app.post('/api/meetings/:id/export-email', optionalAuth, dashboardController.exp
 // Update speaker name
 app.put('/api/meetings/:id/speaker-name', optionalAuth, dashboardController.updateSpeakerName);
 
+// Combined Summary for multiple meetings
+app.post('/api/meetings/combined-summary', optionalAuth, dashboardController.generateCombinedSummary);
+
 // Download dashboard as PDF
 app.get('/api/meetings/:id/download-pdf', optionalAuth, dashboardController.downloadDashboardPDF);
 

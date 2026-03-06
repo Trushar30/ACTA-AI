@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import Analysis from './pages/Analysis';
 import Upload from './pages/Upload';
 import Presentation from './pages/Presentation';
+import SummaryPage from './pages/SummaryPage';
 import Loader from './components/Loader';
 
 import axios from 'axios';
@@ -101,7 +102,7 @@ const Navigation = () => {
         { path: '/dashboard', label: 'Archive Meetings' },
         { path: '/scheduled', label: 'Scheduled' },
         { path: '/collaborate', label: 'Collaborate' },
-
+        { path: '/summary', label: 'Summary' },
     ];
 
     return (
@@ -209,6 +210,7 @@ function App() {
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/presentation" element={<Presentation />} />
+                    <Route path="/summary" element={<SummaryPage />} />
                 </Routes>
             </div>
         </Router>

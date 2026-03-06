@@ -843,3 +843,170 @@ exports.updateSpeakerName = async (req, res) => {
         res.status(500).json({ error: 'Failed to update speaker name' });
     }
 };
+
+// Combined Summary Schema for Gemini
+const COMBINED_SUMMARY_SCHEMA = {
+    type: Type.OBJECT,
+    properties: {
+        title: { type: Type.STRING },
+        executiveSummary: { type: Type.STRING },
+        meetingCount: { type: Type.NUMBER },
+        totalParticipants: { type: Type.NUMBER },
+        totalActionItems: { type: Type.NUMBER },
+        totalDecisions: { type: Type.NUMBER },
+        meetingBreakdowns: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    title: { type: Type.STRING },
+                    date: { type: Type.STRING },
+                    summary: { type: Type.STRING },
+                    participantCount: { type: Type.NUMBER },
+                    keyDecisions: { type: Type.ARRAY, items: { type: Type.STRING } }
+                }
+            }
+        },
+        allParticipants: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    name: { type: Type.STRING },
+                    role: { type: Type.STRING },
+                    meetingsAttended: { type: Type.NUMBER }
+                }
+            }
+        },
+        allActionItems: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    task: { type: Type.STRING },
+                    owner: { type: Type.STRING },
+                    priority: { type: Type.STRING },
+                    fromMeeting: { type: Type.STRING }
+                }
+            }
+        },
+        allDecisions: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    conclusion: { type: Type.STRING },
+                    rationale: { type: Type.STRING },
+                    fromMeeting: { type: Type.STRING }
+                }
+            }
+        },
+        allRisks: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    issue: { type: Type.STRING },
+                    impact: { type: Type.STRING },
+                    severity: { type: Type.STRING }
+                }
+            }
+        },
+        keyThemes: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    theme: { type: Type.STRING },
+                    description: { type: Type.STRING },
+                    frequency: { type: Type.NUMBER }
+                }
+            }
+        },
+        recommendations: { type: Type.STRING }
+    },
+    required: ["title", "executiveSummary", "meetingCount", "totalParticipants", "totalActionItems", "totalDecisions", "meetingBreakdowns", "allParticipants", "allActionItems", "allDecisions", "allRisks", "keyThemes", "recommendations"]
+};
+
+// Generate Combined Summary from multiple meetings
+exports.generateCombinedSummary = async (req, res) => {
+    try {
+        const { meetingIds } = req.body;
+
+        if (!meetingIds || !Array.isArray(meetingIds) || meetingIds.length === 0) {
+            return res.status(400).json({ error: 'Please select at least one meeting' });
+        }
+
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ error: 'Server configuration error: GEMINI_API_KEY missing' });
+        }
+
+        // Fetch all selected meetings
+        const meetings = await Meeting.find({ _id: { $in: meetingIds } });
+
+        if (meetings.length === 0) {
+            return res.status(404).json({ error: 'No meetings found' });
+        }
+
+        // Build combined transcript input
+        const meetingInputs = meetings.map((meeting, i) => {
+            const name = meeting.meetingName || meeting.topic || `Meeting ${i + 1}`;
+            const date = meeting.createdAt ? new Date(meeting.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown date';
+            const transcript = meeting.transcription || '';
+            const analysisJson = meeting.analysis ? JSON.stringify({
+                title: meeting.analysis.title,
+                summary: meeting.analysis.summary,
+                participants: meeting.analysis.participants,
+                actionItems: meeting.analysis.actionItems,
+                decisions: meeting.analysis.decisions,
+                risks: meeting.analysis.risks,
+                topPriorities: meeting.analysis.topPriorities,
+                keyTopics: meeting.analysis.keyTopics
+            }) : '';
+
+            return `--- MEETING ${i + 1}: "${name}" (${date}) ---
+TRANSCRIPT:
+${transcript.substring(0, 8000)}
+${analysisJson ? `\nEXISTING ANALYSIS:\n${analysisJson}` : ''}
+--- END MEETING ${i + 1} ---`;
+        }).join('\n\n');
+
+        console.log(`[CombinedSummary] Generating combined summary for ${meetings.length} meetings...`);
+
+        const prompt = `You are an AI meeting analyst. You have been given transcripts and data from ${meetings.length} different meetings. Generate a comprehensive COMBINED SUMMARY that ties together all meetings into one cohesive analysis.
+
+Instructions:
+1. Create a professional executive summary that covers ALL meetings holistically, identifying connections and themes across them.
+2. For meetingBreakdowns: provide individual summaries for each meeting with their title, date, a concise summary, participant count, and key decisions.
+3. For allParticipants: list every unique participant across ALL meetings. Include how many meetings each attended and their role.
+4. For allActionItems: consolidate ALL action items from all meetings, noting which meeting each came from.
+5. For allDecisions: combine all decisions, noting their source meeting.
+6. For allRisks: combine all risks/concerns identified, with severity levels.
+7. For keyThemes: identify recurring themes, patterns, and topics that appeared across multiple meetings and how many meetings mentioned them.
+8. For recommendations: provide actionable next steps and recommendations based on the combined insights from all meetings.
+
+Focus on being thorough, accurate, and identifying cross-meeting patterns. Return raw JSON matching the schema.
+
+${meetingInputs}`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-flash-latest',
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: COMBINED_SUMMARY_SCHEMA
+            }
+        });
+
+        const rawText = response.candidates?.[0]?.content?.parts?.[0]?.text || response.text?.() || '{}';
+        const summaryData = extractJson(rawText);
+
+        console.log(`[CombinedSummary] ✅ Combined summary generated successfully`);
+
+        res.json({ success: true, summary: summaryData });
+
+    } catch (err) {
+        console.error('[CombinedSummary] Error:', err);
+        res.status(500).json({ error: 'Failed to generate combined summary: ' + err.message });
+    }
+};
