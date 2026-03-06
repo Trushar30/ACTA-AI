@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import {
     FileText, Loader2, Sparkles, Check, ChevronDown, Search, X,
     Users, Clock, Calendar, CheckCircle2, AlertTriangle, BarChart2,
-    TrendingUp, MessageSquare, Target, Zap, ShieldCheck, Copy
+    TrendingUp, MessageSquare, Target, Zap, ShieldCheck, Copy,
+    Save, Trash2, Pencil, ArrowLeft, FolderOpen
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,8 +23,20 @@ const SummaryPage = () => {
     const [error, setError] = useState(null);
     const [copied, setCopied] = useState(null);
 
+    // Saved summaries state
+    const [savedSummaries, setSavedSummaries] = useState([]);
+    const [saving, setSaving] = useState(false);
+    const [summaryName, setSummaryName] = useState('');
+    const [isSaved, setIsSaved] = useState(false);
+    const [currentSavedId, setCurrentSavedId] = useState(null);
+    const [viewingSaved, setViewingSaved] = useState(false);
+    const [editingNameId, setEditingNameId] = useState(null);
+    const [editNameValue, setEditNameValue] = useState('');
+    const [deletingId, setDeletingId] = useState(null);
+
     useEffect(() => {
         fetchMeetings();
+        fetchSavedSummaries();
     }, []);
 
     const fetchMeetings = async () => {
@@ -37,6 +50,17 @@ const SummaryPage = () => {
             console.error('Error fetching meetings:', err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchSavedSummaries = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/api/saved-summaries`);
+            if (res.data.success) {
+                setSavedSummaries(res.data.summaries);
+            }
+        } catch (err) {
+            console.error('Error fetching saved summaries:', err);
         }
     };
 
@@ -69,11 +93,23 @@ const SummaryPage = () => {
         );
     });
 
+    const generateAutoName = () => {
+        const selected = meetings.filter(m => selectedMeetings.includes(m._id));
+        const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        if (selected.length === 1) {
+            return `Summary - ${selected[0].meetingName || selected[0].topic || 'Meeting'} (${date})`;
+        }
+        return `Combined Summary - ${selected.length} Meetings (${date})`;
+    };
+
     const handleGenerateSummary = async () => {
         if (selectedMeetings.length === 0) return;
         setGenerating(true);
         setError(null);
         setSummary(null);
+        setIsSaved(false);
+        setCurrentSavedId(null);
+        setViewingSaved(false);
 
         try {
             const res = await axios.post(`${API_URL}/api/meetings/combined-summary`, {
@@ -81,6 +117,7 @@ const SummaryPage = () => {
             });
             if (res.data.success) {
                 setSummary(res.data.summary);
+                setSummaryName(generateAutoName());
             } else {
                 setError(res.data.error || 'Failed to generate summary');
             }
@@ -90,6 +127,80 @@ const SummaryPage = () => {
         } finally {
             setGenerating(false);
         }
+    };
+
+    const handleSaveSummary = async () => {
+        if (!summary || !summaryName.trim()) return;
+        setSaving(true);
+        try {
+            const res = await axios.post(`${API_URL}/api/saved-summaries`, {
+                name: summaryName.trim(),
+                meetingIds: selectedMeetings,
+                summaryData: summary,
+            });
+            if (res.data.success) {
+                setIsSaved(true);
+                setCurrentSavedId(res.data.summary._id);
+                await fetchSavedSummaries();
+            }
+        } catch (err) {
+            console.error('Error saving summary:', err);
+            alert('Failed to save summary');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleOpenSaved = (saved) => {
+        setSummary(saved.summaryData);
+        setSummaryName(saved.name);
+        setIsSaved(true);
+        setCurrentSavedId(saved._id);
+        setViewingSaved(true);
+        setSelectedMeetings(saved.meetingIds?.map(id => id.toString()) || []);
+    };
+
+    const handleRenameSaved = async (id) => {
+        if (!editNameValue.trim()) return;
+        try {
+            const res = await axios.put(`${API_URL}/api/saved-summaries/${id}`, {
+                name: editNameValue.trim()
+            });
+            if (res.data.success) {
+                setSavedSummaries(prev => prev.map(s => s._id === id ? { ...s, name: editNameValue.trim() } : s));
+                if (currentSavedId === id) setSummaryName(editNameValue.trim());
+                setEditingNameId(null);
+            }
+        } catch (err) {
+            console.error('Error renaming summary:', err);
+        }
+    };
+
+    const handleDeleteSaved = async (id) => {
+        setDeletingId(id);
+        try {
+            await axios.delete(`${API_URL}/api/saved-summaries/${id}`);
+            setSavedSummaries(prev => prev.filter(s => s._id !== id));
+            if (currentSavedId === id) {
+                setSummary(null);
+                setIsSaved(false);
+                setCurrentSavedId(null);
+                setViewingSaved(false);
+            }
+        } catch (err) {
+            console.error('Error deleting summary:', err);
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const handleBackToList = () => {
+        setSummary(null);
+        setIsSaved(false);
+        setCurrentSavedId(null);
+        setViewingSaved(false);
+        setSelectedMeetings([]);
+        setSummaryName('');
     };
 
     const handleCopy = (text, key) => {
@@ -121,12 +232,116 @@ const SummaryPage = () => {
         <div className="min-h-screen bg-[#0B0E14]">
             <div className="max-w-7xl mx-auto px-6 py-10">
                 {/* Header */}
-                <div className="mb-10">
-                    <h1 className="text-4xl font-bold text-white mb-2">Combined Summary</h1>
-                    <p className="text-slate-400">Select multiple meetings and generate a comprehensive combined analysis</p>
+                <div className="mb-10 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        {(summary || viewingSaved) && (
+                            <button
+                                onClick={handleBackToList}
+                                className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-colors"
+                            >
+                                <ArrowLeft size={20} />
+                            </button>
+                        )}
+                        <div>
+                            <h1 className="text-4xl font-bold text-white mb-2">Combined Summary</h1>
+                            <p className="text-slate-400">Select multiple meetings and generate a comprehensive combined analysis</p>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Meeting Selector */}
+                {/* Saved Summaries Grid */}
+                {!summary && !generating && (
+                    <>
+                        {savedSummaries.length > 0 && (
+                            <div className="mb-8">
+                                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                    <FolderOpen size={20} className="text-slate-400" />
+                                    Saved Summaries
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {savedSummaries.map((saved) => (
+                                        <motion.div
+                                            key={saved._id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-5 hover:border-emerald-500/30 transition-all group cursor-pointer"
+                                            onClick={() => handleOpenSaved(saved)}
+                                        >
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div className="flex-1 min-w-0">
+                                                    {editingNameId === saved._id ? (
+                                                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                                            <input
+                                                                type="text"
+                                                                value={editNameValue}
+                                                                onChange={(e) => setEditNameValue(e.target.value)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') handleRenameSaved(saved._id);
+                                                                    if (e.key === 'Escape') setEditingNameId(null);
+                                                                }}
+                                                                autoFocus
+                                                                className="w-full bg-[#0B0E14] border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500/50"
+                                                            />
+                                                            <button
+                                                                onClick={() => handleRenameSaved(saved._id)}
+                                                                className="p-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 transition-colors"
+                                                            >
+                                                                <Check size={14} />
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <h3 className="text-base font-semibold text-white truncate">{saved.name}</h3>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        onClick={() => { setEditingNameId(saved._id); setEditNameValue(saved.name); }}
+                                                        className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors"
+                                                        title="Rename"
+                                                    >
+                                                        <Pencil size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteSaved(saved._id)}
+                                                        disabled={deletingId === saved._id}
+                                                        className="p-1.5 hover:bg-red-500/10 rounded-lg text-slate-400 hover:text-red-400 transition-colors disabled:opacity-50"
+                                                        title="Delete"
+                                                    >
+                                                        {deletingId === saved._id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3 text-xs text-slate-500 mb-3">
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar size={12} />
+                                                    {new Date(saved.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                    <FileText size={12} />
+                                                    {saved.summaryData?.meetingCount || saved.meetingIds?.length || 0} meetings
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-slate-400 line-clamp-2">
+                                                {saved.summaryData?.executiveSummary?.substring(0, 120) || 'No preview available'}...
+                                            </p>
+                                            <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
+                                                {saved.summaryData?.totalParticipants > 0 && (
+                                                    <span className="flex items-center gap-1"><Users size={12} /> {saved.summaryData.totalParticipants}</span>
+                                                )}
+                                                {saved.summaryData?.totalActionItems > 0 && (
+                                                    <span className="flex items-center gap-1"><CheckCircle2 size={12} /> {saved.summaryData.totalActionItems} tasks</span>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {/* Meeting Selector - only show when not viewing a saved summary */}
+                {!viewingSaved && (
                 <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-6 mb-8">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -264,6 +479,7 @@ const SummaryPage = () => {
                         )}
                     </div>
                 </div>
+                )}
 
                 {/* Error */}
                 {error && (
@@ -290,6 +506,40 @@ const SummaryPage = () => {
                 {/* Summary Result */}
                 {summary && !generating && (
                     <div className="space-y-6">
+                        {/* Save Bar */}
+                        <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-5">
+                            <div className="flex items-center gap-4">
+                                <div className="flex-1">
+                                    <label className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1.5 block">Summary Name</label>
+                                    <input
+                                        type="text"
+                                        value={summaryName}
+                                        onChange={(e) => setSummaryName(e.target.value)}
+                                        placeholder="Enter summary name..."
+                                        disabled={isSaved}
+                                        className="w-full bg-[#0B0E14] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 placeholder:text-slate-500 disabled:opacity-60"
+                                    />
+                                </div>
+                                {!isSaved ? (
+                                    <button
+                                        onClick={handleSaveSummary}
+                                        disabled={saving || !summaryName.trim()}
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-5"
+                                    >
+                                        {saving ? (
+                                            <><Loader2 size={16} className="animate-spin" /> Saving...</>
+                                        ) : (
+                                            <><Save size={16} /> Save</>
+                                        )}
+                                    </button>
+                                ) : (
+                                    <div className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm font-semibold mt-5">
+                                        <Check size={16} /> Saved
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Title & Overview */}
                         <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-8">
                             <div className="flex items-start justify-between mb-6">
@@ -510,7 +760,7 @@ const SummaryPage = () => {
                 )}
 
                 {/* Empty State */}
-                {!summary && !generating && !error && (
+                {!summary && !generating && !error && savedSummaries.length === 0 && (
                     <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-16 flex flex-col items-center justify-center text-center">
                         <FileText size={64} className="text-slate-500 mb-4 opacity-20" />
                         <h3 className="text-xl font-bold text-slate-400 mb-2">Select Meetings to Begin</h3>

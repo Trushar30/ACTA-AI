@@ -27,6 +27,7 @@ const { runBot, stopBot, activeBots } = require('./bot/bot');
 const Meeting = require('./models/Meeting');
 const User = require('./models/User');
 const ScheduledMeeting = require('./models/ScheduledMeeting');
+const SavedSummary = require('./models/SavedSummary');
 const zoomService = require('./services/zoomService');
 const meetService = require('./services/meetService');
 const transcriptionService = require('./services/transcriptionService');
@@ -1312,6 +1313,63 @@ app.put('/api/meetings/:id/speaker-name', optionalAuth, dashboardController.upda
 
 // Combined Summary for multiple meetings
 app.post('/api/meetings/combined-summary', optionalAuth, dashboardController.generateCombinedSummary);
+
+// Saved Summaries CRUD
+app.get('/api/saved-summaries', optionalAuth, async (req, res) => {
+    try {
+        const summaries = await SavedSummary.find().sort({ createdAt: -1 });
+        res.json({ success: true, summaries });
+    } catch (err) {
+        console.error('[SavedSummaries] List error:', err);
+        res.status(500).json({ error: 'Failed to fetch saved summaries' });
+    }
+});
+
+app.post('/api/saved-summaries', optionalAuth, async (req, res) => {
+    try {
+        const { name, meetingIds, summaryData } = req.body;
+        if (!name || !summaryData) {
+            return res.status(400).json({ error: 'Name and summary data are required' });
+        }
+        const saved = await SavedSummary.create({
+            name,
+            meetingIds: meetingIds || [],
+            summaryData,
+            userId: req.user?._id || null,
+        });
+        res.json({ success: true, summary: saved });
+    } catch (err) {
+        console.error('[SavedSummaries] Save error:', err);
+        res.status(500).json({ error: 'Failed to save summary' });
+    }
+});
+
+app.put('/api/saved-summaries/:id', optionalAuth, async (req, res) => {
+    try {
+        const { name } = req.body;
+        const updated = await SavedSummary.findByIdAndUpdate(
+            req.params.id,
+            { name, updatedAt: new Date() },
+            { new: true }
+        );
+        if (!updated) return res.status(404).json({ error: 'Summary not found' });
+        res.json({ success: true, summary: updated });
+    } catch (err) {
+        console.error('[SavedSummaries] Update error:', err);
+        res.status(500).json({ error: 'Failed to update summary' });
+    }
+});
+
+app.delete('/api/saved-summaries/:id', optionalAuth, async (req, res) => {
+    try {
+        const deleted = await SavedSummary.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).json({ error: 'Summary not found' });
+        res.json({ success: true });
+    } catch (err) {
+        console.error('[SavedSummaries] Delete error:', err);
+        res.status(500).json({ error: 'Failed to delete summary' });
+    }
+});
 
 // Download dashboard as PDF
 app.get('/api/meetings/:id/download-pdf', optionalAuth, dashboardController.downloadDashboardPDF);
