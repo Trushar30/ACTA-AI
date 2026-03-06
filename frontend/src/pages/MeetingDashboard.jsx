@@ -333,7 +333,7 @@ const MeetingDashboard = () => {
         { id: 'transcript', label: 'Transcript Timeline', icon: FileText },
         { id: 'calendar', label: 'Calendar', icon: Calendar },
         { id: 'analytics', label: 'Analytics', icon: BarChart2 },
-        // { id: 'ask-ai', label: 'Ask AI', icon: Sparkles },
+        { id: 'ask-ai', label: 'Ask AI', icon: Sparkles },
         ...(isOwner ? [{ id: 'collaboration', label: 'Collaboration', icon: Users }] : []),
     ];
 
