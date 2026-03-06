@@ -11,6 +11,16 @@ const ANALYSIS_SCHEMA = {
         title: { type: Type.STRING },
         date: { type: Type.STRING },
         summary: { type: Type.STRING },
+        topicSummaries: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    topicName: { type: Type.STRING },
+                    summary: { type: Type.STRING }
+                }
+            }
+        },
         totalDuration: { type: Type.STRING },
         speakerCount: { type: Type.NUMBER },
         actionItemCount: { type: Type.NUMBER },
@@ -420,6 +430,10 @@ exports.generateDashboard = async (req, res) => {
         10. Sentiment Analysis: For each speaker, analyze their sentiment across the conversation. Provide averageSentiment (0-100, where 0=negative, 50=neutral, 100=positive), count of positive/neutral/negative statements, and a sentimentTrend array with their key statements labeled as positive/neutral/negative with scores.
         11. Buzzwords: Extract 15-20 frequently used words or phrases (excluding common words) with their frequency count and context of usage.
         12. Emotional Moments: Identify 5-10 key emotional moments in the meeting with timestamp, speaker, emotion type (excited, frustrated, concerned, enthusiastic, etc.), the text spoken, and intensity (0-100).
+        13. Topic-wise Executive Summary (topicSummaries): Break the meeting into its main discussion topics (4-8 topics). For EACH topic provide:
+            - topicName: a clear, descriptive heading for the topic (e.g. "Project Timeline & Milestones", "Budget Allocation", "Technical Architecture Review")
+            - summary: a detailed 3-5 sentence summary of what was discussed under this topic, including who said what, decisions made, and any outcomes. Be thorough and specific.
+        The "summary" field should be a comprehensive overall executive summary (4-6 sentences) covering the entire meeting.
         Focus on accuracy and detail. Return raw JSON matching the schema.
         TRANSCRIPT: ${meeting.transcription}`;
 

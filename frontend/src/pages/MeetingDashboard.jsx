@@ -863,11 +863,36 @@ const OverviewTab = ({ data, meetingId }) => {
                             )}
                         </div>
                     </div>
-                    <p className="text-slate-300 leading-relaxed text-sm whitespace-pre-line">
-                        {displaySummary}
-                    </p>
+                    <div className="mb-5">
+                        <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Overview</h4>
+                        <p className="text-slate-300 leading-relaxed text-sm whitespace-pre-line">
+                            {displaySummary}
+                        </p>
+                    </div>
 
-                    <div className="mt-6">
+                    {/* Topic-wise Summaries */}
+                    {data.topicSummaries && data.topicSummaries.length > 0 && (
+                        <div className="space-y-4 mb-6">
+                            {data.topicSummaries.map((topic, i) => {
+                                const colors = ['border-cyan-500/40', 'border-purple-500/40', 'border-amber-500/40', 'border-blue-500/40', 'border-pink-500/40', 'border-emerald-500/40', 'border-orange-500/40', 'border-teal-500/40'];
+                                const dotColors = ['bg-cyan-400', 'bg-purple-400', 'bg-amber-400', 'bg-blue-400', 'bg-pink-400', 'bg-emerald-400', 'bg-orange-400', 'bg-teal-400'];
+                                const colorIdx = i % colors.length;
+                                return (
+                                    <div key={i} className={`bg-[#0B0E14] rounded-xl p-4 border-l-2 border border-white/5 ${colors[colorIdx]}`}>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className={`w-2 h-2 rounded-full ${dotColors[colorIdx]}`}></span>
+                                            <h4 className="text-sm font-bold text-white">{topic.topicName}</h4>
+                                        </div>
+                                        <p className="text-slate-400 text-xs leading-relaxed pl-4">
+                                            {topic.summary}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    <div>
                         <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Key Topics</h4>
                         <div className="flex flex-wrap gap-2">
                             {data.keyTopics?.map((topic, i) => (
