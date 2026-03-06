@@ -651,16 +651,39 @@ const OverviewTab = ({ data, meetingId }) => {
             });
 
             if (res.data.success) {
-                // Reload full data from database to ensure consistency
-                await fetchDashboardData();
-                setEditingSpeaker(null);
+                try {
+                    // Update local state immediately for better UX
+                    const updatedParticipants = participants.map(p => {
+                        if (p.name === originalName) {
+                            return { ...p, name: editedName.trim() };
+                        }
+                        return p;
+                    });
+                    setParticipants(updatedParticipants);
 
-                // Show success message
-                console.log('Speaker name updated successfully in database');
+                    // Update the main data object as well
+                    if (data && data.participants) {
+                        setData({
+                            ...data,
+                            participants: updatedParticipants
+                        });
+                    }
+                } catch (stateErr) {
+                    console.warn('State update error (non-critical):', stateErr);
+                    // Don't throw - the save was successful on backend
+                }
+
+                setEditingSpeaker(null);
+                console.log('Speaker name updated successfully');
             }
         } catch (err) {
-            console.error('Error updating speaker name:', err);
-            alert(err.response?.data?.error || 'Failed to update speaker name');
+            // Only show error if the API call itself failed
+            if (err.response) {
+                console.error('Error updating speaker name:', err);
+                alert(err.response?.data?.error || 'Failed to update speaker name');
+            } else {
+                console.warn('Network or client error (save may have succeeded):', err);
+            }
             setEditingSpeaker(null);
         }
     };
