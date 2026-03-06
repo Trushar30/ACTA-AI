@@ -1314,6 +1314,9 @@ app.put('/api/meetings/:id/speaker-name', optionalAuth, dashboardController.upda
 // Combined Summary for multiple meetings
 app.post('/api/meetings/combined-summary', optionalAuth, dashboardController.generateCombinedSummary);
 
+// Ask AI about a combined summary
+app.post('/api/summary/ask', optionalAuth, dashboardController.askSummaryQuestion);
+
 // Saved Summaries CRUD
 app.get('/api/saved-summaries', optionalAuth, async (req, res) => {
     try {

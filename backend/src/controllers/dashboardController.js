@@ -1024,3 +1024,45 @@ ${meetingInputs}`;
         res.status(500).json({ error: 'Failed to generate combined summary: ' + err.message });
     }
 };
+
+// Ask AI about a combined summary
+exports.askSummaryQuestion = async (req, res) => {
+    try {
+        const { question, summaryData } = req.body;
+
+        if (!question) {
+            return res.status(400).json({ error: 'Question is required' });
+        }
+        if (!summaryData) {
+            return res.status(400).json({ error: 'Summary data is required' });
+        }
+
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ error: 'GEMINI_API_KEY is missing' });
+        }
+
+        const summaryContext = JSON.stringify(summaryData, null, 2).substring(0, 15000);
+
+        const prompt = `You are an AI assistant helping users understand a combined meeting summary. Below is the full summary data from multiple meetings.
+
+SUMMARY DATA:
+${summaryContext}
+
+USER QUESTION: ${question}
+
+Answer concisely and accurately based ONLY on the summary data provided. If the answer is not in the data, say so clearly.`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-flash-latest',
+            contents: prompt
+        });
+
+        const answer = response.candidates?.[0]?.content?.parts?.[0]?.text || response.text?.();
+
+        res.json({ success: true, answer });
+
+    } catch (err) {
+        console.error('[SummaryAskAI] Error:', err);
+        res.status(500).json({ error: 'Failed to get answer' });
+    }
+};

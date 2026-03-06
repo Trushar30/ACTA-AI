@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {
     FileText, Loader2, Sparkles, Check, ChevronDown, Search, X,
     Users, Clock, Calendar, CheckCircle2, AlertTriangle, BarChart2,
     TrendingUp, MessageSquare, Target, Zap, ShieldCheck, Copy,
-    Save, Trash2, Pencil, ArrowLeft, FolderOpen
+    Save, Trash2, Pencil, ArrowLeft, FolderOpen, Send, User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -33,6 +33,13 @@ const SummaryPage = () => {
     const [editingNameId, setEditingNameId] = useState(null);
     const [editNameValue, setEditNameValue] = useState('');
     const [deletingId, setDeletingId] = useState(null);
+
+    // Ask AI state
+    const [chatOpen, setChatOpen] = useState(false);
+    const [chatHistory, setChatHistory] = useState([]);
+    const [chatQuery, setChatQuery] = useState('');
+    const [askingAi, setAskingAi] = useState(false);
+    const chatEndRef = useRef(null);
 
     useEffect(() => {
         fetchMeetings();
@@ -207,6 +214,34 @@ const SummaryPage = () => {
         navigator.clipboard.writeText(text);
         setCopied(key);
         setTimeout(() => setCopied(null), 2000);
+    };
+
+    const handleAskAi = async (e) => {
+        e?.preventDefault();
+        if (!chatQuery.trim() || askingAi || !summary) return;
+
+        const userMsg = chatQuery.trim();
+        setChatHistory(prev => [...prev, { role: 'user', content: userMsg }]);
+        setChatQuery('');
+        setAskingAi(true);
+
+        try {
+            const res = await axios.post(`${API_URL}/api/summary/ask`, {
+                question: userMsg,
+                summaryData: summary,
+            });
+            if (res.data.success) {
+                setChatHistory(prev => [...prev, { role: 'ai', content: res.data.answer }]);
+            } else {
+                setChatHistory(prev => [...prev, { role: 'ai', content: 'Sorry, I could not find an answer.' }]);
+            }
+        } catch (err) {
+            console.error('Ask AI error:', err);
+            setChatHistory(prev => [...prev, { role: 'ai', content: 'Failed to get a response. Please try again.' }]);
+        } finally {
+            setAskingAi(false);
+            setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+        }
     };
 
     const getSelectedMeetingDetails = () => {
@@ -756,6 +791,119 @@ const SummaryPage = () => {
                                 </p>
                             </div>
                         )}
+
+                        {/* Ask AI Section */}
+                        <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                            <button
+                                onClick={() => setChatOpen(!chatOpen)}
+                                className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors"
+                            >
+                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                    <Sparkles size={18} className="text-emerald-400" />
+                                    Ask AI About This Summary
+                                </h3>
+                                <ChevronDown size={18} className={`text-slate-400 transition-transform ${chatOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            <AnimatePresence>
+                                {chatOpen && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <div className="border-t border-white/5">
+                                            {/* Chat Messages */}
+                                            <div className="h-[350px] overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                                                {chatHistory.length === 0 && (
+                                                    <div className="h-full flex flex-col items-center justify-center text-center">
+                                                        <Sparkles size={40} className="text-white mb-3 opacity-30" />
+                                                        <h4 className="text-base font-bold text-white mb-1">Ask anything about this summary</h4>
+                                                        <p className="text-xs text-slate-500 mb-4">Powered by Google Gemini AI</p>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full max-w-lg">
+                                                            {[
+                                                                'What are the most critical action items?',
+                                                                'Summarize the key decisions made',
+                                                                'What are the biggest risks identified?',
+                                                                'Who were the most active participants?'
+                                                            ].map((q, idx) => (
+                                                                <button
+                                                                    key={idx}
+                                                                    onClick={() => { setChatQuery(q); }}
+                                                                    className="text-left p-3 bg-[#0B0E14] hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg text-xs text-slate-300 transition-all"
+                                                                >
+                                                                    <span className="flex items-center gap-2">
+                                                                        <MessageSquare size={12} className="text-white opacity-60" />
+                                                                        {q}
+                                                                    </span>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {chatHistory.map((msg, i) => (
+                                                    <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                                        {msg.role === 'ai' && (
+                                                            <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/30 flex-shrink-0">
+                                                                <Sparkles size={12} />
+                                                            </div>
+                                                        )}
+                                                        <div className={`max-w-[80%] p-3 rounded-xl text-sm leading-relaxed ${
+                                                            msg.role === 'user'
+                                                                ? 'bg-emerald-600/20 text-white rounded-br-none'
+                                                                : 'bg-[#0B0E14] text-slate-200 border border-white/10 rounded-bl-none'
+                                                        }`}>
+                                                            <p className="whitespace-pre-line">{msg.content}</p>
+                                                        </div>
+                                                        {msg.role === 'user' && (
+                                                            <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-white flex-shrink-0">
+                                                                <User size={12} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                                {askingAi && (
+                                                    <div className="flex gap-3 justify-start">
+                                                        <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/30">
+                                                            <Sparkles size={12} />
+                                                        </div>
+                                                        <div className="bg-[#0B0E14] px-3 py-2 rounded-xl rounded-bl-none border border-white/10 flex items-center gap-2">
+                                                            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce"></span>
+                                                            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></span>
+                                                            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <div ref={chatEndRef}></div>
+                                            </div>
+
+                                            {/* Chat Input */}
+                                            <div className="p-4 bg-[#0B0E14] border-t border-white/5">
+                                                <form onSubmit={handleAskAi} className="relative">
+                                                    <input
+                                                        type="text"
+                                                        value={chatQuery}
+                                                        onChange={(e) => setChatQuery(e.target.value)}
+                                                        placeholder="Ask anything about the summary..."
+                                                        disabled={askingAi}
+                                                        className="w-full bg-[#1C1F2E] border border-white/10 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-slate-500 disabled:opacity-50"
+                                                    />
+                                                    <button
+                                                        type="submit"
+                                                        disabled={!chatQuery.trim() || askingAi}
+                                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                                    >
+                                                        <Send size={16} />
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
                     </div>
                 )}
 
