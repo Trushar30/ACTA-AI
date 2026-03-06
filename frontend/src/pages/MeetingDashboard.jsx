@@ -1191,85 +1191,377 @@ const CalendarTab = ({ data }) => {
 };
 
 const AnalyticsTab = ({ data }) => {
-    // Transform data for charts
+    const CHART_COLORS = ['#10B981', '#6366F1', '#F59E0B', '#EF4444', '#06B6D4', '#EC4899', '#8B5CF6', '#14B8A6'];
+    const PIE_COLORS = ['#10B981', '#6366F1', '#F59E0B', '#EC4899', '#06B6D4', '#EF4444', '#8B5CF6', '#14B8A6'];
     const participants = data.participants || [];
     const topics = data.keyTopics || [];
     const sentiment = data.sentimentTimeline || [];
+    const speakerSentiments = data.speakerSentiments || [];
+    const buzzwords = data.buzzwords || [];
+    const emotionalMoments = data.emotionalMoments || [];
+    const risks = data.risks || [];
+    const topPriorities = data.topPriorities || [];
+
+    const totalContribution = participants.reduce((s, p) => s + (p.contribution || 0), 0);
+    const sentimentLabel = (val) => val >= 0.5 ? 'Positive' : val >= 0 ? 'Neutral' : 'Negative';
+    const sentimentColor = (val) => val >= 0.5 ? 'text-emerald-400' : val >= 0 ? 'text-amber-400' : 'text-red-400';
+    const severityColor = (sev) => {
+        const s = (sev || '').toLowerCase();
+        if (s === 'high' || s === 'critical') return 'bg-red-500/15 text-red-400 border-red-500/20';
+        if (s === 'medium') return 'bg-amber-500/15 text-amber-400 border-amber-500/20';
+        return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20';
+    };
+    const emotionIcon = (e) => {
+        const em = (e || '').toLowerCase();
+        if (em.includes('happy') || em.includes('joy') || em.includes('excit')) return <Smile size={14} className="text-emerald-400" />;
+        if (em.includes('frust') || em.includes('anger') || em.includes('annoyed')) return <Frown size={14} className="text-red-400" />;
+        if (em.includes('concern') || em.includes('worry') || em.includes('anxious')) return <AlertTriangle size={14} className="text-amber-400" />;
+        if (em.includes('passion') || em.includes('enthus')) return <Heart size={14} className="text-pink-400" />;
+        return <Meh size={14} className="text-slate-400" />;
+    };
+
+    const CustomTooltip = ({ active, payload, label }) => {
+        if (!active || !payload?.length) return null;
+        return (
+            <div className="bg-[#0B0E14] border border-white/10 rounded-xl px-4 py-3 shadow-xl">
+                <p className="text-xs text-slate-400 mb-1">{label}</p>
+                {payload.map((p, i) => (
+                    <p key={i} className="text-sm font-semibold" style={{ color: p.color || '#10B981' }}>
+                        {p.name}: {typeof p.value === 'number' ? p.value.toFixed?.(1) ?? p.value : p.value}{p.name === 'contribution' ? '%' : ''}
+                    </p>
+                ))}
+            </div>
+        );
+    };
 
     return (
         <div className="space-y-6">
+            {/* --- Summary Stats Row --- */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                    { label: 'Duration', value: data.totalDuration || '—', icon: <Clock size={18} />, color: 'emerald' },
+                    { label: 'Speakers', value: data.speakerCount ?? participants.length, icon: <Users size={18} />, color: 'indigo' },
+                    { label: 'Action Items', value: data.actionItemCount ?? 0, icon: <Target size={18} />, color: 'amber' },
+                    { label: 'Sentiment', value: data.overallSentiment || '—', icon: <TrendingUp size={18} />, color: 'cyan' },
+                ].map((stat, i) => (
+                    <div key={i} className="bg-[#1C1F2E] rounded-2xl p-5 border border-white/5 group hover:border-white/10 transition-all">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${
+                            stat.color === 'emerald' ? 'bg-emerald-500/15 text-emerald-400' :
+                            stat.color === 'indigo' ? 'bg-indigo-500/15 text-indigo-400' :
+                            stat.color === 'amber' ? 'bg-amber-500/15 text-amber-400' :
+                            'bg-cyan-500/15 text-cyan-400'
+                        }`}>
+                            {stat.icon}
+                        </div>
+                        <p className="text-[11px] text-slate-500 uppercase tracking-wider font-medium mb-0.5">{stat.label}</p>
+                        <p className="text-xl font-bold text-white capitalize">{stat.value}</p>
+                    </div>
+                ))}
+            </div>
+
+            {/* --- Row 1: Speaker Contribution + Topic Distribution --- */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Speaker Contribution */}
-                <div className="bg-[#1C1F2E] rounded-3xl p-6 border border-white/5 shadow-sm">
-                    <h3 className="text-lg font-bold text-white mb-6">Speaker Contribution</h3>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={participants} layout="vertical" margin={{ left: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" horizontal={false} />
-                                <XAxis type="number" hide />
-                                <YAxis dataKey="name" type="category" width={80} stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#0F172A', border: '1px solid #1e293b', borderRadius: '12px', color: '#fff' }}
-                                    cursor={{ fill: '#ffffff05' }}
-                                />
-                                <Bar dataKey="contribution" fill="#10B981" radius={[0, 4, 4, 0]} barSize={24} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                    <div className="px-6 pt-5 pb-3 flex items-center gap-3">
+                        <div className="w-8 h-8 bg-emerald-500/15 rounded-lg flex items-center justify-center"><Users size={14} className="text-emerald-400" /></div>
+                        <h3 className="text-sm font-bold text-white">Speaker Contribution</h3>
                     </div>
+                    {participants.length > 0 ? (
+                        <>
+                            <div className="px-6 pb-2">
+                                {participants.map((p, i) => (
+                                    <div key={i} className="flex items-center gap-3 py-2.5 border-b border-white/5 last:border-0">
+                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] + '33', color: CHART_COLORS[i % CHART_COLORS.length] }}>
+                                            {(p.name || '?')[0].toUpperCase()}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-sm text-white font-medium truncate">{p.name}</span>
+                                                <span className="text-xs text-slate-400 ml-2 flex-shrink-0">{p.contribution}%</span>
+                                            </div>
+                                            <div className="w-full bg-white/5 rounded-full h-1.5">
+                                                <div className="h-1.5 rounded-full transition-all" style={{ width: `${totalContribution > 0 ? (p.contribution / Math.max(...participants.map(pp => pp.contribution))) * 100 : 0}%`, backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="h-52 px-2 pb-4">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={participants} layout="vertical" margin={{ left: 5, right: 20 }}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" horizontal={false} />
+                                        <XAxis type="number" hide />
+                                        <YAxis dataKey="name" type="category" width={70} stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} />
+                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#ffffff05' }} />
+                                        <Bar dataKey="contribution" radius={[0, 6, 6, 0]} barSize={18}>
+                                            {participants.map((_, idx) => (
+                                                <Cell key={idx} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="px-6 py-12 text-center text-slate-500 text-sm">No participant data available.</div>
+                    )}
                 </div>
 
                 {/* Topic Distribution */}
-                <div className="bg-[#1C1F2E] rounded-3xl p-6 border border-white/5 shadow-sm">
-                    <h3 className="text-lg font-bold text-white mb-6">Topic Distribution</h3>
-                    <div className="h-[400px] flex items-center justify-center">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart margin={{ bottom: 20 }}>
-                                <Pie
-                                    data={topics}
-                                    cx="50%"
-                                    cy="40%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
-                                    dataKey="percentage"
-                                >
-                                    {topics.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={['#FF6B6B', '#4ECDC4', '#FFD93D', '#6C5CE7', '#00D2FF', '#FFA502'][index % 6]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip contentStyle={{ backgroundColor: '#0F172A', border: '1px solid #1e293b', borderRadius: '12px', color: '#fff' }} />
-                                <Legend
-                                    verticalAlign="bottom"
-                                    layout="vertical"
-                                    align="center"
-                                    wrapperStyle={{ paddingTop: '20px' }}
-                                />
-                            </PieChart>
-                        </ResponsiveContainer>
+                <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                    <div className="px-6 pt-5 pb-3 flex items-center gap-3">
+                        <div className="w-8 h-8 bg-indigo-500/15 rounded-lg flex items-center justify-center"><BarChart2 size={14} className="text-indigo-400" /></div>
+                        <h3 className="text-sm font-bold text-white">Topic Distribution</h3>
                     </div>
-                </div>
-            </div>
-
-            {/* Detailed Breakdown */}
-            <div className="bg-[#1C1F2E] rounded-3xl p-6 border border-white/5 shadow-sm">
-                <h3 className="text-lg font-bold text-white mb-6">Detailed Topic Breakdown</h3>
-                <div className="grid gap-4 md:grid-cols-2">
-                    {data.topicBreakdown?.map((item, i) => (
-                        <div key={i} className="bg-[#0B0E14] p-5 rounded-2xl border border-white/5">
-                            <h4 className="text-base font-bold text-white mb-2">{item.topic}</h4>
-                            <p className="text-sm text-slate-300 mb-4">{item.details}</p>
-                            <div className="flex flex-wrap gap-2">
-                                {item.subtopics?.map((sub, j) => (
-                                    <span key={j} className="text-[10px] px-2 py-1 bg-white/5 rounded-md text-slate-400">
-                                        {sub}
-                                    </span>
+                    {topics.length > 0 ? (
+                        <div className="flex flex-col lg:flex-row items-center gap-4 px-6 pb-6">
+                            <div className="h-56 w-56 flex-shrink-0">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie data={topics} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="percentage" stroke="none">
+                                            {topics.map((_, idx) => <Cell key={idx} fill={PIE_COLORS[idx % PIE_COLORS.length]} />)}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="flex-1 w-full space-y-2.5">
+                                {topics.map((t, i) => (
+                                    <div key={i} className="flex items-center gap-2.5">
+                                        <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }}></span>
+                                        <span className="text-sm text-slate-300 flex-1 truncate">{t.name}</span>
+                                        <span className="text-xs text-slate-500">{t.duration}</span>
+                                        <span className="text-xs font-semibold text-white bg-white/5 px-2 py-0.5 rounded-md">{t.percentage}%</span>
+                                    </div>
                                 ))}
                             </div>
                         </div>
-                    ))}
-                    {!data.topicBreakdown?.length && <p className="text-slate-500">No detailed breakdown available.</p>}
+                    ) : (
+                        <div className="px-6 py-12 text-center text-slate-500 text-sm">No topic data available.</div>
+                    )}
                 </div>
             </div>
+
+            {/* --- Sentiment Flow Over Time --- */}
+            {sentiment.length > 0 && (
+                <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                    <div className="px-6 pt-5 pb-3 flex items-center gap-3">
+                        <div className="w-8 h-8 bg-cyan-500/15 rounded-lg flex items-center justify-center"><TrendingUp size={14} className="text-cyan-400" /></div>
+                        <h3 className="text-sm font-bold text-white">Sentiment Flow</h3>
+                        <span className="text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded-md ml-auto">Over time</span>
+                    </div>
+                    <div className="h-56 px-2 pb-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={sentiment} margin={{ left: 10, right: 20, top: 10 }}>
+                                <defs>
+                                    <linearGradient id="sentGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#06B6D4" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+                                <XAxis dataKey="time" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} domain={[-1, 1]} ticks={[-1, -0.5, 0, 0.5, 1]} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Area type="monotone" dataKey="sentiment" stroke="#06B6D4" strokeWidth={2} fill="url(#sentGrad)" dot={false} />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            )}
+
+            {/* --- Row 2: Speaker Sentiments + Buzzwords --- */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Speaker Sentiments */}
+                {speakerSentiments.length > 0 && (
+                    <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                        <div className="px-6 pt-5 pb-3 flex items-center gap-3">
+                            <div className="w-8 h-8 bg-pink-500/15 rounded-lg flex items-center justify-center"><Smile size={14} className="text-pink-400" /></div>
+                            <h3 className="text-sm font-bold text-white">Speaker Sentiments</h3>
+                        </div>
+                        <div className="px-6 pb-5 space-y-3">
+                            {speakerSentiments.map((sp, i) => {
+                                const total = (sp.positiveCount || 0) + (sp.neutralCount || 0) + (sp.negativeCount || 0) || 1;
+                                return (
+                                    <div key={i} className="bg-[#0B0E14] rounded-xl p-4 border border-white/5">
+                                        <div className="flex items-center justify-between mb-2.5">
+                                            <span className="text-sm font-medium text-white">{sp.speaker}</span>
+                                            <span className={`text-xs font-semibold ${sentimentColor(sp.averageSentiment)}`}>
+                                                {sentimentLabel(sp.averageSentiment)} ({(sp.averageSentiment ?? 0).toFixed(2)})
+                                            </span>
+                                        </div>
+                                        <div className="flex h-2 rounded-full overflow-hidden bg-white/5">
+                                            <div className="bg-emerald-500 transition-all" style={{ width: `${(sp.positiveCount / total) * 100}%` }}></div>
+                                            <div className="bg-amber-500 transition-all" style={{ width: `${(sp.neutralCount / total) * 100}%` }}></div>
+                                            <div className="bg-red-500 transition-all" style={{ width: `${(sp.negativeCount / total) * 100}%` }}></div>
+                                        </div>
+                                        <div className="flex gap-4 mt-2 text-[10px]">
+                                            <span className="text-emerald-400">Positive {sp.positiveCount}</span>
+                                            <span className="text-amber-400">Neutral {sp.neutralCount}</span>
+                                            <span className="text-red-400">Negative {sp.negativeCount}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Buzzwords */}
+                {buzzwords.length > 0 && (
+                    <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                        <div className="px-6 pt-5 pb-3 flex items-center gap-3">
+                            <div className="w-8 h-8 bg-amber-500/15 rounded-lg flex items-center justify-center"><Zap size={14} className="text-amber-400" /></div>
+                            <h3 className="text-sm font-bold text-white">Key Buzzwords</h3>
+                            <span className="text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded-md ml-auto">{buzzwords.length} found</span>
+                        </div>
+                        <div className="px-6 pb-5 flex flex-wrap gap-2.5">
+                            {buzzwords.sort((a, b) => (b.frequency || 0) - (a.frequency || 0)).map((bw, i) => {
+                                const maxFreq = Math.max(...buzzwords.map(b => b.frequency || 1));
+                                const intensity = (bw.frequency || 1) / maxFreq;
+                                return (
+                                    <div key={i} className="group relative">
+                                        <span
+                                            className="inline-block px-3 py-1.5 rounded-lg border text-sm font-medium cursor-default transition-all hover:scale-105"
+                                            style={{
+                                                backgroundColor: `rgba(16, 185, 129, ${0.08 + intensity * 0.2})`,
+                                                borderColor: `rgba(16, 185, 129, ${0.15 + intensity * 0.25})`,
+                                                color: intensity > 0.6 ? '#6EE7B7' : '#94A3B8',
+                                                fontSize: `${Math.max(12, 12 + intensity * 4)}px`
+                                            }}
+                                        >
+                                            {bw.word} <span className="text-[10px] opacity-60">x{bw.frequency}</span>
+                                        </span>
+                                        {bw.context && (
+                                            <div className="absolute z-20 bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2.5 bg-[#0B0E14] border border-white/10 rounded-lg text-xs text-slate-300 shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity">
+                                                {bw.context}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* --- Emotional Moments --- */}
+            {emotionalMoments.length > 0 && (
+                <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                    <div className="px-6 pt-5 pb-3 flex items-center gap-3">
+                        <div className="w-8 h-8 bg-rose-500/15 rounded-lg flex items-center justify-center"><Heart size={14} className="text-rose-400" /></div>
+                        <h3 className="text-sm font-bold text-white">Emotional Moments</h3>
+                        <span className="text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded-md ml-auto">{emotionalMoments.length} detected</span>
+                    </div>
+                    <div className="px-6 pb-5 grid gap-3 md:grid-cols-2">
+                        {emotionalMoments.map((em, i) => (
+                            <div key={i} className="bg-[#0B0E14] rounded-xl p-4 border border-white/5 flex gap-3">
+                                <div className="flex-shrink-0 mt-0.5">{emotionIcon(em.emotion)}</div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-xs font-semibold text-white">{em.speaker}</span>
+                                        <span className="text-[10px] text-slate-600">@ {em.timestamp}</span>
+                                    </div>
+                                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">"{em.text}"</p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <span className="text-[10px] px-2 py-0.5 bg-white/5 rounded-md text-slate-500 capitalize">{em.emotion}</span>
+                                        {em.intensity != null && (
+                                            <div className="flex items-center gap-1">
+                                                <div className="w-12 bg-white/5 rounded-full h-1">
+                                                    <div className="h-1 rounded-full bg-rose-400 transition-all" style={{ width: `${Math.min(em.intensity * 100, 100)}%` }}></div>
+                                                </div>
+                                                <span className="text-[10px] text-slate-600">{(em.intensity * 10).toFixed(0)}/10</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* --- Row 3: Risks + Top Priorities --- */}
+            {(risks.length > 0 || topPriorities.length > 0) && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Risks */}
+                    {risks.length > 0 && (
+                        <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                            <div className="px-6 pt-5 pb-3 flex items-center gap-3">
+                                <div className="w-8 h-8 bg-red-500/15 rounded-lg flex items-center justify-center"><AlertTriangle size={14} className="text-red-400" /></div>
+                                <h3 className="text-sm font-bold text-white">Risks Identified</h3>
+                                <span className="text-[10px] text-red-400 bg-red-500/10 px-2 py-0.5 rounded-md ml-auto font-medium">{risks.length}</span>
+                            </div>
+                            <div className="px-6 pb-5 space-y-2.5">
+                                {risks.map((r, i) => (
+                                    <div key={i} className="bg-[#0B0E14] rounded-xl p-4 border border-white/5">
+                                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                                            <p className="text-sm font-medium text-white">{r.issue}</p>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-md border flex-shrink-0 capitalize ${severityColor(r.severity)}`}>{r.severity}</span>
+                                        </div>
+                                        <p className="text-xs text-slate-400">{r.impact}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Top Priorities */}
+                    {topPriorities.length > 0 && (
+                        <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                            <div className="px-6 pt-5 pb-3 flex items-center gap-3">
+                                <div className="w-8 h-8 bg-violet-500/15 rounded-lg flex items-center justify-center"><Target size={14} className="text-violet-400" /></div>
+                                <h3 className="text-sm font-bold text-white">Top Priorities</h3>
+                            </div>
+                            <div className="px-6 pb-5 space-y-2.5">
+                                {topPriorities.map((tp, i) => (
+                                    <div key={i} className="bg-[#0B0E14] rounded-xl p-4 border border-white/5 flex items-center gap-3">
+                                        <span className="w-8 h-8 rounded-lg bg-violet-500/15 flex items-center justify-center text-violet-400 text-sm font-bold flex-shrink-0">
+                                            {i + 1}
+                                        </span>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-white truncate">{tp.priority}</p>
+                                            {tp.speaker && <p className="text-[11px] text-slate-500 mt-0.5">Raised by {tp.speaker}</p>}
+                                        </div>
+                                        {tp.percentage != null && (
+                                            <span className="text-xs font-semibold text-violet-400 bg-violet-500/10 px-2 py-0.5 rounded-md flex-shrink-0">{tp.percentage}%</span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* --- Detailed Topic Breakdown --- */}
+            {data.topicBreakdown?.length > 0 && (
+                <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
+                    <div className="px-6 pt-5 pb-3 flex items-center gap-3">
+                        <div className="w-8 h-8 bg-teal-500/15 rounded-lg flex items-center justify-center"><FileText size={14} className="text-teal-400" /></div>
+                        <h3 className="text-sm font-bold text-white">Detailed Topic Breakdown</h3>
+                    </div>
+                    <div className="px-6 pb-5 grid gap-3 md:grid-cols-2">
+                        {data.topicBreakdown.map((item, i) => (
+                            <div key={i} className="bg-[#0B0E14] p-4 rounded-xl border border-white/5">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }}></span>
+                                    <h4 className="text-sm font-bold text-white">{item.topic}</h4>
+                                </div>
+                                <p className="text-xs text-slate-400 leading-relaxed mb-3">{item.details}</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {item.subtopics?.map((sub, j) => (
+                                        <span key={j} className="text-[10px] px-2 py-0.5 bg-white/5 rounded-md text-slate-500 border border-white/5">
+                                            {sub}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
