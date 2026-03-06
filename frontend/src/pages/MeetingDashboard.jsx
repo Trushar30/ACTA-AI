@@ -1361,6 +1361,23 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
 // --- Helpers ---
 
 const TranscriptTimelineTab = ({ data, exportToSRT }) => {
+    // Create a mapping from SPEAKER_A, SPEAKER_B, etc. to actual names
+    const speakerMapping = React.useMemo(() => {
+        const mapping = {};
+        if (data.participants && Array.isArray(data.participants)) {
+            data.participants.forEach((participant, index) => {
+                const speakerId = `SPEAKER_${String.fromCharCode(65 + index)}`; // SPEAKER_A, SPEAKER_B, etc.
+                mapping[speakerId] = participant.name || speakerId;
+            });
+        }
+        return mapping;
+    }, [data.participants]);
+
+    // Helper function to get display name for speaker
+    const getDisplayName = (speakerId) => {
+        return speakerMapping[speakerId] || speakerId;
+    };
+
     return (
         <div className="bg-[#1C1F2E] rounded-[2.5rem] border border-white/5 shadow-sm overflow-hidden min-h-[600px] flex flex-col">
             <div className="p-8 border-b border-white/5">
@@ -1389,13 +1406,14 @@ const TranscriptTimelineTab = ({ data, exportToSRT }) => {
                             const colors = ['bg-blue-500', 'bg-emerald-500', 'bg-orange-500', 'bg-pink-500', 'bg-purple-500', 'bg-cyan-500'];
                             const speakerIndex = segment.speaker ? segment.speaker.charCodeAt(segment.speaker.length - 1) % colors.length : 0;
                             const color = colors[speakerIndex];
+                            const displayName = getDisplayName(segment.speaker);
 
                             return (
                                 <div key={index} className="flex gap-4 group hover:bg-white/5 p-4 rounded-xl transition-colors">
                                     {/* Timeline marker */}
                                     <div className="flex-shrink-0 flex flex-col items-center">
                                         <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center text-white font-bold text-xs`}>
-                                            {segment.speaker ? segment.speaker.charAt(0) : '#'}
+                                            {displayName ? displayName.charAt(0) : '#'}
                                         </div>
                                         {index < data.transcriptTimeline.length - 1 && (
                                             <div className="flex-1 w-0.5 bg-white/10 mt-2"></div>
@@ -1416,7 +1434,7 @@ const TranscriptTimelineTab = ({ data, exportToSRT }) => {
                                                 <>
                                                     <span className="text-xs text-slate-500">•</span>
                                                     <span className="text-xs font-semibold text-white">
-                                                        {segment.speaker}
+                                                        {displayName}
                                                     </span>
                                                 </>
                                             )}
