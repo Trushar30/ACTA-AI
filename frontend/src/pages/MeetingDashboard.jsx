@@ -1275,109 +1275,153 @@ const AnalyticsTab = ({ data }) => {
 };
 
 const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi, chatEndRef, suggestedQuestions, handleSuggestedQuestion }) => {
+    const [copiedIdx, setCopiedIdx] = useState(null);
+
+    const copyMessage = (text, idx) => {
+        navigator.clipboard.writeText(text);
+        setCopiedIdx(idx);
+        setTimeout(() => setCopiedIdx(null), 1500);
+    };
+
     return (
-        <div className="bg-[#1C1F2E] rounded-[2.5rem] border border-white/5 shadow-sm overflow-hidden h-[450px] flex flex-col relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
+        <div className="max-w-4xl mx-auto flex flex-col" style={{ height: 'calc(100vh - 180px)', minHeight: '500px' }}>
+            {/* Chat Container */}
+            <div className="flex-1 bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden flex flex-col">
+                {/* Header */}
+                <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-[#1C1F2E]">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-emerald-500/15 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                            <Sparkles size={16} className="text-emerald-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-white">Ask AI</h3>
+                            <p className="text-[11px] text-slate-500">Powered by Google Gemini</p>
+                        </div>
+                    </div>
+                    {chatHistory.length > 0 && (
+                        <span className="text-[10px] font-medium px-2.5 py-1 bg-white/5 text-slate-500 rounded-lg">
+                            {chatHistory.filter(m => m.role === 'user').length} question{chatHistory.filter(m => m.role === 'user').length !== 1 ? 's' : ''}
+                        </span>
+                    )}
+                </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-                {chatHistory.length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-center">
-                        <Sparkles size={48} className="text-white mb-3 opacity-40" />
-                        <h3 className="text-xl font-bold text-white mb-1.5">Ask AI about the meeting</h3>
-                        <p className="text-xs text-slate-400 mb-4">Powered by Google Gemini AI</p>
+                {/* Messages Area */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
+                    {chatHistory.length === 0 && (
+                        <div className="h-full flex flex-col items-center justify-center text-center px-4">
+                            <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-5 border border-emerald-500/20">
+                                <Sparkles size={28} className="text-emerald-400" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-1">Ask anything about this meeting</h3>
+                            <p className="text-sm text-slate-500 mb-8 max-w-md">
+                                Get instant answers from the meeting transcript - decisions, action items, deadlines, and more.
+                            </p>
 
-                        {/* Suggested Questions */}
-                        <div className="mt-3 w-full max-w-2xl">
-                            <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-2 font-semibold">Suggested Questions</p>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                {suggestedQuestions?.map((question, idx) => (
+                            {/* Suggested Questions Grid */}
+                            <div className="w-full max-w-2xl">
+                                <p className="text-[10px] text-slate-600 uppercase tracking-widest mb-3 font-semibold">Try asking</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    {suggestedQuestions?.map((question, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => handleSuggestedQuestion(question)}
+                                            className="text-left p-3.5 bg-[#0B0E14] hover:bg-white/[0.06] border border-white/5 hover:border-emerald-500/20 rounded-xl text-sm text-slate-300 hover:text-white transition-all group"
+                                        >
+                                            <span className="flex items-center gap-2.5">
+                                                <MessageSquare size={14} className="text-slate-600 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
+                                                {question}
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {chatHistory.map((msg, i) => (
+                        <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            {msg.role !== 'user' && (
+                                <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-400 border border-emerald-500/20 flex-shrink-0 mt-0.5">
+                                    <Sparkles size={13} />
+                                </div>
+                            )}
+                            <div className={`max-w-[75%] group relative ${
+                                msg.role === 'user'
+                                    ? 'bg-emerald-600/15 border border-emerald-500/20 text-white rounded-2xl rounded-br-md'
+                                    : msg.role === 'error'
+                                        ? 'bg-red-500/10 border border-red-500/20 text-red-300 rounded-2xl rounded-bl-md'
+                                        : 'bg-[#0B0E14] border border-white/5 text-slate-200 rounded-2xl rounded-bl-md'
+                            } px-4 py-3`}>
+                                <p className="text-sm leading-relaxed whitespace-pre-line">{msg.content}</p>
+                                {msg.role === 'ai' && (
                                     <button
-                                        key={idx}
-                                        onClick={() => handleSuggestedQuestion(question)}
-                                        className="text-left p-3 bg-[#0B0E14] hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg text-xs text-slate-300 transition-all group"
+                                        onClick={() => copyMessage(msg.content, i)}
+                                        className="absolute -bottom-3 right-2 opacity-0 group-hover:opacity-100 p-1 bg-[#1C1F2E] border border-white/10 rounded-md text-slate-500 hover:text-white transition-all"
+                                        title="Copy response"
                                     >
-                                        <span className="flex items-center gap-2">
-                                            <MessageSquare size={12} className="text-white opacity-60 group-hover:opacity-100" />
-                                            {question}
-                                        </span>
+                                        {copiedIdx === i ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} />}
                                     </button>
-                                ))}
+                                )}
+                            </div>
+                            {msg.role === 'user' && (
+                                <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-white flex-shrink-0 mt-0.5">
+                                    <User size={13} />
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {askingAi && (
+                        <div className="flex gap-3 justify-start">
+                            <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                                <Sparkles size={13} />
+                            </div>
+                            <div className="bg-[#0B0E14] px-4 py-3 rounded-2xl rounded-bl-md border border-white/5 flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce"></span>
+                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></span>
+                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></span>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                    <div ref={chatEndRef}></div>
+                </div>
 
-                {chatHistory.map((msg, i) => (
-                    <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        {msg.role === 'ai' && (
-                            <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-white border border-white/30 flex-shrink-0">
-                                <Sparkles size={12} />
-                            </div>
-                        )}
-                        <div className={`max-w-[80%] p-3 rounded-xl text-xs leading-relaxed ${msg.role === 'user'
-                            ? 'bg-white/10 text-white rounded-br-none'
-                            : 'bg-[#0B0E14] text-slate-200 border border-white/10 rounded-bl-none'
-                            }`}>
-                            {msg.content}
+                {/* Input Area */}
+                <div className="p-4 bg-[#0B0E14]/80 border-t border-white/5">
+                    {/* Quick Suggestions (after chat started) */}
+                    {chatHistory.length > 0 && chatHistory.length < 8 && (
+                        <div className="mb-3 flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                            {suggestedQuestions?.filter(q => !chatHistory.some(m => m.content === q)).slice(0, 3).map((question, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => handleSuggestedQuestion(question)}
+                                    disabled={askingAi}
+                                    className="flex-shrink-0 text-xs px-3 py-1.5 bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/20 text-slate-400 hover:text-emerald-300 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    {question}
+                                </button>
+                            ))}
                         </div>
-                        {msg.role === 'user' && (
-                            <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-white flex-shrink-0">
-                                <User size={12} />
-                            </div>
-                        )}
-                    </div>
-                ))}
-                {askingAi && (
-                    <div className="flex gap-3 justify-start">
-                        <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-white border border-white/30">
-                            <Sparkles size={12} />
-                        </div>
-                        <div className="bg-[#0B0E14] px-3 py-2 rounded-xl rounded-bl-none border border-white/10 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></span>
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce delay-100"></span>
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce delay-200"></span>
-                        </div>
-                    </div>
-                )}
-                <div ref={chatEndRef}></div>
-            </div>
+                    )}
 
-            {/* Input Area */}
-            <div className="p-4 bg-[#0B0E14] border-t border-white/5">
-                {/* Suggested Questions (shown when chat has started) */}
-                {chatHistory.length > 0 && (
-                    <div className="mb-3 flex flex-wrap gap-2">
-                        {suggestedQuestions?.slice(0, 3).map((question, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => handleSuggestedQuestion(question)}
-                                disabled={askingAi}
-                                className="text-xs px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {question}
-                            </button>
-                        ))}
-                    </div>
-                )}
-
-                <form onSubmit={handleAskAi} className="relative">
-                    <input
-                        type="text"
-                        value={chatQuery}
-                        onChange={(e) => setChatQuery(e.target.value)}
-                        placeholder="Ask anything about the meeting..."
-                        disabled={askingAi}
-                        className="w-full bg-[#1C1F2E] border border-white/10 rounded-lg pl-3 pr-10 py-2.5 text-xs text-white focus:outline-none focus:border-white/50 focus:ring-1 focus:ring-white/50 transition-all placeholder:text-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                    <button
-                        type="submit"
-                        disabled={!chatQuery.trim() || askingAi}
-                        className="absolute right-2 top-2 p-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <Send size={18} />
-                    </button>
-                </form>
+                    <form onSubmit={handleAskAi} className="relative">
+                        <input
+                            type="text"
+                            value={chatQuery}
+                            onChange={(e) => setChatQuery(e.target.value)}
+                            placeholder="Ask anything about this meeting..."
+                            disabled={askingAi}
+                            className="w-full bg-[#1C1F2E] border border-white/10 rounded-xl pl-4 pr-14 py-3.5 text-sm text-white focus:outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20 transition-all placeholder:text-slate-600 disabled:opacity-50"
+                        />
+                        <button
+                            type="submit"
+                            disabled={!chatQuery.trim() || askingAi}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                            <Send size={16} />
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );
