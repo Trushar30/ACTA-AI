@@ -290,8 +290,8 @@ const ScheduledMeetings = () => {
                     <button
                         onClick={() => setShowGeminiModal(true)}
                         className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${showGeminiModal
-                                ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]'
-                                : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
+                            ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]'
+                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
                             }`}
                         title="Generate with Gemini AI"
                     >
