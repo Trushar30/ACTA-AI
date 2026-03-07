@@ -14,6 +14,7 @@ import {
     Volume2, VolumeX, Pause, Edit2, Check, FileDown, TrendingUp, Smile, Frown, Meh, Heart, Target
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 const API_URL = 'http://localhost:3000';
 
@@ -217,7 +218,7 @@ const MeetingDashboard = () => {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `MOM_${data.title || 'Meeting'}_${new Date().toISOString().slice(0,10)}.pdf`);
+            link.setAttribute('download', `MOM_${data.title || 'Meeting'}_${new Date().toISOString().slice(0, 10)}.pdf`);
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
@@ -371,8 +372,8 @@ const MeetingDashboard = () => {
                             onClick={generateAnalysis}
                             disabled={generating}
                             className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${generating
-                                    ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]'
-                                    : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
+                                ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]'
+                                : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
                                 }`}
                             title="Regenerate AI Analysis"
                         >
@@ -843,10 +844,10 @@ const OverviewTab = ({ data, meetingId }) => {
                             <button
                                 onClick={handleTextToSpeech}
                                 className={`p-1.5 rounded-lg transition-colors ${isSpeaking
-                                        ? isPaused
-                                            ? 'bg-amber-600/20 hover:bg-amber-600/40 text-amber-400'
-                                            : 'bg-purple-600/20 hover:bg-purple-600/40 text-purple-400'
-                                        : 'bg-blue-600/20 hover:bg-blue-600/40 text-blue-400'
+                                    ? isPaused
+                                        ? 'bg-amber-600/20 hover:bg-amber-600/40 text-amber-400'
+                                        : 'bg-purple-600/20 hover:bg-purple-600/40 text-purple-400'
+                                    : 'bg-blue-600/20 hover:bg-blue-600/40 text-blue-400'
                                     }`}
                                 title={isSpeaking ? (isPaused ? 'Resume' : 'Pause') : 'Listen to Summary'}
                             >
@@ -936,8 +937,8 @@ const OverviewTab = ({ data, meetingId }) => {
                                             onClick={handleExportToEmail}
                                             disabled={exportingEmail}
                                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${emailExported
-                                                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                                    : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30'
+                                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                                : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30'
                                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                                             title="Auto-export dashboard to your Outlook email"
                                         >
@@ -1245,12 +1246,11 @@ const AnalyticsTab = ({ data }) => {
                     { label: 'Sentiment', value: data.overallSentiment || '—', icon: <TrendingUp size={18} />, color: 'cyan' },
                 ].map((stat, i) => (
                     <div key={i} className="bg-[#1C1F2E] rounded-2xl p-5 border border-white/5 group hover:border-white/10 transition-all">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${
-                            stat.color === 'emerald' ? 'bg-blue-500/15 text-blue-400' :
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${stat.color === 'emerald' ? 'bg-emerald-500/15 text-emerald-400' :
                             stat.color === 'indigo' ? 'bg-indigo-500/15 text-indigo-400' :
-                            stat.color === 'amber' ? 'bg-amber-500/15 text-amber-400' :
-                            'bg-blue-500/15 text-blue-400'
-                        }`}>
+                                stat.color === 'amber' ? 'bg-amber-500/15 text-amber-400' :
+                                    'bg-cyan-500/15 text-cyan-400'
+                            }`}>
                             {stat.icon}
                         </div>
                         <p className="text-[11px] text-slate-500 uppercase tracking-wider font-medium mb-0.5">{stat.label}</p>
@@ -1637,14 +1637,15 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                                     <Sparkles size={13} />
                                 </div>
                             )}
-                            <div className={`max-w-[75%] group relative ${
-                                msg.role === 'user'
-                                    ? 'bg-blue-600/15 border border-blue-500/20 text-white rounded-2xl rounded-br-md'
-                                    : msg.role === 'error'
-                                        ? 'bg-red-500/10 border border-red-500/20 text-red-300 rounded-2xl rounded-bl-md'
-                                        : 'bg-[#0B0E14] border border-white/5 text-slate-200 rounded-2xl rounded-bl-md'
-                            } px-4 py-3`}>
-                                <p className="text-sm leading-relaxed whitespace-pre-line">{msg.content}</p>
+                            <div className={`max-w-[75%] group relative ${msg.role === 'user'
+                                ? 'bg-emerald-600/15 border border-emerald-500/20 text-white rounded-2xl rounded-br-md'
+                                : msg.role === 'error'
+                                    ? 'bg-red-500/10 border border-red-500/20 text-red-300 rounded-2xl rounded-bl-md'
+                                    : 'bg-[#0B0E14] border border-white/5 text-slate-200 rounded-2xl rounded-bl-md'
+                                } px-4 py-3`}>
+                                <div className="text-sm leading-relaxed prose-ai">
+                                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                </div>
                                 {msg.role === 'ai' && (
                                     <button
                                         onClick={() => copyMessage(msg.content, i)}
@@ -2150,8 +2151,8 @@ const SentimentAnalysisTab = ({ data }) => {
                                                     <p className="text-slate-300 leading-relaxed">"{trend.text}"</p>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <span className={`font-semibold ${trend.sentiment?.toLowerCase() === 'positive' ? 'text-white' :
-                                                                trend.sentiment?.toLowerCase() === 'negative' ? 'text-white/60' :
-                                                                    'text-white/80'
+                                                            trend.sentiment?.toLowerCase() === 'negative' ? 'text-white/60' :
+                                                                'text-white/80'
                                                             }`}>
                                                             {trend.sentiment}
                                                         </span>

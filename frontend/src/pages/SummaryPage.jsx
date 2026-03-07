@@ -9,6 +9,7 @@ import {
     Plus, Filter, LayoutGrid
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 const API_URL = 'http://localhost:3000';
 
@@ -18,17 +19,17 @@ const formatTextContent = (text) => {
 
     // Split by double newlines first to preserve intentional paragraphs
     const paragraphs = text.split(/\n\n+/);
-    
+
     return paragraphs.map((para, pIdx) => {
         // Check if paragraph contains bullet-like patterns
         const lines = para.split('\n').filter(line => line.trim());
-        
+
         // If it looks like a list (starts with -, •, *, numbers, etc.)
-        const isList = lines.some(line => 
-            /^[\-•*]\s/.test(line.trim()) || 
+        const isList = lines.some(line =>
+            /^[\-•*]\s/.test(line.trim()) ||
             /^\d+[\.)]\s/.test(line.trim())
         );
-        
+
         if (isList) {
             return (
                 <ul key={pIdx} className="space-y-2 my-3">
@@ -44,7 +45,7 @@ const formatTextContent = (text) => {
                 </ul>
             );
         }
-        
+
         // Regular paragraph
         return para.trim() ? (
             <p key={pIdx} className="text-slate-300 leading-relaxed mb-4 last:mb-0">
@@ -388,29 +389,26 @@ const SummaryPage = () => {
                         <div className="flex items-center gap-1 bg-[#1C1F2E] rounded-xl p-1 mb-6 w-fit border border-white/5">
                             <button
                                 onClick={() => setActiveTab('create')}
-                                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                                    activeTab === 'create'
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                }`}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'create'
+                                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                    }`}
                             >
                                 <Plus size={16} />
                                 Create New
                             </button>
                             <button
                                 onClick={() => setActiveTab('saved')}
-                                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                                    activeTab === 'saved'
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                }`}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'saved'
+                                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                    }`}
                             >
                                 <FolderOpen size={16} />
                                 Saved
                                 {savedSummaries.length > 0 && (
-                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                                        activeTab === 'saved' ? 'bg-white/20 text-white' : 'bg-white/10 text-slate-400'
-                                    }`}>
+                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${activeTab === 'saved' ? 'bg-white/20 text-white' : 'bg-white/10 text-slate-400'
+                                        }`}>
                                         {savedSummaries.length}
                                     </span>
                                 )}
@@ -446,11 +444,10 @@ const SummaryPage = () => {
                                             <button
                                                 key={f.key}
                                                 onClick={() => setQuickFilter(f.key)}
-                                                className={`px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all border ${
-                                                    quickFilter === f.key
-                                                        ? 'bg-blue-600/15 border-blue-500/30 text-blue-400'
-                                                        : 'bg-[#1C1F2E] border-white/5 text-slate-400 hover:text-white hover:border-white/10'
-                                                }`}
+                                                className={`px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all border ${quickFilter === f.key
+                                                    ? 'bg-emerald-600/15 border-emerald-500/30 text-emerald-400'
+                                                    : 'bg-[#1C1F2E] border-white/5 text-slate-400 hover:text-white hover:border-white/10'
+                                                    }`}
                                             >
                                                 {f.label}
                                             </button>
@@ -505,17 +502,15 @@ const SummaryPage = () => {
                                                     key={meeting._id}
                                                     onClick={() => toggleMeeting(meeting._id)}
                                                     layout
-                                                    className={`relative text-left p-4 rounded-xl border transition-all group ${
-                                                        isSelected
-                                                            ? 'bg-blue-500/5 border-blue-500/30 ring-1 ring-blue-500/20'
-                                                            : 'bg-[#1C1F2E] border-white/5 hover:border-white/15 hover:bg-[#1e2235]'
-                                                    }`}
+                                                    className={`relative text-left p-4 rounded-xl border transition-all group ${isSelected
+                                                        ? 'bg-emerald-500/5 border-emerald-500/30 ring-1 ring-emerald-500/20'
+                                                        : 'bg-[#1C1F2E] border-white/5 hover:border-white/15 hover:bg-[#1e2235]'
+                                                        }`}
                                                 >
                                                     {/* Checkbox */}
                                                     <div className="flex items-start gap-3">
-                                                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
-                                                            isSelected ? 'bg-blue-500 border-blue-500 scale-110' : 'border-white/20 group-hover:border-white/40'
-                                                        }`}>
+                                                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${isSelected ? 'bg-emerald-500 border-emerald-500 scale-110' : 'border-white/20 group-hover:border-white/40'
+                                                            }`}>
                                                             {isSelected && <Check size={12} className="text-white" />}
                                                         </div>
                                                         <div className="flex-1 min-w-0">
@@ -1067,12 +1062,15 @@ const SummaryPage = () => {
                                                                 <Sparkles size={12} />
                                                             </div>
                                                         )}
-                                                        <div className={`max-w-[80%] p-3 rounded-xl text-sm leading-relaxed ${
-                                                            msg.role === 'user'
-                                                                ? 'bg-blue-600/20 text-white rounded-br-none'
-                                                                : 'bg-[#0B0E14] text-slate-200 border border-white/10 rounded-bl-none'
-                                                        }`}>
-                                                            <p className="whitespace-pre-line">{msg.content}</p>
+                                                        <div className={`max-w-[80%] p-3 rounded-xl text-sm leading-relaxed ${msg.role === 'user'
+                                                            ? 'bg-emerald-600/20 text-white rounded-br-none'
+                                                            : 'bg-[#0B0E14] text-slate-200 border border-white/10 rounded-bl-none prose-ai'
+                                                            }`}>
+                                                            {msg.role === 'user' ? (
+                                                                <p className="whitespace-pre-line">{msg.content}</p>
+                                                            ) : (
+                                                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                                            )}
                                                         </div>
                                                         {msg.role === 'user' && (
                                                             <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-white flex-shrink-0">

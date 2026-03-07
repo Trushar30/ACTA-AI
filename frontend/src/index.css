@@ -107,3 +107,45 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(139, 92, 246, 0.5);
 }
+
+/* AI Message Markdown Styling */
+.prose-ai {
+  @apply text-slate-300;
+}
+
+.prose-ai p {
+  @apply mb-4 last:mb-0;
+}
+
+.prose-ai h3 {
+  @apply text-white font-bold text-base mt-4 mb-2 first:mt-0;
+}
+
+.prose-ai ul,
+.prose-ai ol {
+  @apply pl-5 mb-4 space-y-2 list-outside;
+}
+
+.prose-ai ul {
+  @apply list-disc;
+}
+
+.prose-ai ol {
+  @apply list-decimal;
+}
+
+.prose-ai strong {
+  @apply text-white font-bold;
+}
+
+.prose-ai code {
+  @apply bg-white/10 px-1 py-0.5 rounded text-xs font-mono text-emerald-400;
+}
+
+.prose-ai blockquote {
+  @apply border-l-4 border-emerald-500/30 pl-4 italic text-slate-400 my-4;
+}
+
+.prose-ai hr {
+  @apply border-white/10 my-6;
+}

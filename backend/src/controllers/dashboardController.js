@@ -517,7 +517,7 @@ exports.generateDashboard = async (req, res) => {
         await meeting.save();
 
         console.log(`[Dashboard] Analysis saved for meeting ${id}`);
-        
+
         // Automatically send dashboard summary email to owner
         console.log(`[Dashboard] Sending dashboard summary email...`);
         sendDashboardSummary(meeting._id, analysisData).catch(err => {
@@ -557,12 +557,12 @@ exports.getDashboard = async (req, res) => {
         // Apply speaker name mappings if they exist
         if (analysis && meeting.speakerNameMapping) {
             const mapping = meeting.speakerNameMapping;
-            
+
             // Helper function to map speaker names
             const mapSpeakerName = (speakerName) => {
                 return mapping[speakerName] || speakerName;
             };
-            
+
             // Map participants
             if (analysis.participants) {
                 analysis.participants = analysis.participants.map(participant => {
@@ -573,7 +573,7 @@ exports.getDashboard = async (req, res) => {
                     return participant;
                 });
             }
-            
+
             // Map transcript timeline
             if (analysis.transcriptTimeline) {
                 analysis.transcriptTimeline = analysis.transcriptTimeline.map(segment => {
@@ -584,7 +584,7 @@ exports.getDashboard = async (req, res) => {
                     return segment;
                 });
             }
-            
+
             // Map speaker sentiments
             if (analysis.speakerSentiments) {
                 analysis.speakerSentiments = analysis.speakerSentiments.map(sentiment => {
@@ -595,7 +595,7 @@ exports.getDashboard = async (req, res) => {
                     return sentiment;
                 });
             }
-            
+
             // Map top priorities
             if (analysis.topPriorities) {
                 analysis.topPriorities = analysis.topPriorities.map(priority => {
@@ -608,7 +608,7 @@ exports.getDashboard = async (req, res) => {
                     return priority;
                 });
             }
-            
+
             // Map emotional moments
             if (analysis.emotionalMoments) {
                 analysis.emotionalMoments = analysis.emotionalMoments.map(moment => {
@@ -621,7 +621,7 @@ exports.getDashboard = async (req, res) => {
                     return moment;
                 });
             }
-            
+
             console.log('[Dashboard] Applied speaker name mappings:', meeting.speakerNameMapping);
         }
 
@@ -650,12 +650,22 @@ exports.askQuestion = async (req, res) => {
             return res.status(500).json({ error: 'GEMINI_API_KEY is missing' });
         }
 
-        const prompt = `You are an AI assistant answering questions about a meeting transcript.
-        TRANSCRIPT: ${meeting.transcription}
+        const prompt = `You are a professional meeting assistant. Answer the user's question about the following transcript.
         
-        QUESTION: ${question}
+        TRANSCRIPT:
+        ${meeting.transcription}
         
-        Answer concisely and accurately based ONLY on the transcript.`;
+        QUESTION:
+        ${question}
+        
+        INSTRUCTIONS for your response:
+        - Answer concisely and accurately based ONLY on the transcript provided.
+        - Use professional language.
+        - Structure your response using Markdown (e.g., headers, bold text, bullet points).
+        - If the question is about multiple points (like decisions or action items), use a clearly labeled list.
+        - For key names, dates, or terms, use **bolding**.
+        - Always use double-newlines between sections or list items for clarity.
+        - Do not mention the transcript or AI persona in your answer unless necessary—just provide the facts.`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-flash-latest',
@@ -790,10 +800,10 @@ exports.exportDashboardToEmail = async (req, res) => {
         const result = await sendDashboardSummary(meeting._id, meeting.analysis, recipientEmail);
 
         if (result.success) {
-            res.json({ 
-                success: true, 
+            res.json({
+                success: true,
                 message: 'Dashboard exported to your email successfully!',
-                messageId: result.messageId 
+                messageId: result.messageId
             });
         } else {
             res.status(500).json({ error: 'Failed to send email: ' + result.error });
@@ -836,18 +846,18 @@ exports.downloadDashboardPDF = async (req, res) => {
         } catch (e) {
             console.log('[Dashboard] Could not fetch user for Prepared By:', e.message);
         }
-        
+
         const { generateDashboardPDF } = require('../services/pdfService');
         const pdfBuffer = await generateDashboardPDF(meeting, meeting.analysis, { preparedByName, preparedByEmail });
 
         // Set headers for PDF download
         const date = new Date().toISOString().slice(0, 10);
         const filename = `MOM_${meeting.meetingName || 'Meeting'}_${date}.pdf`.replace(/[^a-z0-9_\-\.]/gi, '_');
-        
+
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.setHeader('Content-Length', pdfBuffer.length);
-        
+
         res.send(pdfBuffer);
         console.log(`[Dashboard] ✅ MOM PDF generated and sent: ${filename}`);
 
@@ -879,10 +889,10 @@ exports.updateSpeakerName = async (req, res) => {
 
         // Update the mapping
         meeting.speakerNameMapping[originalName] = newName.trim();
-        
+
         // Mark as modified (required for nested objects in Mongoose)
         meeting.markModified('speakerNameMapping');
-        
+
         // Also update in analysis if it exists
         if (meeting.analysis && meeting.analysis.participants) {
             meeting.analysis.participants = meeting.analysis.participants.map(p => {
@@ -891,7 +901,7 @@ exports.updateSpeakerName = async (req, res) => {
                 }
                 return p;
             });
-            
+
             // Mark analysis as modified too
             meeting.markModified('analysis');
         }
@@ -904,8 +914,8 @@ exports.updateSpeakerName = async (req, res) => {
         console.log(`  - Original: "${originalName}" -> New: "${newName}"`);
         console.log(`  - Mapping in DB:`, updatedMeeting.speakerNameMapping);
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             speakerNameMapping: updatedMeeting.speakerNameMapping,
             analysis: updatedMeeting.analysis
         });
@@ -1101,14 +1111,23 @@ exports.askSummaryQuestion = async (req, res) => {
 
         const summaryContext = JSON.stringify(summaryData, null, 2).substring(0, 15000);
 
-        const prompt = `You are an AI assistant helping users understand a combined meeting summary. Below is the full summary data from multiple meetings.
+        const prompt = `You are a professional AI meeting assistant. Below is a combined summary and detailed data from multiple meetings.
+        
+        Answer the user's question concisely and accurately based ONLY on the provided summary data.
+        
+        FORMATTING RULES:
+        - Use professional Markdown with clear hierarchy.
+        - Use ## for main headers and ### for sub-headers.
+        - Use bold text (**text**) for names, dates, and key terms.
+        - Use bullet points for lists.
+        - IMPORTANT: Add a double newline (empty line) between list items to ensure proper rendering.
+        - If the information is not in the data, state clearly that you don't have that specific information.
+        - Keep your tone professional, helpful, and direct.
 
-SUMMARY DATA:
-${summaryContext}
+        SUMMARY DATA:
+        ${summaryContext}
 
-USER QUESTION: ${question}
-
-Answer concisely and accurately based ONLY on the summary data provided. If the answer is not in the data, say so clearly.`;
+        USER QUESTION: ${question}`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-flash-latest',
