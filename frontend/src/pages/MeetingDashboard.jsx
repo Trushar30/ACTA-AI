@@ -217,7 +217,7 @@ const MeetingDashboard = () => {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `${data.title || 'Meeting'}_Dashboard.pdf`);
+            link.setAttribute('download', `MOM_${data.title || 'Meeting'}_${new Date().toISOString().slice(0,10)}.pdf`);
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
@@ -386,17 +386,17 @@ const MeetingDashboard = () => {
                             onClick={handleDownloadPDF}
                             disabled={downloadingPDF}
                             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            title="Download Dashboard as PDF"
+                            title="Download Minutes of Meeting (MOM)"
                         >
                             {downloadingPDF ? (
                                 <>
                                     <Loader2 size={16} className="animate-spin" />
-                                    <span>Generating...</span>
+                                    <span>Generating MOM...</span>
                                 </>
                             ) : (
                                 <>
                                     <FileDown size={16} />
-                                    <span>Download PDF</span>
+                                    <span>Download M.o.M</span>
                                 </>
                             )}
                         </button>
