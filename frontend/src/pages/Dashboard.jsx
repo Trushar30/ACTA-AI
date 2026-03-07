@@ -111,7 +111,7 @@ const Dashboard = () => {
             // Auto-save transcript when meeting completes
             if (data.status === 'completed') {
                 fetchMeetings();
-                
+
                 // Auto-save transcript data
                 setTimeout(async () => {
                     try {
@@ -275,7 +275,7 @@ const Dashboard = () => {
                 .join(' ');
 
             const transcriptToSave = fullTranscript || meeting.liveTranscriptFull || meeting.transcription || '';
-            
+
             if (!transcriptToSave) {
                 console.log('[Auto-Save] No transcript data to save');
                 return;
@@ -297,7 +297,7 @@ const Dashboard = () => {
             console.log('[Auto-Save] Saving transcript automatically:', meetingId);
 
             const response = await axios.put(
-                `${API_URL}/api/meetings/${meetingId}/save-transcript`, 
+                `${API_URL}/api/meetings/${meetingId}/save-transcript`,
                 saveData
             );
 
@@ -314,14 +314,14 @@ const Dashboard = () => {
 
     const saveTasks = async (meeting) => {
         const meetingId = meeting._id;
-        
+
         if (!meeting.extractedTasks || meeting.extractedTasks.length === 0) {
             alert('No tasks available to save. Please extract tasks first.');
             return;
         }
 
         setSavingTasks(prev => ({ ...prev, [meetingId]: true }));
-        
+
         try {
             const response = await axios.put(
                 `${API_URL}/api/meetings/${meetingId}/save-tasks`,
@@ -347,7 +347,7 @@ const Dashboard = () => {
 
     const saveLiveTranscript = async (meeting) => {
         const meetingId = meeting._id;
-        
+
         // Check if there's any transcript data to save (including regular transcription field)
         const transcriptData = liveTranscripts[meetingId] || [];
         const hasTranscriptData = transcriptData.length > 0 || meeting.liveTranscriptFull || meeting.transcription;
@@ -358,7 +358,7 @@ const Dashboard = () => {
         }
 
         setSavingTranscript(prev => ({ ...prev, [meetingId]: true }));
-        
+
         try {
             // Compile full transcript from live segments
             const fullTranscript = transcriptData
@@ -386,7 +386,7 @@ const Dashboard = () => {
             console.log('[Dashboard] Saving transcript:', saveData);
 
             const response = await axios.put(
-                `${API_URL}/api/meetings/${meetingId}/save-transcript`, 
+                `${API_URL}/api/meetings/${meetingId}/save-transcript`,
                 saveData
             );
 
@@ -670,7 +670,7 @@ const Dashboard = () => {
     const toggleAiSearch = () => {
         const newMode = !aiSearchMode;
         setAiSearchMode(newMode);
-        
+
         if (newMode) {
             // Turning on AI mode - if there's already a search query, perform search immediately
             if (searchQuery.trim()) {
@@ -759,9 +759,8 @@ const Dashboard = () => {
                 <div className="flex-1 flex justify-center items-center gap-3 px-8">
                     <div className="relative group w-full max-w-3xl">
                         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className={`relative flex items-center bg-[#0B0E14] border rounded-full px-4 py-2.5 transition-all ${
-                            aiSearchMode ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.15)]' : 'border-white/10 focus-within:border-white/50'
-                        }`}>
+                        <div className={`relative flex items-center bg-[#0B0E14] border rounded-full px-4 py-2.5 transition-all ${aiSearchMode ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.15)]' : 'border-white/10 focus-within:border-white/50'
+                            }`}>
                             <Search size={16} className={aiSearchMode ? 'text-purple-400' : 'text-slate-500'} />
                             <input
                                 type="text"
@@ -788,16 +787,15 @@ const Dashboard = () => {
                             )}
                         </div>
                     </div>
-                    
+
                     {/* AI Toggle Button */}
                     <button
                         onClick={toggleAiSearch}
                         disabled={aiSearching}
-                        className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                            aiSearchMode 
-                                ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
+                        className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${aiSearchMode
+                                ? 'bg-purple-500/20 border-2 border-purple-500/50 text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]'
                                 : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
-                        } ${aiSearching ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            } ${aiSearching ? 'opacity-50 cursor-not-allowed' : ''}`}
                         title={aiSearchMode ? "Switch to Normal Search" : "AI Search (Search through transcripts)"}
                     >
                         {aiSearching ? (
@@ -819,8 +817,8 @@ const Dashboard = () => {
                 <button
                     onClick={() => toggleFilter('zoom')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('zoom')
-                            ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
+                        ? 'bg-white/20 border-2 border-white/50 text-white'
+                        : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <img src={zoomLogo} alt="Zoom" className="w-3 h-3" />
@@ -830,8 +828,8 @@ const Dashboard = () => {
                 <button
                     onClick={() => toggleFilter('meet')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('meet')
-                            ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
+                        ? 'bg-white/20 border-2 border-white/50 text-white'
+                        : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <img src={googleMeetLogo} alt="Meet" className="w-3 h-3" />
@@ -841,8 +839,8 @@ const Dashboard = () => {
                 <button
                     onClick={() => toggleFilter('teams')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('teams')
-                            ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
+                        ? 'bg-white/20 border-2 border-white/50 text-white'
+                        : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <img src={teamsLogo} alt="Teams" className="w-3 h-3" />
@@ -855,8 +853,8 @@ const Dashboard = () => {
                 <button
                     onClick={() => toggleFilter('transcript')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('transcript')
-                            ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
+                        ? 'bg-white/20 border-2 border-white/50 text-white'
+                        : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <FileText size={12} />
@@ -866,8 +864,8 @@ const Dashboard = () => {
                 <button
                     onClick={() => toggleFilter('completed')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('completed')
-                            ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
+                        ? 'bg-white/20 border-2 border-white/50 text-white'
+                        : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <CheckCircle2 size={12} />
@@ -877,8 +875,8 @@ const Dashboard = () => {
                 <button
                     onClick={() => toggleFilter('failed')}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${activeFilters.includes('failed')
-                            ? 'bg-white/20 border-2 border-white/50 text-white'
-                            : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
+                        ? 'bg-white/20 border-2 border-white/50 text-white'
+                        : 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10'
                         }`}
                 >
                     <X size={12} />
@@ -1541,8 +1539,8 @@ const Dashboard = () => {
                                                                                 onClick={() => !taskStatus.jira && addTaskToJira(task, index)}
                                                                                 disabled={taskStatus.jira}
                                                                                 className={`relative group text-xs px-3 py-1.5 rounded-lg font-medium transition-all overflow-hidden ${taskStatus.jira
-                                                                                        ? 'bg-white/20 border border-white/50 text-white cursor-default'
-                                                                                        : 'bg-[#0B0E14] hover:bg-[#151820] border border-white/30 hover:border-white/50 text-white hover:text-slate-300'
+                                                                                    ? 'bg-white/20 border border-white/50 text-white cursor-default'
+                                                                                    : 'bg-[#0B0E14] hover:bg-[#151820] border border-white/30 hover:border-white/50 text-white hover:text-slate-300'
                                                                                     }`}
                                                                                 title={taskStatus.jira ? `Added to Jira: ${taskStatus.issueKey}` : 'Add this task to Jira'}
                                                                             >
@@ -1553,8 +1551,8 @@ const Dashboard = () => {
                                                                                 onClick={() => !taskStatus.trello && addTaskToTrello(task, index)}
                                                                                 disabled={taskStatus.trello}
                                                                                 className={`relative group text-xs px-3 py-1.5 rounded-lg font-medium transition-all overflow-hidden ${taskStatus.trello
-                                                                                        ? 'bg-white/20 border border-white/50 text-white cursor-default'
-                                                                                        : 'bg-[#0B0E14] hover:bg-[#151820] border border-white/30 hover:border-white/50 text-white hover:text-slate-300'
+                                                                                    ? 'bg-white/20 border border-white/50 text-white cursor-default'
+                                                                                    : 'bg-[#0B0E14] hover:bg-[#151820] border border-white/30 hover:border-white/50 text-white hover:text-slate-300'
                                                                                     }`}
                                                                                 title={taskStatus.trello ? 'Already added to Trello' : 'Add this task to Trello'}
                                                                             >

@@ -805,7 +805,7 @@ exports.exportDashboardToEmail = async (req, res) => {
     }
 };
 
-// Generate and download dashboard PDF
+// Generate and download Minutes of Meeting (MOM) PDF
 exports.downloadDashboardPDF = async (req, res) => {
     try {
         const { id } = req.params;
@@ -819,20 +819,37 @@ exports.downloadDashboardPDF = async (req, res) => {
             return res.status(400).json({ error: 'Meeting analysis not available. Please generate dashboard first.' });
         }
 
-        console.log(`[Dashboard] Generating PDF for meeting: ${id}`);
+        console.log(`[Dashboard] Generating MOM PDF for meeting: ${id}`);
+
+        // Look up user for "Prepared By"
+        let preparedByName = 'ACTA AI System';
+        let preparedByEmail = '';
+        try {
+            const User = require('../models/User');
+            if (meeting.userId) {
+                const user = await User.findById(meeting.userId);
+                if (user) {
+                    preparedByName = user.name || user.email || preparedByName;
+                    preparedByEmail = user.email || '';
+                }
+            }
+        } catch (e) {
+            console.log('[Dashboard] Could not fetch user for Prepared By:', e.message);
+        }
         
         const { generateDashboardPDF } = require('../services/pdfService');
-        const pdfBuffer = await generateDashboardPDF(meeting, meeting.analysis);
+        const pdfBuffer = await generateDashboardPDF(meeting, meeting.analysis, { preparedByName, preparedByEmail });
 
         // Set headers for PDF download
-        const filename = `${meeting.meetingName || 'Meeting'}_${meeting.analysis.title || 'Dashboard'}.pdf`.replace(/[^a-z0-9_\-]/gi, '_');
+        const date = new Date().toISOString().slice(0, 10);
+        const filename = `MOM_${meeting.meetingName || 'Meeting'}_${date}.pdf`.replace(/[^a-z0-9_\-\.]/gi, '_');
         
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.setHeader('Content-Length', pdfBuffer.length);
         
         res.send(pdfBuffer);
-        console.log(`[Dashboard] ✅ PDF generated and sent: ${filename}`);
+        console.log(`[Dashboard] ✅ MOM PDF generated and sent: ${filename}`);
 
     } catch (err) {
         console.error('[Dashboard] PDF generation error:', err);

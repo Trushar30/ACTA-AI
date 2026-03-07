@@ -264,14 +264,12 @@ const CollaborateDashboard = () => {
                                                         Shared by {meeting.userEmail?.split('@')[0] || 'Unknown'}
                                                     </p>
                                                 </div>
-                                                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${
-                                                    meeting.status === 'completed'
+                                                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${meeting.status === 'completed'
                                                         ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                                         : 'bg-white/5 text-slate-400 border-white/10'
-                                                }`}>
-                                                    <div className={`w-1.5 h-1.5 rounded-full ${
-                                                        meeting.status === 'completed' ? 'bg-emerald-400' : 'bg-slate-400'
-                                                    }`} />
+                                                    }`}>
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${meeting.status === 'completed' ? 'bg-emerald-400' : 'bg-slate-400'
+                                                        }`} />
                                                     {meeting.status}
                                                 </div>
                                             </div>
