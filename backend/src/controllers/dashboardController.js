@@ -1,9 +1,13 @@
 const { GoogleGenAI, Type } = require("@google/genai");
+const Groq = require('groq-sdk');
 const Meeting = require('../models/Meeting');
 const { sendDashboardSummary, sendDashboardToCollaborators, sendCollaboratorInvite } = require('../services/emailService');
 
 // Initialize Gemini
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+// Initialize Groq
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const ANALYSIS_SCHEMA = {
     type: Type.OBJECT,
@@ -646,33 +650,39 @@ exports.askQuestion = async (req, res) => {
         if (!meeting) return res.status(404).json({ error: 'Meeting not found' });
         if (!meeting.transcription) return res.status(400).json({ error: 'No transcript available' });
 
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ error: 'GEMINI_API_KEY is missing' });
+        if (!process.env.GROQ_API_KEY) {
+            return res.status(500).json({ error: 'GROQ_API_KEY is missing' });
         }
 
-        const prompt = `You are a professional meeting assistant. Answer the user's question about the following transcript.
-        
-        TRANSCRIPT:
-        ${meeting.transcription}
-        
-        QUESTION:
-        ${question}
-        
-        INSTRUCTIONS for your response:
-        - Answer concisely and accurately based ONLY on the transcript provided.
-        - Use professional language.
-        - Structure your response using Markdown (e.g., headers, bold text, bullet points).
-        - If the question is about multiple points (like decisions or action items), use a clearly labeled list.
-        - For key names, dates, or terms, use **bolding**.
-        - Always use double-newlines between sections or list items for clarity.
-        - Do not mention the transcript or AI persona in your answer unless necessary—just provide the facts.`;
+        const completion = await groq.chat.completions.create({
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+                {
+                    role: 'system',
+                    content: `You are a professional meeting assistant. Answer the user's question about the following transcript.
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-flash-latest',
-            contents: prompt
+INSTRUCTIONS for your response:
+- Answer concisely and accurately based ONLY on the transcript provided.
+- Use professional language.
+- Structure your response using Markdown (e.g., headers, bold text, bullet points).
+- If the question is about multiple points (like decisions or action items), use a clearly labeled list.
+- For key names, dates, or terms, use **bolding**.
+- Always use double-newlines between sections or list items for clarity.
+- Do not mention the transcript or AI persona in your answer unless necessary—just provide the facts.
+
+TRANSCRIPT:
+${meeting.transcription}`
+                },
+                {
+                    role: 'user',
+                    content: question
+                }
+            ],
+            temperature: 0.3,
+            max_tokens: 2048
         });
 
-        const answer = response.candidates?.[0]?.content?.parts?.[0]?.text || response.text?.();
+        const answer = completion.choices?.[0]?.message?.content;
 
         res.json({ success: true, answer });
 
