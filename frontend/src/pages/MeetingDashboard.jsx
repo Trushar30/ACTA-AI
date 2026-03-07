@@ -264,7 +264,7 @@ const MeetingDashboard = () => {
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center bg-[#0B0E14] text-white">
-                <Loader2 className="animate-spin text-emerald-500" size={40} />
+                <Loader2 className="animate-spin text-blue-500" size={40} />
             </div>
         );
     }
@@ -289,8 +289,8 @@ const MeetingDashboard = () => {
         return (
             <div className="flex h-screen flex-col items-center justify-center bg-[#0B0E14] text-white gap-6 p-6 text-center">
                 <div className="relative">
-                    <div className="absolute inset-0 bg-emerald-500 blur-2xl opacity-20 animate-pulse"></div>
-                    <Sparkles className="relative z-10 text-emerald-400" size={64} />
+                    <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-20 animate-pulse"></div>
+                    <Sparkles className="relative z-10 text-blue-400" size={64} />
                 </div>
                 <div>
                     <h2 className="text-3xl font-bold mb-2">Ready to Analyze</h2>
@@ -302,7 +302,7 @@ const MeetingDashboard = () => {
                 <button
                     onClick={generateAnalysis}
                     disabled={generating}
-                    className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                    className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-500 hover:to-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
                 >
                     {generating ? (
                         <>
@@ -338,11 +338,11 @@ const MeetingDashboard = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#0B0E14] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30">
+        <div className="min-h-screen bg-[#0B0E14] text-slate-100 flex flex-col font-sans selection:bg-blue-500/30">
             {/* Background Effects - matching Home page */}
             <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
                 <div className="absolute top-[-50%] left-[-10%] w-[80%] h-[80%] rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl"></div>
-                <div className="absolute bottom-[-30%] right-[-10%] w-[70%] h-[70%] rounded-full bg-gradient-to-tl from-indigo-500/20 to-cyan-500/20 blur-3xl"></div>
+                <div className="absolute bottom-[-30%] right-[-10%] w-[70%] h-[70%] rounded-full bg-gradient-to-tl from-indigo-500/20 to-blue-500/20 blur-3xl"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-3xl"></div>
             </div>
 
@@ -420,12 +420,12 @@ const MeetingDashboard = () => {
                             className={`relative pb-4 pt-2 text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${activeTab === tab.id ? 'text-white' : 'text-slate-500 hover:text-slate-300'
                                 }`}
                         >
-                            <tab.icon size={16} className={activeTab === tab.id ? 'text-emerald-400' : ''} />
+                            <tab.icon size={16} className={activeTab === tab.id ? 'text-blue-400' : ''} />
                             {tab.label}
                             {activeTab === tab.id && (
                                 <motion.div
                                     layoutId="activeTab"
-                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
                                 />
                             )}
                         </button>
@@ -701,8 +701,8 @@ const OverviewTab = ({ data, meetingId }) => {
         <div className="space-y-6">
             {/* Quick Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard label="Duration" value={data.totalDuration} icon={<Clock size={16} className="text-cyan-400" />} />
-                <StatCard label="Action Items" value={data.actionItemCount || data.actionItems?.length || 0} icon={<CheckCircle2 size={16} className="text-green-400" />} />
+                <StatCard label="Duration" value={data.totalDuration} icon={<Clock size={16} className="text-blue-400" />} />
+                <StatCard label="Action Items" value={data.actionItemCount || data.actionItems?.length || 0} icon={<CheckCircle2 size={16} className="text-blue-400" />} />
                 <StatCard label="Decisions" value={data.decisions?.length || 0} icon={<ShieldCheck size={16} className="text-purple-400" />} />
                 <StatCard label="Sentiment" value={data.overallSentiment} icon={<Sparkles size={16} className="text-yellow-400" />} />
             </div>
@@ -751,12 +751,12 @@ const OverviewTab = ({ data, meetingId }) => {
                                                         if (e.key === 'Enter') handleSaveSpeakerName(i, speaker.name);
                                                         if (e.key === 'Escape') handleCancelEdit();
                                                     }}
-                                                    className="bg-[#1C1F2E] text-white text-sm px-2 py-1 rounded border border-emerald-500/50 focus:outline-none focus:border-emerald-500 w-32"
+                                                    className="bg-[#1C1F2E] text-white text-sm px-2 py-1 rounded border border-blue-500/50 focus:outline-none focus:border-blue-500 w-32"
                                                     autoFocus
                                                 />
                                                 <button
                                                     onClick={() => handleSaveSpeakerName(i, speaker.name)}
-                                                    className="p-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded transition-colors"
+                                                    className="p-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded transition-colors"
                                                     title="Save"
                                                 >
                                                     <Check size={14} />
@@ -790,7 +790,7 @@ const OverviewTab = ({ data, meetingId }) => {
                                     <div className="flex items-center gap-3 text-xs text-slate-400">
                                         <span>{utterances} utterances</span>
                                         <span className="text-slate-500">•</span>
-                                        <span className="text-cyan-400 font-semibold">{speaker.contribution?.toFixed(1) || '0.0'}%</span>
+                                        <span className="text-blue-400 font-semibold">{speaker.contribution?.toFixed(1) || '0.0'}%</span>
                                     </div>
                                 </div>
                                 <div className="flex-shrink-0 w-16">
@@ -835,7 +835,7 @@ const OverviewTab = ({ data, meetingId }) => {
                             <button
                                 onClick={handleTranslateSummary}
                                 disabled={isTranslating || selectedLanguage === 'English'}
-                                className="p-1.5 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="p-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                 title="Translate Summary"
                             >
                                 {isTranslating ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
@@ -864,7 +864,7 @@ const OverviewTab = ({ data, meetingId }) => {
                         </div>
                     </div>
                     <div className="mb-5">
-                        <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Overview</h4>
+                        <h4 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">Overview</h4>
                         <p className="text-slate-300 leading-relaxed text-sm whitespace-pre-line">
                             {displaySummary}
                         </p>
@@ -874,8 +874,8 @@ const OverviewTab = ({ data, meetingId }) => {
                     {data.topicSummaries && data.topicSummaries.length > 0 && (
                         <div className="space-y-4 mb-6">
                             {data.topicSummaries.map((topic, i) => {
-                                const colors = ['border-cyan-500/40', 'border-purple-500/40', 'border-amber-500/40', 'border-blue-500/40', 'border-pink-500/40', 'border-emerald-500/40', 'border-orange-500/40', 'border-teal-500/40'];
-                                const dotColors = ['bg-cyan-400', 'bg-purple-400', 'bg-amber-400', 'bg-blue-400', 'bg-pink-400', 'bg-emerald-400', 'bg-orange-400', 'bg-teal-400'];
+                                const colors = ['border-blue-500/40', 'border-purple-500/40', 'border-amber-500/40', 'border-blue-500/40', 'border-pink-500/40', 'border-blue-500/40', 'border-orange-500/40', 'border-blue-500/40'];
+                                const dotColors = ['bg-blue-400', 'bg-purple-400', 'bg-amber-400', 'bg-blue-400', 'bg-pink-400', 'bg-blue-400', 'bg-orange-400', 'bg-blue-400'];
                                 const colorIdx = i % colors.length;
                                 return (
                                     <div key={i} className={`bg-[#0B0E14] rounded-xl p-4 border-l-2 border border-white/5 ${colors[colorIdx]}`}>
@@ -897,7 +897,7 @@ const OverviewTab = ({ data, meetingId }) => {
                         <div className="flex flex-wrap gap-2">
                             {data.keyTopics?.map((topic, i) => (
                                 <div key={i} className="px-3 py-1.5 bg-white/5 rounded-lg border border-white/5 text-xs text-slate-300 flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
                                     {topic.name}
                                     <span className="text-slate-500 ml-1 opacity-60">
                                         {Math.round(topic.percentage)}%
@@ -936,7 +936,7 @@ const OverviewTab = ({ data, meetingId }) => {
                                             onClick={handleExportToEmail}
                                             disabled={exportingEmail}
                                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${emailExported
-                                                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                                                     : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30'
                                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                                             title="Auto-export dashboard to your Outlook email"
@@ -1018,7 +1018,7 @@ const OverviewTab = ({ data, meetingId }) => {
                             return (
                                 <li key={i} className="flex flex-col gap-2">
                                     <div className="flex gap-3 text-sm">
-                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xs font-bold">
+                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center text-xs font-bold">
                                             {i + 1}
                                         </span>
                                         <div className="flex-1">
@@ -1037,11 +1037,11 @@ const OverviewTab = ({ data, meetingId }) => {
                                                         <div className="flex items-center gap-1.5">
                                                             <div className="w-16 h-1.5 bg-[#0B0E14] rounded-full overflow-hidden">
                                                                 <div
-                                                                    className="h-full bg-cyan-400 rounded-full"
+                                                                    className="h-full bg-blue-400 rounded-full"
                                                                     style={{ width: `${Math.min(percentage, 100)}%` }}
                                                                 />
                                                             </div>
-                                                            <span className="text-xs text-cyan-400 font-semibold">
+                                                            <span className="text-xs text-blue-400 font-semibold">
                                                                 {Math.round(percentage)}%
                                                             </span>
                                                         </div>
@@ -1062,8 +1062,8 @@ const OverviewTab = ({ data, meetingId }) => {
                     <div className="relative pl-4 border-l border-white/10 space-y-6">
                         {data.timeline?.map((item, i) => (
                             <div key={i} className="relative">
-                                <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#1C1F2E] border-2 border-emerald-500"></div>
-                                <span className="text-xs text-emerald-400 font-mono mb-1 block">{item.time}</span>
+                                <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#1C1F2E] border-2 border-blue-500"></div>
+                                <span className="text-xs text-blue-400 font-mono mb-1 block">{item.time}</span>
                                 <p className="text-sm font-semibold text-slate-200">{item.event}</p>
                                 <p className="text-xs text-slate-400 mt-1">{item.description}</p>
                             </div>
@@ -1092,9 +1092,9 @@ const TasksTab = ({ data }) => {
                 {tasks.length > 0 ? (
                     <div className="grid gap-4">
                         {tasks.map((task, i) => (
-                            <div key={i} className="group flex items-start sm:items-center justify-between p-5 bg-[#0B0E14] border border-white/5 rounded-2xl hover:border-emerald-500/30 transition-all hover:bg-[#0B0E14]/80">
+                            <div key={i} className="group flex items-start sm:items-center justify-between p-5 bg-[#0B0E14] border border-white/5 rounded-2xl hover:border-blue-500/30 transition-all hover:bg-[#0B0E14]/80">
                                 <div className="flex items-start gap-4">
-                                    <button className="mt-1 text-slate-500 hover:text-emerald-500 transition-colors">
+                                    <button className="mt-1 text-slate-500 hover:text-blue-500 transition-colors">
                                         <CheckCircle2 size={20} />
                                     </button>
                                     <div>
@@ -1160,9 +1160,9 @@ const CalendarTab = ({ data }) => {
             {dates.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {dates.map((date, i) => (
-                        <div key={i} className="bg-[#0B0E14] p-6 rounded-3xl border border-white/5 group hover:border-emerald-500/30 transition-all">
+                        <div key={i} className="bg-[#0B0E14] p-6 rounded-3xl border border-white/5 group hover:border-blue-500/30 transition-all">
                             <div className="flex items-start justify-between mb-4">
-                                <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400">
+                                <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-400">
                                     <Calendar size={24} />
                                 </div>
                                 <button
@@ -1173,7 +1173,7 @@ const CalendarTab = ({ data }) => {
                                 </button>
                             </div>
                             <h3 className="text-lg font-bold text-white mb-1">{date.date}</h3>
-                            <p className="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">{date.event}</p>
+                            <p className="text-blue-400 text-xs font-bold uppercase tracking-wider mb-4">{date.event}</p>
                             <p className="text-sm text-slate-400 leading-relaxed">
                                 {date.description}
                             </p>
@@ -1204,16 +1204,16 @@ const AnalyticsTab = ({ data }) => {
 
     const totalContribution = participants.reduce((s, p) => s + (p.contribution || 0), 0);
     const sentimentLabel = (val) => val >= 0.5 ? 'Positive' : val >= 0 ? 'Neutral' : 'Negative';
-    const sentimentColor = (val) => val >= 0.5 ? 'text-emerald-400' : val >= 0 ? 'text-amber-400' : 'text-red-400';
+    const sentimentColor = (val) => val >= 0.5 ? 'text-blue-400' : val >= 0 ? 'text-amber-400' : 'text-red-400';
     const severityColor = (sev) => {
         const s = (sev || '').toLowerCase();
         if (s === 'high' || s === 'critical') return 'bg-red-500/15 text-red-400 border-red-500/20';
         if (s === 'medium') return 'bg-amber-500/15 text-amber-400 border-amber-500/20';
-        return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20';
+        return 'bg-blue-500/15 text-blue-400 border-blue-500/20';
     };
     const emotionIcon = (e) => {
         const em = (e || '').toLowerCase();
-        if (em.includes('happy') || em.includes('joy') || em.includes('excit')) return <Smile size={14} className="text-emerald-400" />;
+        if (em.includes('happy') || em.includes('joy') || em.includes('excit')) return <Smile size={14} className="text-blue-400" />;
         if (em.includes('frust') || em.includes('anger') || em.includes('annoyed')) return <Frown size={14} className="text-red-400" />;
         if (em.includes('concern') || em.includes('worry') || em.includes('anxious')) return <AlertTriangle size={14} className="text-amber-400" />;
         if (em.includes('passion') || em.includes('enthus')) return <Heart size={14} className="text-pink-400" />;
@@ -1246,10 +1246,10 @@ const AnalyticsTab = ({ data }) => {
                 ].map((stat, i) => (
                     <div key={i} className="bg-[#1C1F2E] rounded-2xl p-5 border border-white/5 group hover:border-white/10 transition-all">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${
-                            stat.color === 'emerald' ? 'bg-emerald-500/15 text-emerald-400' :
+                            stat.color === 'emerald' ? 'bg-blue-500/15 text-blue-400' :
                             stat.color === 'indigo' ? 'bg-indigo-500/15 text-indigo-400' :
                             stat.color === 'amber' ? 'bg-amber-500/15 text-amber-400' :
-                            'bg-cyan-500/15 text-cyan-400'
+                            'bg-blue-500/15 text-blue-400'
                         }`}>
                             {stat.icon}
                         </div>
@@ -1264,7 +1264,7 @@ const AnalyticsTab = ({ data }) => {
                 {/* Speaker Contribution */}
                 <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
                     <div className="px-6 pt-5 pb-3 flex items-center gap-3">
-                        <div className="w-8 h-8 bg-emerald-500/15 rounded-lg flex items-center justify-center"><Users size={14} className="text-emerald-400" /></div>
+                        <div className="w-8 h-8 bg-blue-500/15 rounded-lg flex items-center justify-center"><Users size={14} className="text-blue-400" /></div>
                         <h3 className="text-sm font-bold text-white">Speaker Contribution</h3>
                     </div>
                     {participants.length > 0 ? (
@@ -1347,7 +1347,7 @@ const AnalyticsTab = ({ data }) => {
             {sentiment.length > 0 && (
                 <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
                     <div className="px-6 pt-5 pb-3 flex items-center gap-3">
-                        <div className="w-8 h-8 bg-cyan-500/15 rounded-lg flex items-center justify-center"><TrendingUp size={14} className="text-cyan-400" /></div>
+                        <div className="w-8 h-8 bg-blue-500/15 rounded-lg flex items-center justify-center"><TrendingUp size={14} className="text-blue-400" /></div>
                         <h3 className="text-sm font-bold text-white">Sentiment Flow</h3>
                         <span className="text-[10px] text-slate-500 bg-white/5 px-2 py-0.5 rounded-md ml-auto">Over time</span>
                     </div>
@@ -1392,12 +1392,12 @@ const AnalyticsTab = ({ data }) => {
                                             </span>
                                         </div>
                                         <div className="flex h-2 rounded-full overflow-hidden bg-white/5">
-                                            <div className="bg-emerald-500 transition-all" style={{ width: `${(sp.positiveCount / total) * 100}%` }}></div>
+                                            <div className="bg-blue-500 transition-all" style={{ width: `${(sp.positiveCount / total) * 100}%` }}></div>
                                             <div className="bg-amber-500 transition-all" style={{ width: `${(sp.neutralCount / total) * 100}%` }}></div>
                                             <div className="bg-red-500 transition-all" style={{ width: `${(sp.negativeCount / total) * 100}%` }}></div>
                                         </div>
                                         <div className="flex gap-4 mt-2 text-[10px]">
-                                            <span className="text-emerald-400">Positive {sp.positiveCount}</span>
+                                            <span className="text-blue-400">Positive {sp.positiveCount}</span>
                                             <span className="text-amber-400">Neutral {sp.neutralCount}</span>
                                             <span className="text-red-400">Negative {sp.negativeCount}</span>
                                         </div>
@@ -1539,7 +1539,7 @@ const AnalyticsTab = ({ data }) => {
             {data.topicBreakdown?.length > 0 && (
                 <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 overflow-hidden">
                     <div className="px-6 pt-5 pb-3 flex items-center gap-3">
-                        <div className="w-8 h-8 bg-teal-500/15 rounded-lg flex items-center justify-center"><FileText size={14} className="text-teal-400" /></div>
+                        <div className="w-8 h-8 bg-blue-500/15 rounded-lg flex items-center justify-center"><FileText size={14} className="text-blue-400" /></div>
                         <h3 className="text-sm font-bold text-white">Detailed Topic Breakdown</h3>
                     </div>
                     <div className="px-6 pb-5 grid gap-3 md:grid-cols-2">
@@ -1582,8 +1582,8 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-[#1C1F2E]">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-emerald-500/15 rounded-xl flex items-center justify-center border border-emerald-500/20">
-                            <Sparkles size={16} className="text-emerald-400" />
+                        <div className="w-9 h-9 bg-blue-500/15 rounded-xl flex items-center justify-center border border-blue-500/20">
+                            <Sparkles size={16} className="text-blue-400" />
                         </div>
                         <div>
                             <h3 className="text-sm font-bold text-white">Ask AI</h3>
@@ -1601,8 +1601,8 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                 <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
                     {chatHistory.length === 0 && (
                         <div className="h-full flex flex-col items-center justify-center text-center px-4">
-                            <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-5 border border-emerald-500/20">
-                                <Sparkles size={28} className="text-emerald-400" />
+                            <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-5 border border-blue-500/20">
+                                <Sparkles size={28} className="text-blue-400" />
                             </div>
                             <h3 className="text-lg font-bold text-white mb-1">Ask anything about this meeting</h3>
                             <p className="text-sm text-slate-500 mb-8 max-w-md">
@@ -1617,10 +1617,10 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                                         <button
                                             key={idx}
                                             onClick={() => handleSuggestedQuestion(question)}
-                                            className="text-left p-3.5 bg-[#0B0E14] hover:bg-white/[0.06] border border-white/5 hover:border-emerald-500/20 rounded-xl text-sm text-slate-300 hover:text-white transition-all group"
+                                            className="text-left p-3.5 bg-[#0B0E14] hover:bg-white/[0.06] border border-white/5 hover:border-blue-500/20 rounded-xl text-sm text-slate-300 hover:text-white transition-all group"
                                         >
                                             <span className="flex items-center gap-2.5">
-                                                <MessageSquare size={14} className="text-slate-600 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
+                                                <MessageSquare size={14} className="text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0" />
                                                 {question}
                                             </span>
                                         </button>
@@ -1633,13 +1633,13 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                     {chatHistory.map((msg, i) => (
                         <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             {msg.role !== 'user' && (
-                                <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-400 border border-emerald-500/20 flex-shrink-0 mt-0.5">
+                                <div className="w-8 h-8 rounded-xl bg-blue-500/15 flex items-center justify-center text-blue-400 border border-blue-500/20 flex-shrink-0 mt-0.5">
                                     <Sparkles size={13} />
                                 </div>
                             )}
                             <div className={`max-w-[75%] group relative ${
                                 msg.role === 'user'
-                                    ? 'bg-emerald-600/15 border border-emerald-500/20 text-white rounded-2xl rounded-br-md'
+                                    ? 'bg-blue-600/15 border border-blue-500/20 text-white rounded-2xl rounded-br-md'
                                     : msg.role === 'error'
                                         ? 'bg-red-500/10 border border-red-500/20 text-red-300 rounded-2xl rounded-bl-md'
                                         : 'bg-[#0B0E14] border border-white/5 text-slate-200 rounded-2xl rounded-bl-md'
@@ -1651,7 +1651,7 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                                         className="absolute -bottom-3 right-2 opacity-0 group-hover:opacity-100 p-1 bg-[#1C1F2E] border border-white/10 rounded-md text-slate-500 hover:text-white transition-all"
                                         title="Copy response"
                                     >
-                                        {copiedIdx === i ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} />}
+                                        {copiedIdx === i ? <Check size={11} className="text-blue-400" /> : <Copy size={11} />}
                                     </button>
                                 )}
                             </div>
@@ -1665,13 +1665,13 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
 
                     {askingAi && (
                         <div className="flex gap-3 justify-start">
-                            <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                            <div className="w-8 h-8 rounded-xl bg-blue-500/15 flex items-center justify-center text-blue-400 border border-blue-500/20">
                                 <Sparkles size={13} />
                             </div>
                             <div className="bg-[#0B0E14] px-4 py-3 rounded-2xl rounded-bl-md border border-white/5 flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce"></span>
-                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></span>
-                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></span>
+                                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></span>
+                                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></span>
+                                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></span>
                             </div>
                         </div>
                     )}
@@ -1688,7 +1688,7 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                                     key={idx}
                                     onClick={() => handleSuggestedQuestion(question)}
                                     disabled={askingAi}
-                                    className="flex-shrink-0 text-xs px-3 py-1.5 bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/20 text-slate-400 hover:text-emerald-300 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="flex-shrink-0 text-xs px-3 py-1.5 bg-white/5 hover:bg-blue-500/10 border border-white/10 hover:border-blue-500/20 text-slate-400 hover:text-blue-300 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     {question}
                                 </button>
@@ -1703,12 +1703,12 @@ const AskAiTab = ({ chatHistory, chatQuery, setChatQuery, handleAskAi, askingAi,
                             onChange={(e) => setChatQuery(e.target.value)}
                             placeholder="Ask anything about this meeting..."
                             disabled={askingAi}
-                            className="w-full bg-[#1C1F2E] border border-white/10 rounded-xl pl-4 pr-14 py-3.5 text-sm text-white focus:outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20 transition-all placeholder:text-slate-600 disabled:opacity-50"
+                            className="w-full bg-[#1C1F2E] border border-white/10 rounded-xl pl-4 pr-14 py-3.5 text-sm text-white focus:outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 transition-all placeholder:text-slate-600 disabled:opacity-50"
                         />
                         <button
                             type="submit"
                             disabled={!chatQuery.trim() || askingAi}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                             <Send size={16} />
                         </button>
@@ -1764,7 +1764,7 @@ const TranscriptTimelineTab = ({ data, exportToSRT }) => {
                 {data.transcriptTimeline && data.transcriptTimeline.length > 0 ? (
                     <div className="space-y-4">
                         {data.transcriptTimeline.map((segment, index) => {
-                            const colors = ['bg-blue-500', 'bg-emerald-500', 'bg-orange-500', 'bg-pink-500', 'bg-purple-500', 'bg-cyan-500'];
+                            const colors = ['bg-blue-500', 'bg-blue-500', 'bg-orange-500', 'bg-pink-500', 'bg-purple-500', 'bg-blue-500'];
                             const speakerIndex = segment.speaker ? segment.speaker.charCodeAt(segment.speaker.length - 1) % colors.length : 0;
                             const color = colors[speakerIndex];
                             const displayName = getDisplayName(segment.speaker);
@@ -2270,7 +2270,7 @@ const CopyButton = ({ text }) => {
     return (
         <button
             onClick={handleCopy}
-            className="p-1.5 hover:bg-white/10 rounded-lg text-emerald-500 transition-colors opacity-80 hover:opacity-100"
+            className="p-1.5 hover:bg-white/10 rounded-lg text-blue-500 transition-colors opacity-80 hover:opacity-100"
             title="Copy"
         >
             <Copy size={14} />
@@ -2287,7 +2287,7 @@ const CollaborationTab = ({
     addingCollaborator
 }) => {
     const [linkCopied, setLinkCopied] = useState(false);
-    const avatarColors = ['bg-purple-500', 'bg-emerald-500', 'bg-amber-500', 'bg-blue-500', 'bg-pink-500', 'bg-cyan-500', 'bg-rose-500', 'bg-indigo-500'];
+    const avatarColors = ['bg-purple-500', 'bg-blue-500', 'bg-amber-500', 'bg-blue-500', 'bg-pink-500', 'bg-blue-500', 'bg-rose-500', 'bg-indigo-500'];
 
     const copyShareLink = () => {
         navigator.clipboard.writeText(window.location.href);
@@ -2298,10 +2298,10 @@ const CollaborationTab = ({
     return (
         <div className="max-w-3xl mx-auto space-y-6">
             {/* Hero Invite Card */}
-            <div className="bg-gradient-to-br from-emerald-500/10 via-[#1C1F2E] to-[#1C1F2E] rounded-2xl border border-emerald-500/10 p-8">
+            <div className="bg-gradient-to-br from-blue-500/10 via-[#1C1F2E] to-[#1C1F2E] rounded-2xl border border-blue-500/10 p-8">
                 <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 bg-emerald-500/15 rounded-xl flex items-center justify-center border border-emerald-500/20">
-                        <Users size={22} className="text-emerald-400" />
+                    <div className="w-12 h-12 bg-blue-500/15 rounded-xl flex items-center justify-center border border-blue-500/20">
+                        <Users size={22} className="text-blue-400" />
                     </div>
                     <div>
                         <h3 className="text-xl font-bold text-white">Share This Dashboard</h3>
@@ -2318,14 +2318,14 @@ const CollaborationTab = ({
                             value={newCollaboratorEmail}
                             onChange={(e) => setNewCollaboratorEmail(e.target.value)}
                             placeholder="colleague@company.com"
-                            className="w-full pl-11 pr-4 py-3.5 bg-[#0B0E14] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20 transition-all"
+                            className="w-full pl-11 pr-4 py-3.5 bg-[#0B0E14] border border-white/10 rounded-xl text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 transition-all"
                             disabled={addingCollaborator}
                         />
                     </div>
                     <button
                         type="submit"
                         disabled={addingCollaborator || !newCollaboratorEmail.trim()}
-                        className="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm shadow-lg shadow-emerald-600/20 hover:shadow-emerald-500/30"
+                        className="px-6 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 text-sm shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30"
                     >
                         {addingCollaborator ? (
                             <><Loader2 size={16} className="animate-spin" /> Inviting...</>
@@ -2346,7 +2346,7 @@ const CollaborationTab = ({
                     className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#0B0E14] border border-white/10 hover:border-white/20 rounded-xl text-sm text-slate-300 hover:text-white transition-all group"
                 >
                     {linkCopied ? (
-                        <><Check size={15} className="text-emerald-400" /> <span className="text-emerald-400 font-medium">Link Copied!</span></>
+                        <><Check size={15} className="text-blue-400" /> <span className="text-blue-400 font-medium">Link Copied!</span></>
                     ) : (
                         <><Copy size={15} className="text-slate-500 group-hover:text-white transition-colors" /> Copy Dashboard Link</>
                     )}
@@ -2428,8 +2428,8 @@ const CollaborationTab = ({
             {/* Permissions Info */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="bg-[#1C1F2E] rounded-xl border border-white/5 p-4 flex items-start gap-3">
-                    <div className="p-2 bg-emerald-500/10 rounded-lg flex-shrink-0">
-                        <CheckCircle2 size={14} className="text-emerald-400" />
+                    <div className="p-2 bg-blue-500/10 rounded-lg flex-shrink-0">
+                        <CheckCircle2 size={14} className="text-blue-400" />
                     </div>
                     <div>
                         <p className="text-xs font-semibold text-white mb-0.5">View Transcripts</p>
@@ -2460,3 +2460,4 @@ const CollaborationTab = ({
 };
 
 export default MeetingDashboard;
+

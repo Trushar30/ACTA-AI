@@ -417,13 +417,16 @@ exports.generateDashboard = async (req, res) => {
 
         console.log(`[Dashboard] Generating analysis for meeting ${id}...`);
 
+        const currentYear = new Date().getFullYear();
+
         const prompt = `Analyze this transcript and extract comprehensive insights for a meeting dashboard.
+        IMPORTANT DATE RULE: Today's date is ${new Date().toISOString().split('T')[0]}. The current year is ${currentYear}. When extracting any dates (importantDates, actionItem dueDates, timeline dates, etc.), if the transcript mentions only a month and day WITHOUT specifying a year, you MUST assume the current year ${currentYear}. NEVER use past years like 2024 or 2025 unless the transcript explicitly states that year. All dates should be in the format "Month Day, Year" (e.g. "March 15, ${currentYear}").
         1. Identify Risks/Blockers (severity: High/Medium/Low).
         2. Generate a professional Follow-up Email draft.
         3. Generate a concise Slack update.
         4. Identify Top Priorities: For each priority, extract the speaker name who mentioned it and calculate their contribution percentage (0-100) based on how much they discussed this topic.
         5. Create a Meeting Timeline (time, event, description).
-        6. Extract Important Dates (date, event, description) for a calendar.
+        6. Extract Important Dates (date, event, description) for a calendar. Remember: if no year is mentioned in the transcript, use ${currentYear}.
         7. Provide a Topic Breakdown with subtopics.
         8. Identify speaker names from the transcript (look for patterns like "Speaker 1:", "John:", names followed by colons, etc.).
         9. Create a Transcript Timeline in SRT subtitle format: Break the transcript into segments with startTime (HH:MM:SS), endTime (HH:MM:SS), speaker name, and text for each segment. Estimate timestamps based on word count (average 2-3 words per second).
@@ -448,6 +451,44 @@ exports.generateDashboard = async (req, res) => {
 
         const rawText = response.candidates?.[0]?.content?.parts?.[0]?.text || response.text?.() || '{}';
         const data = extractJson(rawText);
+
+        // Fix dates that have wrong/missing years
+        const fixDateYear = (dateStr) => {
+            if (!dateStr || typeof dateStr !== 'string') return dateStr;
+            const currentYear = new Date().getFullYear();
+            // Check if it's a date without a year (e.g. "March 15" or "Mar 15")
+            const noYearPattern = /^([A-Za-z]+\s+\d{1,2})$/;
+            if (noYearPattern.test(dateStr.trim())) {
+                return `${dateStr.trim()}, ${currentYear}`;
+            }
+            // Check if it has an old year (2020-previous year) and the transcript didn't explicitly mention it
+            const oldYearPattern = /(.+?)\b(20[0-2]\d)\b(.*)$/;
+            const match = dateStr.match(oldYearPattern);
+            if (match) {
+                const yearInDate = parseInt(match[2]);
+                if (yearInDate < currentYear) {
+                    // Check if this old year was actually in the transcript
+                    const yearMentionedInTranscript = meeting.transcription && meeting.transcription.includes(match[2]);
+                    if (!yearMentionedInTranscript) {
+                        return `${match[1]}${currentYear}${match[3]}`;
+                    }
+                }
+            }
+            return dateStr;
+        };
+
+        if (data.importantDates) {
+            data.importantDates = data.importantDates.map(d => ({
+                ...d,
+                date: fixDateYear(d.date)
+            }));
+        }
+        if (data.actionItems) {
+            data.actionItems = data.actionItems.map(item => ({
+                ...item,
+                dueDate: fixDateYear(item.dueDate)
+            }));
+        }
 
         // Enhance data with real metrics if available
 

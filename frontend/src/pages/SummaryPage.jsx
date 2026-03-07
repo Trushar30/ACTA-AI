@@ -12,6 +12,48 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const API_URL = 'http://localhost:3000';
 
+// Helper function to format text for better readability
+const formatTextContent = (text) => {
+    if (!text) return null;
+
+    // Split by double newlines first to preserve intentional paragraphs
+    const paragraphs = text.split(/\n\n+/);
+    
+    return paragraphs.map((para, pIdx) => {
+        // Check if paragraph contains bullet-like patterns
+        const lines = para.split('\n').filter(line => line.trim());
+        
+        // If it looks like a list (starts with -, •, *, numbers, etc.)
+        const isList = lines.some(line => 
+            /^[\-•*]\s/.test(line.trim()) || 
+            /^\d+[\.)]\s/.test(line.trim())
+        );
+        
+        if (isList) {
+            return (
+                <ul key={pIdx} className="space-y-2 my-3">
+                    {lines.map((line, lIdx) => {
+                        const cleanLine = line.trim().replace(/^[\-•*]\s/, '').replace(/^\d+[\.)]\s/, '');
+                        return cleanLine ? (
+                            <li key={lIdx} className="flex items-start gap-2 text-slate-300">
+                                <span className="text-blue-400 mt-1.5">•</span>
+                                <span className="flex-1 leading-relaxed">{cleanLine}</span>
+                            </li>
+                        ) : null;
+                    })}
+                </ul>
+            );
+        }
+        
+        // Regular paragraph
+        return para.trim() ? (
+            <p key={pIdx} className="text-slate-300 leading-relaxed mb-4 last:mb-0">
+                {para.trim()}
+            </p>
+        ) : null;
+    });
+};
+
 const SummaryPage = () => {
     const navigate = useNavigate();
     const [meetings, setMeetings] = useState([]);
@@ -312,8 +354,8 @@ const SummaryPage = () => {
                             )}
                             <div>
                                 <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                                    <div className="p-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                                        <Sparkles size={22} className="text-emerald-400" />
+                                    <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                                        <Sparkles size={22} className="text-blue-400" />
                                     </div>
                                     AI Summary
                                 </h1>
@@ -348,7 +390,7 @@ const SummaryPage = () => {
                                 onClick={() => setActiveTab('create')}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                                     activeTab === 'create'
-                                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
                                         : 'text-slate-400 hover:text-white hover:bg-white/5'
                                 }`}
                             >
@@ -359,7 +401,7 @@ const SummaryPage = () => {
                                 onClick={() => setActiveTab('saved')}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                                     activeTab === 'saved'
-                                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
                                         : 'text-slate-400 hover:text-white hover:bg-white/5'
                                 }`}
                             >
@@ -387,7 +429,7 @@ const SummaryPage = () => {
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             placeholder="Search meetings by name or topic..."
-                                            className="w-full bg-[#1C1F2E] border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/30 placeholder:text-slate-600 transition-colors"
+                                            className="w-full bg-[#1C1F2E] border border-white/5 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/30 placeholder:text-slate-600 transition-colors"
                                         />
                                         {searchQuery && (
                                             <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
@@ -406,7 +448,7 @@ const SummaryPage = () => {
                                                 onClick={() => setQuickFilter(f.key)}
                                                 className={`px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all border ${
                                                     quickFilter === f.key
-                                                        ? 'bg-emerald-600/15 border-emerald-500/30 text-emerald-400'
+                                                        ? 'bg-blue-600/15 border-blue-500/30 text-blue-400'
                                                         : 'bg-[#1C1F2E] border-white/5 text-slate-400 hover:text-white hover:border-white/10'
                                                 }`}
                                             >
@@ -440,7 +482,7 @@ const SummaryPage = () => {
                                             animate={{ opacity: 1, scale: 1 }}
                                             className="flex items-center gap-3"
                                         >
-                                            <span className="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                                            <span className="text-xs font-medium text-blue-400 bg-blue-500/10 px-3 py-1.5 rounded-lg border border-blue-500/20">
                                                 {selectedMeetings.length} selected
                                             </span>
                                             <button
@@ -465,14 +507,14 @@ const SummaryPage = () => {
                                                     layout
                                                     className={`relative text-left p-4 rounded-xl border transition-all group ${
                                                         isSelected
-                                                            ? 'bg-emerald-500/5 border-emerald-500/30 ring-1 ring-emerald-500/20'
+                                                            ? 'bg-blue-500/5 border-blue-500/30 ring-1 ring-blue-500/20'
                                                             : 'bg-[#1C1F2E] border-white/5 hover:border-white/15 hover:bg-[#1e2235]'
                                                     }`}
                                                 >
                                                     {/* Checkbox */}
                                                     <div className="flex items-start gap-3">
                                                         <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
-                                                            isSelected ? 'bg-emerald-500 border-emerald-500 scale-110' : 'border-white/20 group-hover:border-white/40'
+                                                            isSelected ? 'bg-blue-500 border-blue-500 scale-110' : 'border-white/20 group-hover:border-white/40'
                                                         }`}>
                                                             {isSelected && <Check size={12} className="text-white" />}
                                                         </div>
@@ -516,10 +558,10 @@ const SummaryPage = () => {
                                             exit={{ opacity: 0, y: 20 }}
                                             className="sticky bottom-6 z-40"
                                         >
-                                            <div className="bg-[#1C1F2E]/95 backdrop-blur-xl rounded-2xl border border-emerald-500/20 p-4 shadow-2xl shadow-black/40 flex items-center justify-between gap-4">
+                                            <div className="bg-[#1C1F2E]/95 backdrop-blur-xl rounded-2xl border border-blue-500/20 p-4 shadow-2xl shadow-black/40 flex items-center justify-between gap-4">
                                                 <div className="flex items-center gap-3 min-w-0">
-                                                    <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-500/20">
-                                                        <Sparkles size={18} className="text-emerald-400" />
+                                                    <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0 border border-blue-500/20">
+                                                        <Sparkles size={18} className="text-blue-400" />
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="text-sm font-semibold text-white">
@@ -533,7 +575,7 @@ const SummaryPage = () => {
                                                 <button
                                                     onClick={handleGenerateSummary}
                                                     disabled={generating}
-                                                    className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed text-sm whitespace-nowrap"
+                                                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 disabled:opacity-40 disabled:cursor-not-allowed text-sm whitespace-nowrap"
                                                 >
                                                     <Sparkles size={16} />
                                                     Generate Summary
@@ -545,9 +587,9 @@ const SummaryPage = () => {
 
                                 {/* Empty welcome when no meetings selected and none saved */}
                                 {selectedMeetings.length === 0 && meetings.length > 0 && savedSummaries.length === 0 && (
-                                    <div className="bg-gradient-to-br from-emerald-500/5 via-[#1C1F2E] to-[#1C1F2E] rounded-2xl border border-emerald-500/10 p-10 text-center">
-                                        <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
-                                            <Sparkles size={28} className="text-emerald-400" />
+                                    <div className="bg-gradient-to-br from-blue-500/5 via-[#1C1F2E] to-[#1C1F2E] rounded-2xl border border-blue-500/10 p-10 text-center">
+                                        <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
+                                            <Sparkles size={28} className="text-blue-400" />
                                         </div>
                                         <h3 className="text-lg font-bold text-white mb-2">Select meetings above to begin</h3>
                                         <p className="text-sm text-slate-500 max-w-md mx-auto">
@@ -568,7 +610,7 @@ const SummaryPage = () => {
                                                 key={saved._id}
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
-                                                className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-5 hover:border-emerald-500/30 transition-all group cursor-pointer"
+                                                className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-5 hover:border-blue-500/30 transition-all group cursor-pointer"
                                                 onClick={() => handleOpenSaved(saved)}
                                             >
                                                 <div className="flex items-start justify-between mb-3">
@@ -584,11 +626,11 @@ const SummaryPage = () => {
                                                                         if (e.key === 'Escape') setEditingNameId(null);
                                                                     }}
                                                                     autoFocus
-                                                                    className="w-full bg-[#0B0E14] border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500/50"
+                                                                    className="w-full bg-[#0B0E14] border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500/50"
                                                                 />
                                                                 <button
                                                                     onClick={() => handleRenameSaved(saved._id)}
-                                                                    className="p-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 transition-colors"
+                                                                    className="p-1.5 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg text-blue-400 transition-colors"
                                                                 >
                                                                     <Check size={14} />
                                                                 </button>
@@ -648,7 +690,7 @@ const SummaryPage = () => {
                                         </p>
                                         <button
                                             onClick={() => setActiveTab('create')}
-                                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-colors text-sm"
+                                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-colors text-sm"
                                         >
                                             <Plus size={16} />
                                             Create Your First Summary
@@ -673,7 +715,7 @@ const SummaryPage = () => {
                 {generating && (
                     <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-16 mb-8 flex flex-col items-center justify-center">
                         <div className="relative mb-6">
-                            <Loader2 size={48} className="text-emerald-400 animate-spin" />
+                            <Loader2 size={48} className="text-blue-400 animate-spin" />
                             <Sparkles size={20} className="text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2">Analyzing {selectedMeetings.length} Meeting{selectedMeetings.length > 1 ? 's' : ''}...</h3>
@@ -681,9 +723,9 @@ const SummaryPage = () => {
                             AI is processing all transcripts, extracting insights, and creating a comprehensive combined summary.
                         </p>
                         <div className="mt-6 flex items-center gap-2">
-                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
-                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
-                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
                         </div>
                     </div>
                 )}
@@ -702,14 +744,14 @@ const SummaryPage = () => {
                                         onChange={(e) => setSummaryName(e.target.value)}
                                         placeholder="Enter summary name..."
                                         disabled={isSaved}
-                                        className="w-full bg-[#0B0E14] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 placeholder:text-slate-500 disabled:opacity-60"
+                                        className="w-full bg-[#0B0E14] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50 placeholder:text-slate-500 disabled:opacity-60"
                                     />
                                 </div>
                                 {!isSaved ? (
                                     <button
                                         onClick={handleSaveSummary}
                                         disabled={saving || !summaryName.trim()}
-                                        className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-5"
+                                        className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-5"
                                     >
                                         {saving ? (
                                             <><Loader2 size={16} className="animate-spin" /> Saving...</>
@@ -718,7 +760,7 @@ const SummaryPage = () => {
                                         )}
                                     </button>
                                 ) : (
-                                    <div className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm font-semibold mt-5">
+                                    <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-400 text-sm font-semibold mt-5">
                                         <Check size={16} /> Saved
                                     </div>
                                 )}
@@ -747,16 +789,16 @@ const SummaryPage = () => {
 
                             {/* Executive Summary */}
                             <div className="mb-6">
-                                <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                        <Sparkles size={18} className="text-emerald-400" />
+                                        <Sparkles size={18} className="text-blue-400" />
                                         Executive Summary
                                     </h3>
                                     <CopyBtn text={summary.executiveSummary} label="Copy" copied={copied} onCopy={handleCopy} copyKey="exec" />
                                 </div>
-                                <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-line">
-                                    {summary.executiveSummary}
-                                </p>
+                                <div className="text-sm space-y-3">
+                                    {formatTextContent(summary.executiveSummary)}
+                                </div>
                             </div>
                         </div>
 
@@ -766,23 +808,25 @@ const SummaryPage = () => {
                                 <BarChart2 size={18} className="text-slate-400" />
                                 Meeting-by-Meeting Breakdown
                             </h3>
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                                 {summary.meetingBreakdowns?.map((mb, i) => (
-                                    <div key={i} className="bg-[#0B0E14] rounded-xl border border-white/5 p-5">
-                                        <div className="flex items-start justify-between mb-3">
+                                    <div key={i} className="bg-[#0B0E14] rounded-xl border border-white/5 p-6">
+                                        <div className="flex items-start justify-between mb-4">
                                             <div>
                                                 <h4 className="text-base font-semibold text-white">{mb.title}</h4>
-                                                <p className="text-xs text-slate-500 mt-0.5">{mb.date}</p>
+                                                <p className="text-xs text-slate-500 mt-1">{mb.date}</p>
                                             </div>
-                                            <span className="text-xs px-2 py-1 bg-white/5 rounded-lg text-slate-400">
+                                            <span className="text-xs px-2.5 py-1 bg-white/5 rounded-lg text-slate-400 font-medium">
                                                 {mb.participantCount} participants
                                             </span>
                                         </div>
-                                        <p className="text-sm text-slate-300 leading-relaxed">{mb.summary}</p>
+                                        <div className="text-sm space-y-3">
+                                            {formatTextContent(mb.summary)}
+                                        </div>
                                         {mb.keyDecisions?.length > 0 && (
-                                            <div className="mt-3 flex flex-wrap gap-2">
+                                            <div className="mt-4 pt-4 border-t border-white/5 flex flex-wrap gap-2">
                                                 {mb.keyDecisions.map((d, j) => (
-                                                    <span key={j} className="text-xs px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400">
+                                                    <span key={j} className="text-xs px-2.5 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-400">
                                                         {d}
                                                     </span>
                                                 ))}
@@ -802,7 +846,7 @@ const SummaryPage = () => {
                                 </h3>
                                 <div className="space-y-3">
                                     {summary.allParticipants?.map((p, i) => {
-                                        const colors = ['bg-purple-500', 'bg-emerald-500', 'bg-amber-500', 'bg-blue-500', 'bg-pink-500', 'bg-cyan-500'];
+                                        const colors = ['bg-purple-500', 'bg-blue-500', 'bg-amber-500', 'bg-blue-500', 'bg-pink-500', 'bg-cyan-500'];
                                         return (
                                             <div key={i} className="flex items-center gap-3 p-3 bg-[#0B0E14] rounded-xl border border-white/5">
                                                 <div className={`w-9 h-9 rounded-lg ${colors[i % 6]} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
@@ -825,19 +869,22 @@ const SummaryPage = () => {
                                     <Target size={18} className="text-slate-400" />
                                     All Action Items
                                 </h3>
-                                <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <div className="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
                                     {summary.allActionItems?.map((task, i) => (
-                                        <div key={i} className="flex items-start gap-3 p-3 bg-[#0B0E14] rounded-xl border border-white/5">
-                                            <CheckCircle2 size={16} className="text-slate-500 mt-0.5 flex-shrink-0" />
+                                        <div key={i} className="flex items-start gap-3 p-4 bg-[#0B0E14] rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                            <CheckCircle2 size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm text-slate-200">{task.task}</p>
-                                                <div className="flex items-center gap-2 mt-1">
+                                                <p className="text-sm text-slate-200 leading-relaxed mb-2">{task.task}</p>
+                                                <div className="flex flex-wrap items-center gap-2">
                                                     {task.owner && (
-                                                        <span className="text-xs text-slate-500">{task.owner}</span>
+                                                        <span className="flex items-center gap-1 text-xs text-slate-400 bg-white/5 px-2 py-0.5 rounded">
+                                                            <User size={10} />
+                                                            {task.owner}
+                                                        </span>
                                                     )}
                                                     {task.priority && (
-                                                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${task.priority === 'High' ? 'bg-red-500/10 text-red-400' :
-                                                            task.priority === 'Medium' ? 'bg-amber-500/10 text-amber-400' : 'bg-blue-500/10 text-blue-400'
+                                                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${task.priority === 'High' ? 'bg-red-500/15 text-red-400 border border-red-500/20' :
+                                                            task.priority === 'Medium' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20' : 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
                                                             }`}>
                                                             {task.priority}
                                                         </span>
@@ -849,7 +896,12 @@ const SummaryPage = () => {
                                             </div>
                                         </div>
                                     ))}
-                                    {!summary.allActionItems?.length && <p className="text-slate-500 text-sm">No action items found</p>}
+                                    {!summary.allActionItems?.length && (
+                                        <div className="text-center py-8">
+                                            <CheckCircle2 size={40} className="text-slate-600 mx-auto mb-2" />
+                                            <p className="text-slate-500 text-sm">No action items found</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -861,19 +913,34 @@ const SummaryPage = () => {
                                     <ShieldCheck size={18} className="text-slate-400" />
                                     All Key Decisions
                                 </h3>
-                                <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <div className="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
                                     {summary.allDecisions?.map((d, i) => (
-                                        <div key={i} className="p-4 bg-[#0B0E14] rounded-xl border border-white/5">
-                                            <p className="text-sm text-slate-200 font-medium">{d.conclusion}</p>
-                                            {d.rationale && (
-                                                <p className="text-xs text-slate-500 mt-1">{d.rationale}</p>
-                                            )}
-                                            {d.fromMeeting && (
-                                                <p className="text-[10px] text-slate-600 mt-2">from: {d.fromMeeting}</p>
-                                            )}
+                                        <div key={i} className="p-4 bg-[#0B0E14] rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-6 h-6 rounded-md bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <ShieldCheck size={14} className="text-blue-400" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm text-slate-200 font-medium leading-relaxed mb-2">{d.conclusion}</p>
+                                                    {d.rationale && (
+                                                        <p className="text-xs text-slate-400 leading-relaxed pl-3 border-l-2 border-white/10">{d.rationale}</p>
+                                                    )}
+                                                    {d.fromMeeting && (
+                                                        <p className="text-[10px] text-slate-600 mt-2 flex items-center gap-1">
+                                                            <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+                                                            from: {d.fromMeeting}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     ))}
-                                    {!summary.allDecisions?.length && <p className="text-slate-500 text-sm">No decisions recorded</p>}
+                                    {!summary.allDecisions?.length && (
+                                        <div className="text-center py-8">
+                                            <ShieldCheck size={40} className="text-slate-600 mx-auto mb-2" />
+                                            <p className="text-slate-500 text-sm">No decisions recorded</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -931,14 +998,14 @@ const SummaryPage = () => {
                             <div className="bg-[#1C1F2E] rounded-2xl border border-white/5 p-8">
                                 <div className="flex items-center justify-between mb-6">
                                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                        <Zap size={18} className="text-emerald-400" />
+                                        <Zap size={18} className="text-blue-400" />
                                         Recommendations & Next Steps
                                     </h3>
                                     <CopyBtn text={summary.recommendations} label="Copy" copied={copied} onCopy={handleCopy} copyKey="recs" />
                                 </div>
-                                <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-line">
-                                    {summary.recommendations}
-                                </p>
+                                <div className="text-sm space-y-3">
+                                    {formatTextContent(summary.recommendations)}
+                                </div>
                             </div>
                         )}
 
@@ -949,7 +1016,7 @@ const SummaryPage = () => {
                                 className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors"
                             >
                                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                    <Sparkles size={18} className="text-emerald-400" />
+                                    <Sparkles size={18} className="text-blue-400" />
                                     Ask AI About This Summary
                                 </h3>
                                 <ChevronDown size={18} className={`text-slate-400 transition-transform ${chatOpen ? 'rotate-180' : ''}`} />
@@ -996,13 +1063,13 @@ const SummaryPage = () => {
                                                 {chatHistory.map((msg, i) => (
                                                     <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                                         {msg.role === 'ai' && (
-                                                            <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/30 flex-shrink-0">
+                                                            <div className="w-7 h-7 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/30 flex-shrink-0">
                                                                 <Sparkles size={12} />
                                                             </div>
                                                         )}
                                                         <div className={`max-w-[80%] p-3 rounded-xl text-sm leading-relaxed ${
                                                             msg.role === 'user'
-                                                                ? 'bg-emerald-600/20 text-white rounded-br-none'
+                                                                ? 'bg-blue-600/20 text-white rounded-br-none'
                                                                 : 'bg-[#0B0E14] text-slate-200 border border-white/10 rounded-bl-none'
                                                         }`}>
                                                             <p className="whitespace-pre-line">{msg.content}</p>
@@ -1016,13 +1083,13 @@ const SummaryPage = () => {
                                                 ))}
                                                 {askingAi && (
                                                     <div className="flex gap-3 justify-start">
-                                                        <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/30">
+                                                        <div className="w-7 h-7 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/30">
                                                             <Sparkles size={12} />
                                                         </div>
                                                         <div className="bg-[#0B0E14] px-3 py-2 rounded-xl rounded-bl-none border border-white/10 flex items-center gap-2">
-                                                            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce"></span>
-                                                            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></span>
-                                                            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                                                            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></span>
+                                                            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></span>
+                                                            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                                                         </div>
                                                     </div>
                                                 )}
@@ -1038,12 +1105,12 @@ const SummaryPage = () => {
                                                         onChange={(e) => setChatQuery(e.target.value)}
                                                         placeholder="Ask anything about the summary..."
                                                         disabled={askingAi}
-                                                        className="w-full bg-[#1C1F2E] border border-white/10 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-slate-500 disabled:opacity-50"
+                                                        className="w-full bg-[#1C1F2E] border border-white/10 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-500 disabled:opacity-50"
                                                     />
                                                     <button
                                                         type="submit"
                                                         disabled={!chatQuery.trim() || askingAi}
-                                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                                     >
                                                         <Send size={16} />
                                                     </button>
@@ -1089,7 +1156,7 @@ const CopyBtn = ({ text, label, copied, onCopy, copyKey }) => (
         onClick={() => onCopy(text, copyKey)}
         className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-lg text-xs font-medium transition-colors"
     >
-        {copied === copyKey ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+        {copied === copyKey ? <Check size={12} className="text-blue-400" /> : <Copy size={12} />}
         {copied === copyKey ? 'Copied!' : label}
     </button>
 );
