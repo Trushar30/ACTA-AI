@@ -35,6 +35,10 @@ const taskExtractionService = require('./services/taskExtractionService');
 const dashboardController = require('./controllers/dashboardController');
 const translationService = require('./services/translationService');
 const meetingSchedulerService = require('./services/meetingSchedulerService');
+const teamController = require('./controllers/teamController');
+const classroomController = require('./controllers/classroomController');
+const companyController = require('./controllers/companyController');
+const chatController = require('./controllers/chatController');
 
 const app = express();
 const server = http.createServer(app);
@@ -2413,6 +2417,57 @@ app.post('/api/meetings/:id/translate', async (req, res) => {
         res.status(500).json({ error: 'Translation failed' });
     }
 });
+
+// ===== TEAM SYSTEM ROUTES =====
+app.post('/api/teams', verifyToken, teamController.createTeam);
+app.get('/api/teams', verifyToken, teamController.getMyTeams);
+app.get('/api/teams/public', verifyToken, teamController.getPublicTeams);
+app.get('/api/teams/:id', verifyToken, teamController.getTeam);
+app.put('/api/teams/:id', verifyToken, teamController.updateTeam);
+app.delete('/api/teams/:id', verifyToken, teamController.deleteTeam);
+app.post('/api/teams/:id/members', verifyToken, teamController.addMember);
+app.delete('/api/teams/:id/members', verifyToken, teamController.removeMember);
+app.put('/api/teams/:id/members/role', verifyToken, teamController.updateMemberRole);
+app.post('/api/teams/:id/meeting', verifyToken, teamController.shareMeetingLink);
+app.post('/api/teams/:id/join', verifyToken, teamController.joinTeam);
+app.post('/api/teams/join-by-code', verifyToken, teamController.joinByCode);
+app.post('/api/teams/:id/regenerate-code', verifyToken, teamController.regenerateCode);
+
+// ===== CLASSROOM ROUTES =====
+app.post('/api/classrooms', verifyToken, classroomController.createClassroom);
+app.get('/api/classrooms', verifyToken, classroomController.getMyClassrooms);
+app.get('/api/classrooms/public', verifyToken, classroomController.getPublicClassrooms);
+app.get('/api/classrooms/:id', verifyToken, classroomController.getClassroom);
+app.put('/api/classrooms/:id', verifyToken, classroomController.updateClassroom);
+app.delete('/api/classrooms/:id', verifyToken, classroomController.deleteClassroom);
+app.post('/api/classrooms/:id/students', verifyToken, classroomController.addStudent);
+app.delete('/api/classrooms/:id/students', verifyToken, classroomController.removeStudent);
+app.post('/api/classrooms/:id/meeting', verifyToken, classroomController.shareMeetingLink);
+app.post('/api/classrooms/:id/announcements', verifyToken, classroomController.addAnnouncement);
+app.post('/api/classrooms/:id/join', verifyToken, classroomController.joinClassroom);
+app.post('/api/classrooms/join-by-code', verifyToken, classroomController.joinByCode);
+app.post('/api/classrooms/:id/regenerate-code', verifyToken, classroomController.regenerateCode);
+
+// ===== COMPANY ROUTES =====
+app.post('/api/companies', verifyToken, companyController.createCompany);
+app.get('/api/companies', verifyToken, companyController.getMyCompanies);
+app.get('/api/companies/public', verifyToken, companyController.getPublicCompanies);
+app.get('/api/companies/:id', verifyToken, companyController.getCompany);
+app.put('/api/companies/:id', verifyToken, companyController.updateCompany);
+app.delete('/api/companies/:id', verifyToken, companyController.deleteCompany);
+app.post('/api/companies/:id/employees', verifyToken, companyController.addEmployee);
+app.delete('/api/companies/:id/employees', verifyToken, companyController.removeEmployee);
+app.put('/api/companies/:id/employees/role', verifyToken, companyController.updateEmployeeRole);
+app.post('/api/companies/:id/meeting', verifyToken, companyController.shareMeetingLink);
+app.post('/api/companies/:id/join', verifyToken, companyController.joinCompany);
+app.post('/api/companies/join-by-code', verifyToken, companyController.joinByCode);
+app.post('/api/companies/:id/regenerate-code', verifyToken, companyController.regenerateCode);
+
+// ===== CHAT ROUTES =====
+app.get('/api/chat/:contextType/:contextId', verifyToken, chatController.getMessages);
+app.post('/api/chat/:contextType/:contextId', verifyToken, chatController.sendMessage);
+app.post('/api/chat/:contextType/:contextId/read', verifyToken, chatController.markRead);
+app.get('/api/chat/:contextType/:contextId/unread', verifyToken, chatController.getUnreadCount);
 
 // Start Server
 const PORT = process.env.PORT || 3000;

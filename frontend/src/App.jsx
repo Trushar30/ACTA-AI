@@ -11,6 +11,10 @@ import Analysis from './pages/Analysis';
 
 import Presentation from './pages/Presentation';
 import SummaryPage from './pages/SummaryPage';
+import TeamsHub from './pages/TeamsHub';
+import TeamDetail from './pages/TeamDetail';
+import ClassroomDetail from './pages/ClassroomDetail';
+import CompanyDetail from './pages/CompanyDetail';
 import Loader from './components/Loader';
 
 import axios from 'axios';
@@ -101,6 +105,7 @@ const Navigation = () => {
         { path: '/dashboard', label: 'Archive Meetings' },
         { path: '/scheduled', label: 'Scheduled' },
         { path: '/collaborate', label: 'Collaborate' },
+        { path: '/teams', label: 'Teams' },
         { path: '/summary', label: 'Summary' },
     ];
 
@@ -210,6 +215,10 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/presentation" element={<Presentation />} />
                     <Route path="/summary" element={<SummaryPage />} />
+                    <Route path="/teams" element={<TeamsHub />} />
+                    <Route path="/teams/team/:id" element={<TeamDetail />} />
+                    <Route path="/teams/classroom/:id" element={<ClassroomDetail />} />
+                    <Route path="/teams/company/:id" element={<CompanyDetail />} />
                 </Routes>
             </div>
         </Router>
