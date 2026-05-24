@@ -10,7 +10,7 @@ import googleMeetLogo from '../assets/google-meet.png';
 import teamsLogo from '../assets/teams.png';
 import zoomLogo from '../assets/zoom.png';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
 const ScheduledMeetings = () => {
     const navigate = useNavigate();

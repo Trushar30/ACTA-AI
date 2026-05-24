@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Cloud, Download, Play, Calendar, Clock, FileText, Loader2, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
 const ZoomRecordings = () => {
     const [recordings, setRecordings] = useState([]);
