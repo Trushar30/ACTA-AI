@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { ZoomLogo, TeamsLogo, MeetLogo } from '../components/Logos';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Animated Text Component with letter-by-letter reveal
 const AnimatedText = ({ text, isVisible }) => {

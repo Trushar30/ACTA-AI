@@ -1,0 +1,27 @@
+node_modules
+npm-debug.log
+.env
+.env.*
+!.env.example
+
+# Local-only artifacts
+browser-profiles/
+recordings/
+*.mp3
+*.mp4
+*.wav
+*.webm
+*.ogg
+*.m4a
+
+# Python virtualenvs (transcription scripts run via PYTHON_EXECUTABLE if you wire them up)
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.log

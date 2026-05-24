@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Send, MessageCircle } from 'lucide-react';
 import { io } from 'socket.io-client';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function ChatBox({ contextType, contextId }) {
     const [messages, setMessages] = useState([]);

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Users, ArrowLeft, Plus, Trash2, Shield, Globe, Lock, Link as LinkIcon, Calendar, Settings, UserPlus, Crown, Mail, Copy, Check, RefreshCw, KeyRound } from 'lucide-react';
 import ChatBox from '../components/ChatBox';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function TeamDetail() {
     const { id } = useParams();

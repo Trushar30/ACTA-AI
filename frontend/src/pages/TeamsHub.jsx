@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Users, Building2, GraduationCap, Plus, Globe, Lock, Search, ChevronRight, KeyRound, Copy, Check } from 'lucide-react';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function TeamsHub() {
     const [activeTab, setActiveTab] = useState('student');

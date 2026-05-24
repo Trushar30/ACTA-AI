@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Building2, ArrowLeft, Plus, Trash2, Globe, Lock, Link as LinkIcon, Calendar, Settings, UserPlus, Mail, Crown, Briefcase, Copy, Check, RefreshCw, KeyRound } from 'lucide-react';
 import ChatBox from '../components/ChatBox';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const ROLE_LABELS = {
     ceo: 'CEO', cto: 'CTO', hr: 'HR', manager: 'Manager',
